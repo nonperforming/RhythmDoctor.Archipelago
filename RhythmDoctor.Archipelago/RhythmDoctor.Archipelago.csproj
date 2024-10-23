@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>RhythmDoctor.Archipelago</AssemblyName>
+    <LangVersion>latest</LangVersion>
+    <RestoreAdditionalProjectSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.bepinex.dev/v3/index.json;
+      https://nuget.samboy.dev/v3/index.json
+    </RestoreAdditionalProjectSources>
+    <RootNamespace>RhythmDoctor.Archipelago</RootNamespace>
+  </PropertyGroup>
+
+  <!-- MSB3277: Found conflicts between different versions of "System.IO.Compression" that could not be resolved. -->
+  <PropertyGroup>
+    <MSBuildWarningsAsMessages>
+      $(MSBuildWarningsAsMessages);MSB3277
+    </MSBuildWarningsAsMessages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="libs\**" />
+    <EmbeddedResource Remove="libs\**" />
+    <None Remove="libs\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.Core" Version="5.*" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
+    <PackageReference Include="UnityEngine.Modules" Version="2022.3.7" IncludeAssets="compile" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>libs\Assembly-CSharp.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
