@@ -1,0 +1,50 @@
+name: Build
+on:
+  pull_request:
+    paths-ignore:
+      - "**LICENSE"
+      - "**.editorconfig"
+      - "**.git**"
+  push:
+    paths-ignore:
+      - "**LICENSE"
+      - "**.editorconfig"
+      - "**.git**"
+      
+jobs:
+  build:
+    name: Build
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+        with:
+          submodules: recursive
+          
+      - name: Cache
+        uses: actions/cache@v4.1.2
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4.1.0
+        
+      - name: Build client
+        run: dotnet build --configuration Debug
+
+      - name: Upload client plugin
+        uses: actions/upload-artifact@v4.4.3
+        with:
+          name: "RhythmDoctor.Archipelago.dll"
+          path: "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/RhythmDoctor.Archipelago.*" # .dll and .pdb
+          if-no-files-found: error
+
+      - name: Upload APWorld
+        uses: actions/upload-artifact@v4.4.3
+        with:
+          name: "RhythmDoctor.apworld"
+          path: "World/"
+          if-no-files-found: error
+        
+        
