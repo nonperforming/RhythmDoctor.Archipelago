@@ -178,6 +178,7 @@ filler:
     classification: filler
   - name: Samurai.
     id: 82_104_121_68_114_047
+    classification: filler
 
   - powerups:
     - name: Strengthened Heart
