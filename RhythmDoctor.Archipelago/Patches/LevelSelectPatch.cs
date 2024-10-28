@@ -22,13 +22,13 @@ internal static class LevelSelectPatch
     }
 
     // Unlock all wards/rooms
-    __instance.UnlockEntrance(LevelSelectPatch.FindSelectableEntity(__instance, "GoToArtRoom"));
-    __instance.UnlockEntrance(LevelSelectPatch.FindSelectableEntity(__instance, "GoToAthleteWard"));
-    __instance.UnlockEntrance(LevelSelectPatch.FindSelectableEntity(__instance, "GoToBasement"));
-    __instance.UnlockEntrance(LevelSelectPatch.FindSelectableEntity(__instance, "GoToMuseDashRoom"));
-    __instance.UnlockEntrance(LevelSelectPatch.FindSelectableEntity(__instance, "GoToRooftop"));
-    __instance.UnlockEntrance(LevelSelectPatch.FindSelectableEntity(__instance, "GoToSVTWard"));
-    __instance.UnlockEntrance(LevelSelectPatch.FindSelectableEntity(__instance, "GoToTrain"));
+    __instance.UnlockEntrance(FindSelectableEntity(__instance, "GoToArtRoom"));
+    __instance.UnlockEntrance(FindSelectableEntity(__instance, "GoToAthleteWard"));
+    __instance.UnlockEntrance(FindSelectableEntity(__instance, "GoToBasement"));
+    __instance.UnlockEntrance(FindSelectableEntity(__instance, "GoToMuseDashRoom"));
+    __instance.UnlockEntrance(FindSelectableEntity(__instance, "GoToRooftop"));
+    __instance.UnlockEntrance(FindSelectableEntity(__instance, "GoToSVTWard"));
+    __instance.UnlockEntrance(FindSelectableEntity(__instance, "GoToTrain"));
 
     //Persistence.SetIsGameDone(state: true);
 
