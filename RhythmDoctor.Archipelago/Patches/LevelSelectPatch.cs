@@ -18,7 +18,7 @@ internal static class LevelSelectPatch
     foreach (Level level in Enum.GetValues(typeof(Level)))
     {
       if (level == Level.OrientalTechno) return; // Don't lock 1-1 - Oriental Techno: it is always available
-      Persistence.SetLevelRank(level, -2);
+      Persistence.SetLevelRank(level, Rank.NotAvailable);
     }
 
     // Unlock all wards/rooms
