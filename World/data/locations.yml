@@ -1,0 +1,176 @@
+# Locations are places where items can be located in your game.
+# This may be chests or boss drops for RPG-like games,
+#  but could also be progress in a research tree,
+#  or even something more abstract like a level up.
+# https://github.com/ArchipelagoMW/Archipelago/blob/main/docs/world%20api.md#locations
+
+# Offset is 82_104_121_68_114_000 - RhyDr in ASCII
+# Gives us room to input 3 numbers before going over the 1-(2^53)-1 limit
+
+#TODO: Add A Rank and add Perfect and S+ rank
+
+# Act 1
+- name: 1-1 - Samurai Techno - B Rank
+  id: 82_104_121_68_114_001
+  classification: default
+- name: 1-1N - Samurai Dubstep - B Rank
+  id: 82_104_121_68_114_002
+  classification: default
+- name: 1-2 - Intimate - B Rank
+  id: 82_104_121_68_114_003
+  classification: default
+- name: 1-2N - Intimate (Night) - B Rank
+  id: 82_104_121_68_114_004
+  classification: default
+- name: 1-X - Battleworn Insomniac - Cleared
+  id: 82_104_121_68_114_005
+  classification: priority
+- name: 1-CNY - Chinese New Year - B Rank
+  id: 82_104_121_68_114_006
+  classification: default
+
+# Act 2
+- name: 2-1 - Lo-fi Hip-Hop Beats To Treat Patients To - B Rank
+  id: 82_104_121_68_114_007
+  classification: default
+- name: 2-1N - wish i could care less - B Rank
+  id: 82_104_121_68_114_008
+  classification: default
+- name: 2-2 - Supraventricular Tachycardia - B Rank
+  id: 82_104_121_68_114_009
+  classification: default
+- name: 2-2N - Unreachable - B Rank
+  id: 82_104_121_68_114_010
+  classification: default
+- name: 2-3 - Puff Piece - B Rank
+  id: 82_104_121_68_114_011
+  classification: default
+- name: 2-3N - Bomb-Sniffing Pomeranian - B Rank
+  id: 82_104_121_68_114_012
+  classification: default
+- name: 2-4 - Song of the Sea - S+ Rank
+  id: 82_104_121_68_114_013
+  classification: default
+- name: 2-4N - Song of the Sea (Night) - S+ Rank
+  id: 82_104_121_68_114_014
+  classification: default
+- name: 2-X - All The Times - Cleared
+  id: 82_104_121_68_114_015
+  classification: priority
+- name: 2-B1 - Beans Hopper - B Rank
+  id: 82_104_121_68_114_016
+  classification: excluded
+
+# Act 3
+- name: 3-1 - Sleepy Garden - B Rank
+  id: 82_104_121_68_114_017
+  classification: default
+- name: 3-1N - Lounge - B Rank
+  id: 82_104_121_68_114_018
+  classification: default
+- name: 3-2 - Classy - B Rank
+  id: 82_104_121_68_114_019
+  classification: default
+- name: 3-2N - Classy (Night) - B Rank
+  id: 82_104_121_68_114_020
+  classification: default
+- name: 3-3 - Distant Duet - B Rank
+  id: 82_104_121_68_114_021
+  classification: default
+- name: 3-3N - Distant Duet (Night) - B Rank
+  id: 82_104_121_68_114_022
+  classification: default
+- name: 3-X - One Shift More - B Rank
+  id: 82_104_121_68_114_023
+  classification: priority
+
+# Act 4
+- name: 4-1 - Training Doctor's Train Ride Performance - B Rank
+  id: 82_104_121_68_114_024
+  classification: default
+- name: 4-1N - Rollerdisco Rumble - B Rank
+  id: 82_104_121_68_114_025
+  classification: default
+- name: 4-2 - Invisible - B Rank
+  id: 82_104_121_68_114_026
+  classification: default
+- name: 4-2N - Invisible (Night) - B Rank
+  id: 82_104_121_68_114_027
+  classification: default
+- name: 4-3 - Steinway - B Rank
+  id: 82_104_121_68_114_028
+  classification: default
+- name: 4-3N - Steinway Reprise - B Rank
+  id: 82_104_121_68_114_029
+  classification: default
+- name: 4-4 - Know You - B Rank
+  id: 82_104_121_68_114_030
+  classification: default
+- name: 4-4N - Murmurs - B Rank
+  id: 82_104_121_68_114_031
+  classification: default
+- name: 1-XN - Super Battleworn Insomniac - B Rank
+  id: 82_104_121_68_114_032
+  classification: default
+
+# Act 5
+- name: 5-1 - Lucky Break - B Rank
+  id: 82_104_121_68_114_033
+  classification: default
+- name: 5-1N - One Slip Too Late - B Rank
+  id: 82_104_121_68_114_034
+  classification: default
+- name: 5-2 - Lo-fi Beats For Patients To Chill To - B Rank
+  id: 82_104_121_68_114_035
+  classification: default
+- name: 5-2N - Unsustainable Inconsolable - S- Rank
+  id: 82_104_121_68_114_036
+  classification: default
+- name: 5-3 - Seventh-Inning Stretch - B Rank
+  id: 82_104_121_68_114_037
+  classification: default
+- name: 5-B1 - Rhythm Weightlifter - B Rank # FIXME: Should this be Clear ?/
+  id: 82_104_121_68_114_038
+  clasification: excluded
+- name: 5-X - Dreams Don't Stop - Cleared
+  id: 82_104_121_68_114_039
+  classification: priority
+- name: 5-X - Dreams Don't Stop - Cleared without Checkpoints
+  id: 82_104_121_68_114_039
+  classification: default
+- name: 5-X - Dreams Don't Stop - Perfect
+  id: 82_104_121_68_114_039
+  classification: default
+
+# Basement
+# We don't actually know how much more collabs or new acts will be added in the future
+#  so it's probably a good idea to leave some space for those
+- name: X-FTS - Fixations Toward the Stars - B Rank
+  id: 82_104_121_68_114_100
+  classification: default
+- name: X-KOB - Kingdom of Balloons - B Rank
+  id: 82_104_121_68_114_101
+  classification: default
+- name: X-WOT - Worn Out Tapes - B Rank
+  id: 82_104_121_68_114_102
+  classification: default
+- name: X-MAT - Meet and Tweet - B Rank
+  id: 82_104_121_68_114_103
+  classification: default
+- name: MD-1 - Blackest Luxury Car - B Rank
+  id: 82_104_121_68_114_104
+  classification: default
+- name: MD-2 - tape/stop/night - B Rank
+  id: 82_104_121_68_114_105
+  classification: default
+- name: MD-3 - The 90's Decision - B Rank
+  id: 82_104_121_68_114_106
+  classification: default
+- name: X-1 - Art Exercise - B Rank
+  id: 82_104_121_68_114_107
+  classification: default
+
+# Art Room
+- name: X-0 - Helping Hands - B Rank
+  id: 82_104_121_68_114_190
+  classification: priority

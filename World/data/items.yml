@@ -1,0 +1,169 @@
+# Items are all things that can "drop" for your game.
+#  This may be RPG items like weapons, or technologies you normally research in a research tree.
+# Each item has a name, a code (hereafter referred to as id), and a classification.
+#  The most important classification is progression.
+#  Progression items are items which a player may require to progress in their world.
+#  If an item can possibly be considered for logic (it's referenced in a location's rules) it must be progression.
+#  Progression items will be assigned to locations with higher priority, and moved around to meet defined rules and satisfy progression balancing.
+# https://github.com/ArchipelagoMW/Archipelago/blob/main/docs/world%20api.md#items
+
+# Boss songs are not included here - they unlock after a specific number of
+#  levels are cleared in its Act.
+# By default:
+#  Act 1: 2 levels completed
+#  Act 2: 4 levels completed
+#  Act 3: 3 levels completed
+#  Act 4: 4 levels completed
+#  Act 5: 3 levels completed
+# X-0 - Helping Hands unlocks when all Acts' bosses are complete.
+
+# Main Ward
+- name: 1-1 - Samurai Techno
+  id: 1-1
+  classification: progression
+- name: 1-1N - Samurai Dubstep
+  id: 1-1N
+  classification: progression
+- name: 1-2 - Intimate
+  id: 1-2
+  classification: progression
+- name: 1-2N - Intimate (Night)
+  id: 1-2N
+  classification: progression
+- name: 1-CNY - Chinese New Year
+  id: 1-CNY
+  classification: progression
+
+- name: 3-1 - Sleepy Garden
+  id: 3-1
+  classification: progression
+- name: 3-1N - Lounge
+  id: 3-1N
+  classification: progression
+- name: 3-2 - Classy
+  id: 3-2
+  classification: progression
+- name: 3-2N - Classy (Night)
+  id: 3-2N
+  classification: progression
+- name: 3-3 - Distant Duet
+  id: 3-3
+  classification: progression
+- name: 3-3N - Distant Duet (Night)
+  id: 3-3N
+  classification: progression
+
+# SVT Ward
+- name: 2-1 - Lo-fi Hip-Hop Beats To Treat Patients To
+  id: 2-1
+  classification: progression
+- name: 2-1N - wish i could care less
+  id: 2-1N
+  classification: progression
+- name: 2-2 - Supraventricular Tachycardia
+  id: 2-2
+  classification: progression
+- name: 2-2N - Unreachable
+  id: 2-2N
+  classification: progression
+- name: 2-3 - Puff Piece
+  id: 2-3
+  classification: progression
+- name: 2-3N - Bomb-Sniffing Pomeranian
+  id: 2-3N
+  classification: progression
+- name: 2-4 - Song of the Sea
+  id: 2-4
+  classification: progression
+- name: 2-4N - Song of the Sea (Night)
+  id: 2-4N
+  classification: progression
+- name: 2-B1 - Beans Hopper
+  id: 2-B1
+  classification: progression
+
+# Train (Choo Choo! :))
+- name: 4-1 - Training Doctor's Train Ride Performance
+  id: 4-1
+  classification: progression
+- name: 4-1N - Rollerdisco Rumble
+  id: 4-1N
+  classification: progression
+- name: 4-2 - Invisible
+  id: 4-2
+  classification: progression
+- name: 4-2N - Invisible (Night)
+  id: 4-2N
+  classification: progression
+- name: 4-3 - Steinway
+  id: 4-3
+  classification: progression
+- name: 4-3N - Steinway Reprise
+  id: 4-3N
+  classification: progression
+- name: 4-4 - Know You
+  id: 4-4
+  classification: progression
+- name: 4-4N - Murmurs
+  id: 4-4N
+  classification: progression
+
+# Physiotherapy Ward
+- name: 5-1 - Lucky Break
+  id: 5-1
+  classification: progression
+- name: 5-1N - One Slip Too Late
+  id: 5-1N
+  classification: progression
+- name: 5-2 - Lo-fi Beats For Patients To Chill To
+  id: 5-2
+  classification: progression
+- name: 5-2N - Unsustainable Inconsolable
+  id: 5-2N
+  classification: progression
+- name: 5-3 - Seventh Inning Stretch
+  id: 5-3
+  classification: progression
+- name: 5-B1 - Rhythm Weightlifter
+  id: 5-B1
+  classification: progression
+
+# Basement
+- name: X-FTS - Fixations Towards the Stars
+  id: X-FTS
+  classification: progression
+- name: X-KOB - Kingdom of Balloons
+  id: X-KOB
+  classification: progression
+- name: X-WOT - Worn Out Tapes
+  id: X-WOT
+  classification: progression
+- name: X-MAT - Meet and Tweet
+  id: X-MAT
+  classification: progression
+- name: MD-1 - Blackest Luxury Car
+  id: MD-1
+  classification: progression
+- name: MD-2 - tape/stop/night
+  id: MD-2
+  classification: progression
+- name: MD-3 - The 90's Decision
+  id: MD-3
+  classification: progression
+- name: X-1 - Art Exercise
+  id: X-1
+  classification: progression
+
+# Keys
+- name: SVT Ward Key
+  id: key-svt
+  classification: progression
+- name: Train Key
+  id: key-train
+  classification: progression
+- name: Physiotherapy Ward Key
+  id: key-pt
+  classification: progression
+- name: Basement Key
+  id: key-basement
+  classification: progression
