@@ -21,142 +21,142 @@
 # X-0 - Helping Hands unlocks when all Acts' bosses are complete.
 
 levels:
-  # Main Ward
-  - name: 1-1 - Samurai Techno
-    id: 82_104_121_68_114_000
-    classification: progression
-  - name: 1-1N - Samurai Dubstep
-    id: 82_104_121_68_114_001
-    classification: progression
-  - name: 1-2 - Intimate
-    id: 82_104_121_68_114_002
-    classification: progression
-  - name: 1-2N - Intimate (Night)
-    id: 82_104_121_68_114_003
-    classification: progression
-  - name: 1-CNY - Chinese New Year
-    id: 82_104_121_68_114_004
-    classification: progression
+  - main-ward:
+    - name: 1-1 - Samurai Techno
+      id: 82_104_121_68_114_000
+      classification: progression
+    - name: 1-1N - Samurai Dubstep
+      id: 82_104_121_68_114_001
+      classification: progression
+    - name: 1-2 - Intimate
+      id: 82_104_121_68_114_002
+      classification: progression
+    - name: 1-2N - Intimate (Night)
+      id: 82_104_121_68_114_003
+      classification: progression
+    - name: 1-CNY - Chinese New Year
+      id: 82_104_121_68_114_004
+      classification: progression
 
-  - name: 3-1 - Sleepy Garden
-    id: 82_104_121_68_114_005
-    classification: progression
-  - name: 3-1N - Lounge
-    id: 82_104_121_68_114_006
-    classification: progression
-  - name: 3-2 - Classy
-    id: 82_104_121_68_114_007
-    classification: progression
-  - name: 3-2N - Classy (Night)
-    id: 82_104_121_68_114_008
-    classification: progression
-  - name: 3-3 - Distant Duet
-    id: 82_104_121_68_114_009
-    classification: progression
-  - name: 3-3N - Distant Duet (Night)
-    id: 82_104_121_68_114_010
-    classification: progression
+    - name: 3-1 - Sleepy Garden
+      id: 82_104_121_68_114_005
+      classification: progression
+    - name: 3-1N - Lounge
+      id: 82_104_121_68_114_006
+      classification: progression
+    - name: 3-2 - Classy
+      id: 82_104_121_68_114_007
+      classification: progression
+    - name: 3-2N - Classy (Night)
+      id: 82_104_121_68_114_008
+      classification: progression
+    - name: 3-3 - Distant Duet
+      id: 82_104_121_68_114_009
+      classification: progression
+    - name: 3-3N - Distant Duet (Night)
+      id: 82_104_121_68_114_010
+      classification: progression
 
-  # SVT Ward
-  - name: 2-1 - Lo-fi Hip-Hop Beats To Treat Patients To
-    id: 82_104_121_68_114_011
-    classification: progression
-  - name: 2-1N - wish i could care less
-    id: 82_104_121_68_114_012
-    classification: progression
-  - name: 2-2 - Supraventricular Tachycardia
-    id: 82_104_121_68_114_013
-    classification: progression
-  - name: 2-2N - Unreachable
-    id: 82_104_121_68_114_014
-    classification: progression
-  - name: 2-3 - Puff Piece
-    id: 82_104_121_68_114_015
-    classification: progression
-  - name: 2-3N - Bomb-Sniffing Pomeranian
-    id: 82_104_121_68_114_016
-    classification: progression
-  - name: 2-4 - Song of the Sea
-    id: 82_104_121_68_114_017
-    classification: progression
-  - name: 2-4N - Song of the Sea (Night)
-    id: 82_104_121_68_114_018
-    classification: progression
-  - name: 2-B1 - Beans Hopper
-    id: 82_104_121_68_114_019
-    classification: progression
+  - svt-ward:
+    - name: 2-1 - Lo-fi Hip-Hop Beats To Treat Patients To
+      id: 82_104_121_68_114_011
+      classification: progression
+    - name: 2-1N - wish i could care less
+      id: 82_104_121_68_114_012
+      classification: progression
+    - name: 2-2 - Supraventricular Tachycardia
+      id: 82_104_121_68_114_013
+      classification: progression
+    - name: 2-2N - Unreachable
+      id: 82_104_121_68_114_014
+      classification: progression
+    - name: 2-3 - Puff Piece
+      id: 82_104_121_68_114_015
+      classification: progression
+    - name: 2-3N - Bomb-Sniffing Pomeranian
+      id: 82_104_121_68_114_016
+      classification: progression
+    - name: 2-4 - Song of the Sea
+      id: 82_104_121_68_114_017
+      classification: progression
+    - name: 2-4N - Song of the Sea (Night)
+      id: 82_104_121_68_114_018
+      classification: progression
+    - name: 2-B1 - Beans Hopper
+      id: 82_104_121_68_114_019
+      classification: progression
 
-  # Train (Choo Choo! :))
-  - name: 4-1 - Training Doctor's Train Ride Performance
-    id: 82_104_121_68_114_020
-    classification: progression
-  - name: 4-1N - Rollerdisco Rumble
-    id: 82_104_121_68_114_021
-    classification: progression
-  - name: 4-2 - Invisible
-    id: 82_104_121_68_114_022
-    classification: progression
-  - name: 4-2N - Invisible (Night)
-    id: 82_104_121_68_114_023
-    classification: progression
-  - name: 4-3 - Steinway
-    id: 82_104_121_68_114_024
-    classification: progression
-  - name: 4-3N - Steinway Reprise
-    id: 82_104_121_68_114_025
-    classification: progression
-  - name: 4-4 - Know You
-    id: 82_104_121_68_114_026
-    classification: progression
-  - name: 4-4N - Murmurs
-    id: 82_104_121_68_114_027
-    classification: progression
+  - train: # Choo Choo! :)
+    - name: 4-1 - Training Doctor's Train Ride Performance
+      id: 82_104_121_68_114_020
+      classification: progression
+    - name: 4-1N - Rollerdisco Rumble
+      id: 82_104_121_68_114_021
+      classification: progression
+    - name: 4-2 - Invisible
+      id: 82_104_121_68_114_022
+      classification: progression
+    - name: 4-2N - Invisible (Night)
+      id: 82_104_121_68_114_023
+      classification: progression
+    - name: 4-3 - Steinway
+      id: 82_104_121_68_114_024
+      classification: progression
+    - name: 4-3N - Steinway Reprise
+      id: 82_104_121_68_114_025
+      classification: progression
+    - name: 4-4 - Know You
+      id: 82_104_121_68_114_026
+      classification: progression
+    - name: 4-4N - Murmurs
+      id: 82_104_121_68_114_027
+      classification: progression
 
-  # Physiotherapy Ward
-  - name: 5-1 - Lucky Break
-    id: 82_104_121_68_114_028
-    classification: progression
-  - name: 5-1N - One Slip Too Late
-    id: 82_104_121_68_114_029
-    classification: progression
-  - name: 5-2 - Lo-fi Beats For Patients To Chill To
-    id: 82_104_121_68_114_030
-    classification: progression
-  - name: 5-2N - Unsustainable Inconsolable
-    id: 82_104_121_68_114_031
-    classification: progression
-  - name: 5-3 - Seventh Inning Stretch
-    id: 82_104_121_68_114_032
-    classification: progression
-  - name: 5-B1 - Rhythm Weightlifter
-    id: 82_104_121_68_114_033
-    classification: progression
+  - physiotherapy-ward:
+    - name: 5-1 - Lucky Break
+      id: 82_104_121_68_114_028
+      classification: progression
+    - name: 5-1N - One Slip Too Late
+      id: 82_104_121_68_114_029
+      classification: progression
+    - name: 5-2 - Lo-fi Beats For Patients To Chill To
+      id: 82_104_121_68_114_030
+      classification: progression
+    - name: 5-2N - Unsustainable Inconsolable
+      id: 82_104_121_68_114_031
+      classification: progression
+    - name: 5-3 - Seventh Inning Stretch
+      id: 82_104_121_68_114_032
+      classification: progression
+    - name: 5-B1 - Rhythm Weightlifter
+      id: 82_104_121_68_114_033
+      classification: progression
 
-  # Basement
-  - name: X-FTS - Fixations Towards the Stars
-    id: 82_104_121_68_114_034
-    classification: progression
-  - name: X-KOB - Kingdom of Balloons
-    id: 82_104_121_68_114_035
-    classification: progression
-  - name: X-WOT - Worn Out Tapes
-    id: 82_104_121_68_114_036
-    classification: progression
-  - name: X-MAT - Meet and Tweet
-    id: 82_104_121_68_114_037
-    classification: progression
-  - name: MD-1 - Blackest Luxury Car
-    id: 82_104_121_68_114_038
-    classification: progression
-  - name: MD-2 - tape/stop/night
-    id: 82_104_121_68_114_039
-    classification: progression
-  - name: MD-3 - The 90's Decision
-    id: 82_104_121_68_114_040
-    classification: progression
-  - name: X-1 - Art Exercise
-    id: 82_104_121_68_114_041
-    classification: progression
+  - basement:
+    - name: X-FTS - Fixations Towards the Stars
+      id: 82_104_121_68_114_034
+      classification: progression
+    - name: X-KOB - Kingdom of Balloons
+      id: 82_104_121_68_114_035
+      classification: progression
+    - name: X-WOT - Worn Out Tapes
+      id: 82_104_121_68_114_036
+      classification: progression
+    - name: X-MAT - Meet and Tweet
+      id: 82_104_121_68_114_037
+      classification: progression
+    - name: MD-1 - Blackest Luxury Car
+      id: 82_104_121_68_114_038
+      classification: progression
+    - name: MD-2 - tape/stop/night
+      id: 82_104_121_68_114_039
+      classification: progression
+    - name: MD-3 - The 90's Decision
+      id: 82_104_121_68_114_040
+      classification: progression
+    - name: X-1 - Art Exercise
+      id: 82_104_121_68_114_041
+      classification: progression
 
 keys:
   - name: SVT Ward Key
