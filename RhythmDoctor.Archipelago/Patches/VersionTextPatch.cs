@@ -1,0 +1,15 @@
+namespace RhythmDoctor.Archipelago.Patches;
+
+/// <summary>
+/// Append our plugin's version to Rhythm Doctor's version on the home screen.
+/// </summary>
+[HarmonyPatch(typeof(RDVersionText))]
+internal static class VersionTextPatch
+{
+  [HarmonyPatch("SetPage")]
+  [HarmonyPostfix]
+  static void Postfix(RDVersionText __instance)
+  {
+    __instance.text.text += " / Archipelago v" + MyPluginInfo.PLUGIN_VERSION;
+  }
+}
