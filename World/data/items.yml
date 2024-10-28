@@ -176,28 +176,30 @@ filler:
   - name: Sleeve Paint
     id: 82_104_121_68_114_046
     classification: filler
+  - name: Samurai.
+    id: 82_104_121_68_114_047
 
   - powerups:
     - name: Strengthened Heart
-      id: 82_104_121_68_114_047
+      id: 82_104_121_68_114_048
       classification: filler
     - name: Easy Mode
-      id: 82_104_121_68_114_048
+      id: 82_104_121_68_114_049
       classification: filler
 
   - traps:
     - name: Fragile Heart Trap
-      id: 82_104_121_68_114_051
+      id: 82_104_121_68_114_050
       classification: trap
     - name: Hard Mode Trap
-      id: 82_104_121_68_114_052
+      id: 82_104_121_68_114_051
       classification: trap
     - name: Connectifia Abortus Trap
-      id: 82_104_121_68_114_053
+      id: 82_104_121_68_114_052
       classification: trap
     - name: Randomize Characters
-      id: 82_104_121_68_114_049
+      id: 82_104_121_68_114_053
       classification: filler
     - name: Scramble Beat Sounds
-      id: 82_104_121_68_114_050
+      id: 82_104_121_68_114_054
       classification: filler
