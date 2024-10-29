@@ -5,11 +5,13 @@ on:
       - "**LICENSE"
       - "**.editorconfig"
       - "**.git**"
+      - "!.github/workflows/**"
   push:
     paths-ignore:
       - "**LICENSE"
       - "**.editorconfig"
       - "**.git**"
+      - "!.github/workflows/**"
 
 jobs:
   build:
