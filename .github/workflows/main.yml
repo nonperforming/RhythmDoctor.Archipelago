@@ -40,7 +40,10 @@ jobs:
         with:
           name: "RhythmDoctor.Archipelago.dll"
           path: |
-            "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/World/*.yml"
+            "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/World/data/items.yml"
+            "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/World/data/locations.yml"
+            "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/World/data/options.yml"
+            "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/World/data/world.yml"
             "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/Archipelago.MultiClient.Net.dll"
             "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/RhythmDoctor.Archipelago.dll"
             "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/RhythmDoctor.Archipelago.pdb"
