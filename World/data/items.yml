@@ -8,7 +8,7 @@
 # https://github.com/ArchipelagoMW/Archipelago/blob/main/docs/world%20api.md#items
 
 # Offset is 82_104_121_68_114_000 - RhyDr in ASCII
-# Gives us room to input 3 numbers before going over the 1-(2^53)-1 limit
+# Gives us room to input 3 numbers before going over the 1 to (2^53)-1 limit
 
 # Boss songs are not included here - they unlock after a specific number of
 #  levels are cleared in its Act.
@@ -21,7 +21,7 @@
 # X-0 - Helping Hands unlocks when all Acts' bosses are complete.
 
 levels:
-  - main-ward:
+  main-ward:
     - name: 1-1 - Samurai Techno
       id: 82_104_121_68_114_000
       classification: progression
@@ -57,7 +57,7 @@ levels:
       id: 82_104_121_68_114_010
       classification: progression
 
-  - svt-ward:
+  svt-ward:
     - name: 2-1 - Lo-fi Hip-Hop Beats To Treat Patients To
       id: 82_104_121_68_114_011
       classification: progression
@@ -86,7 +86,7 @@ levels:
       id: 82_104_121_68_114_019
       classification: progression
 
-  - train: # Choo Choo! :)
+  train: # Choo Choo! :)
     - name: 4-1 - Training Doctor's Train Ride Performance
       id: 82_104_121_68_114_020
       classification: progression
@@ -112,7 +112,7 @@ levels:
       id: 82_104_121_68_114_027
       classification: progression
 
-  - physiotherapy-ward:
+  physiotherapy-ward:
     - name: 5-1 - Lucky Break
       id: 82_104_121_68_114_028
       classification: progression
@@ -132,7 +132,7 @@ levels:
       id: 82_104_121_68_114_033
       classification: progression
 
-  - basement:
+  basement:
     - name: X-FTS - Fixations Towards the Stars
       id: 82_104_121_68_114_034
       classification: progression
@@ -173,14 +173,15 @@ keys:
     classification: progression
 
 filler:
-  - name: Sleeve Paint
-    id: 82_104_121_68_114_046
-    classification: filler
-  - name: Samurai.
-    id: 82_104_121_68_114_047
-    classification: filler
+  junk:
+    - name: Sleeve Paint
+      id: 82_104_121_68_114_046
+      classification: filler
+    - name: Samurai.
+      id: 82_104_121_68_114_047
+      classification: filler
 
-  - powerups:
+  powerups:
     - name: Strengthened Heart
       id: 82_104_121_68_114_048
       classification: filler
@@ -188,7 +189,7 @@ filler:
       id: 82_104_121_68_114_049
       classification: filler
 
-  - traps:
+  traps:
     - name: Fragile Heart Trap
       id: 82_104_121_68_114_050
       classification: trap
