@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>gg.archipelago.rhythmdoctor</AssemblyName>
@@ -11,6 +11,7 @@
       https://nuget.bepinex.dev/v3/index.json;
       https://nuget.samboy.dev/v3/index.json
     </RestoreAdditionalProjectSources>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies> <!-- Copy over required libraries such as YamlDotNet -->
     <RootNamespace>RhythmDoctor.Archipelago</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -58,10 +59,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\World\data\items.yml" Link="World\data\items.yml" />
-    <None Include="..\World\data\locations.yml" Link="World\data\locations.yml" />
-    <None Include="..\World\data\options.yml" Link="World\data\options.yml" />
-    <None Include="..\World\data\world.yml" Link="World\data\world.yml" />
+    <None Include="..\World\data\items.yml" Link="World\data\items.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\World\data\locations.yml" Link="World\data\locations.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\World\data\options.yml" Link="World\data\options.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\World\data\world.yml" Link="World\data\world.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
