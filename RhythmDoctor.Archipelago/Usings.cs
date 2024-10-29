@@ -13,7 +13,11 @@ global using RhythmDoctor.Archipelago.World;
 
 global using System;
 global using System.Collections.Generic;
+global using System.IO;
 
 global using UnityEngine;
 global using UnityEngine.Assertions;
 global using UnityEngine.UI;
+
+global using YamlDotNet.Serialization;
+global using YamlDotNet.Serialization.NamingConventions;
