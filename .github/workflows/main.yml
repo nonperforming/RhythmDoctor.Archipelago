@@ -39,6 +39,9 @@ jobs:
         run: |
           mkdir -p "RhythmDoctor.Archipelago/build/World/data/"
           cp -r World/data/* "RhythmDoctor.Archipelago/build/World/data/"
+          ls
+          ls RhythmDoctor.Archipelago/build/World/data
+          tree
 
       - name: Upload client plugin
         uses: actions/upload-artifact@v4.4.3
