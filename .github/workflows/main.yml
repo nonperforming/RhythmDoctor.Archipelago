@@ -1,10 +1,5 @@
 name: Build
 on:
-  pull_request:
-    paths-ignore:
-      - "**LICENSE"
-      - "**.editorconfig"
-      - "**.git**"
   push:
     paths-ignore:
       - "**LICENSE"
