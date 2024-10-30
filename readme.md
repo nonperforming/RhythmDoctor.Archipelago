@@ -15,17 +15,26 @@ To set up the Rhythm Doctor Archipelago mod, follow these steps:
 3. **Run the Game**
    Launch Rhythm Doctor once to ensure that BepInEx sets up the required folder structure.
 
-4. **Install the Mod DLL**
-  - Obtain the mod DLL from GitHub Actions (available in the `Releases` section) or build it locally.
-  - Place the DLL file in the `Rhythm Doctor\BepInEx\plugins` folder.
+4. **Install the Mod Files**
+   - Obtain the mod files from GitHub Actions (these are debug builds and may be unstable) or from a stable release in the `Releases` section.
+   - Place the following files in the `Rhythm Doctor\BepInEx\plugins` folder:
+      - `RhythmDoctor.Archipelago.dll`
+      - `World` folder
+      - `Archipelago.MultiClient.Net.dll`
+      - `YamlDotNet.dll`
 
 ## Development
 
-- **visual studio**
-  1. Open the .sln file
-  2. Make your changes
-  3. Build the solution
-  4. Copy the `bin\Debug\netXX\RhythmDoctor.Archipelago.dll` to the game
+**Visual Studio** and **Rider**
+1. Open the `.sln` file.
+2. Make your changes.
+3. Build the solution.
+4. Copy the following output files from `bin\Debug\netstandard2.1\` to the game’s `BepInEx\plugins` directory:
+    - `RhythmDoctor.Archipelago.dll`
+    - `World` folder
+    - `Archipelago.MultiClient.Net.dll`
+    - `YamlDotNet.dll`
+5. Launch the game. Successful installation shows the current Archipelago version.
 
 ---
 
