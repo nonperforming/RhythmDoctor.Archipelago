@@ -33,7 +33,7 @@ jobs:
         uses: actions/setup-dotnet@v4.1.0
 
       - name: Build client
-        run: dotnet publish RhythmDoctor.Archipelago --configuration Debug --output build --verbosity diagnostic
+        run: dotnet publish RhythmDoctor.Archipelago --configuration Debug --output build --verbosity detailed
 
       - name: Copy APWorld data
         run: |
