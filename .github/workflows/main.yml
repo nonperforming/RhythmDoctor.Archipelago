@@ -37,7 +37,7 @@ jobs:
 
       - name: Copy APWorld data
         run: |
-          mkdir "RhythmDoctor.Archipelago/build/World"
+          mkdir -p "RhythmDoctor.Archipelago/build/World"
           cp "RhythmDoctor.Archipelago/World/data" "RhythmDoctor.Archipelago/build/World"
 
       - name: Upload client plugin
