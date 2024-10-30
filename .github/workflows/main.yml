@@ -45,11 +45,11 @@ jobs:
         with:
           name: "RhythmDoctor.Archipelago.dll"
           path: |
-            "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/World"
-            "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/Archipelago.MultiClient.Net.dll"
-            "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/RhythmDoctor.Archipelago.dll"
-            "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/RhythmDoctor.Archipelago.pdb"
-            "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/YamlDotNet.dll"
+            "RhythmDoctor.Archipelago/build/World"
+            "RhythmDoctor.Archipelago/build/Archipelago.MultiClient.Net.dll"
+            "RhythmDoctor.Archipelago/build/RhythmDoctor.Archipelago.dll"
+            "RhythmDoctor.Archipelago/build/RhythmDoctor.Archipelago.pdb"
+            "RhythmDoctor.Archipelago/build/YamlDotNet.dll"
           if-no-files-found: error
 
       - name: Upload APWorld
