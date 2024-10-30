@@ -5,11 +5,11 @@ namespace RhythmDoctor.Archipelago.World;
 public struct ItemsData
 {
   [EnumMember(Value = "levels")]
-  internal Dictionary<Ward, List<Item>> Levels;
+  public Dictionary<Ward, List<Item>> Levels;
   [EnumMember(Value = "keys")]
-  internal List<Item> Keys;
+  public List<Item> Keys;
   [EnumMember(Value = "filler")]
-  internal Dictionary<FillerType, List<Item>> Filler;
+  public Dictionary<FillerType, List<Item>> Filler;
 
   public ItemsData()
   {
