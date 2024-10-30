@@ -33,17 +33,19 @@ jobs:
         uses: actions/setup-dotnet@v4.1.0
 
       - name: Build client
-        run: dotnet build --configuration Debug
+        run: dotnet publish --configuration Debug --output build --verbosity diagnostic
+
+      - name: Copy APWorld data
+        run: |
+          mkdir "RhythmDoctor.Archipelago/build/World"
+          cp "RhythmDoctor.Archipelago/World/data" "RhythmDoctor.Archipelago/build/World"
 
       - name: Upload client plugin
         uses: actions/upload-artifact@v4.4.3
         with:
           name: "RhythmDoctor.Archipelago.dll"
           path: |
-            "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/World/data/items.yml"
-            "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/World/data/locations.yml"
-            "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/World/data/options.yml"
-            "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/World/data/world.yml"
+            "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/World"
             "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/Archipelago.MultiClient.Net.dll"
             "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/RhythmDoctor.Archipelago.dll"
             "RhythmDoctor.Archipelago/bin/Debug/netstandard2.1/RhythmDoctor.Archipelago.pdb"
@@ -56,5 +58,3 @@ jobs:
           name: "RhythmDoctor.apworld"
           path: "World/"
           if-no-files-found: error
-
-
