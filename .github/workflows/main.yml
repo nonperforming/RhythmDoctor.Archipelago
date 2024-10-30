@@ -37,19 +37,19 @@ jobs:
 
       - name: Copy APWorld data
         run: |
-          mkdir -p "RhythmDoctor.Archipelago/build/World/data/"
-          cp -r World/data/* "RhythmDoctor.Archipelago/build/World/data/"
+          mkdir -p "build/World/data/"
+          cp -r World/data/* "build/World/data/"
 
       - name: Upload client plugin
         uses: actions/upload-artifact@v4.4.3
         with:
           name: "RhythmDoctor.Archipelago.dll"
           path: |
-            RhythmDoctor.Archipelago/build/World/data/*
-            RhythmDoctor.Archipelago/build/Archipelago.MultiClient.Net.dll
-            RhythmDoctor.Archipelago/build/RhythmDoctor.Archipelago.dll
-            RhythmDoctor.Archipelago/build/RhythmDoctor.Archipelago.pdb
-            RhythmDoctor.Archipelago/build/YamlDotNet.dll
+            build/World/data/*
+            build/Archipelago.MultiClient.Net.dll
+            build/RhythmDoctor.Archipelago.dll
+            build/RhythmDoctor.Archipelago.pdb
+            build/YamlDotNet.dll
           if-no-files-found: error
 
       - name: Upload APWorld
