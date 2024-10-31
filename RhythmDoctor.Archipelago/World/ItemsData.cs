@@ -1,14 +1,12 @@
-using System.Runtime.Serialization;
-
 namespace RhythmDoctor.Archipelago.World;
 
 public struct ItemsData
 {
-  [EnumMember(Value = "levels")]
+  [YamlMember(Alias = "levels")]
   public Dictionary<Ward, List<Item>> Levels;
-  [EnumMember(Value = "keys")]
+  [YamlMember(Alias = "keys")]
   public List<Item> Keys;
-  [EnumMember(Value = "filler")]
+  [YamlMember(Alias = "filler")]
   public Dictionary<FillerType, List<Item>> Filler;
 
   public ItemsData()
@@ -26,54 +24,54 @@ public struct ItemsData
 
 public struct Item
 {
-  [EnumMember(Value = "name")]
+  [YamlMember(Alias = "name")]
   public string Name;
-  [EnumMember(Value = "id")]
+  [YamlMember(Alias = "id")]
   public ulong ID;
-  [EnumMember(Value = "classification")]
+  [YamlMember(Alias = "classification")]
   public ItemClassification Classification;
 }
 
 public enum Ward
 {
-  [EnumMember(Value = "main-ward")]
+  [YamlMember(Alias = "main-ward")]
   MainWard,
-  [EnumMember(Value = "svt-ward")]
+  [YamlMember(Alias = "svt-ward")]
   SVTWard,
-  [EnumMember(Value = "train")]
+  [YamlMember(Alias = "train")]
   Train,
-  [EnumMember(Value = "physiotherapy-ward")]
+  [YamlMember(Alias = "physiotherapy-ward")]
   PhysiotherapyWard,
-  [EnumMember(Value = "basement")]
+  [YamlMember(Alias = "basement")]
   Basement,
 }
 
 public enum ItemType
 {
-  [EnumMember(Value = "levels")]
+  [YamlMember(Alias = "levels")]
   Levels,
-  [EnumMember(Value = "keys")]
+  [YamlMember(Alias = "keys")]
   Keys,
-  [EnumMember(Value = "filler")]
+  [YamlMember(Alias = "filler")]
   Filler,
 }
 
 public enum ItemClassification
 {
-  [EnumMember(Value = "progression")]
+  [YamlMember(Alias = "progression")]
   Progression,
-  [EnumMember(Value = "filler")]
+  [YamlMember(Alias = "filler")]
   Filler,
-  [EnumMember(Value = "trap")]
+  [YamlMember(Alias = "trap")]
   Trap,
 }
 
 public enum FillerType
 {
-  [EnumMember(Value = "junk")]
+  [YamlMember(Alias = "junk")]
   Junk,
-  [EnumMember(Value = "powerups")]
+  [YamlMember(Alias = "powerups")]
   Powerups,
-  [EnumMember(Value = "traps")]
+  [YamlMember(Alias = "traps")]
   Traps,
 }
