@@ -1,3 +1,5 @@
+using System.Runtime.Serialization;
+
 namespace RhythmDoctor.Archipelago.World;
 
 public struct ItemsData
@@ -8,18 +10,6 @@ public struct ItemsData
   public List<Item> Keys;
   [YamlMember(Alias = "filler")]
   public Dictionary<FillerType, List<Item>> Filler;
-
-  public ItemsData()
-  {
-    string yaml = DataFileHelper.GetDataFile(DataFileType.Items);
-    IDeserializer deserializer = new DeserializerBuilder()
-      .WithNamingConvention(HyphenatedNamingConvention.Instance)
-      .Build();
-    //Dictionary<string, object> deserialized = (deserializer.Deserialize(yaml) as Dictionary<string, object>)!;
-
-    //this.Levels = (deserialized["levels"] as Dictionary<Ward, List<Item>>)!;
-    //this.Keys =
-  }
 }
 
 public struct Item
@@ -34,44 +24,34 @@ public struct Item
 
 public enum Ward
 {
-  [YamlMember(Alias = "main-ward")]
+  [EnumMember(Value = "main-ward")]
   MainWard,
-  [YamlMember(Alias = "svt-ward")]
+  [EnumMember(Value = "svt-ward")]
   SVTWard,
-  [YamlMember(Alias = "train")]
+  [EnumMember(Value = "train")]
   Train,
-  [YamlMember(Alias = "physiotherapy-ward")]
+  [EnumMember(Value = "physiotherapy-ward")]
   PhysiotherapyWard,
-  [YamlMember(Alias = "basement")]
+  [EnumMember(Value = "basement")]
   Basement,
-}
-
-public enum ItemType
-{
-  [YamlMember(Alias = "levels")]
-  Levels,
-  [YamlMember(Alias = "keys")]
-  Keys,
-  [YamlMember(Alias = "filler")]
-  Filler,
 }
 
 public enum ItemClassification
 {
-  [YamlMember(Alias = "progression")]
+  [EnumMember(Value = "progression")]
   Progression,
-  [YamlMember(Alias = "filler")]
+  [EnumMember(Value = "filler")]
   Filler,
-  [YamlMember(Alias = "trap")]
+  [EnumMember(Value = "trap")]
   Trap,
 }
 
 public enum FillerType
 {
-  [YamlMember(Alias = "junk")]
+  [EnumMember(Value = "junk")]
   Junk,
-  [YamlMember(Alias = "powerups")]
+  [EnumMember(Value = "powerups")]
   Powerups,
-  [YamlMember(Alias = "traps")]
+  [EnumMember(Value = "traps")]
   Traps,
 }

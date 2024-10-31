@@ -4,7 +4,11 @@ namespace RhythmDoctor.Archipelago.Helpers;
 
 internal static class DataFileHelper
 {
-  internal static string GetDataFile(DataFileType fileType)
+  private static IDeserializer Deserializer = new DeserializerBuilder()
+    .WithNamingConvention(HyphenatedNamingConvention.Instance)
+    .Build();
+
+  private static string GetDataFile(DataFileType fileType)
   {
     string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
 
@@ -28,8 +32,13 @@ internal static class DataFileHelper
     }
 
     string path = Path.Combine(assemblyFolder, "World", "data", fileName);
-
     return File.ReadAllText(path);
+  }
+
+  internal static ItemsData GetItemsData()
+  {
+    string itemsData = GetDataFile(DataFileType.Items);
+    return Deserializer.Deserialize<ItemsData>(itemsData);
   }
 }
 
