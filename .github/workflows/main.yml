@@ -5,7 +5,7 @@ on:
       - "**LICENSE"
       - "**.editorconfig"
       - "**.git**"
-      
+
 jobs:
   build:
     name: Build
@@ -15,16 +15,13 @@ jobs:
         uses: actions/checkout@v4.2.2
         with:
           submodules: recursive
-          
+
       - name: Cache
         uses: actions/cache@v4.1.2
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4.1.0
-        
       - name: Build client
         run: dotnet build --configuration Debug
 
@@ -41,5 +38,5 @@ jobs:
           name: "RhythmDoctor.apworld"
           path: "World/"
           if-no-files-found: error
-        
-        
+
+
