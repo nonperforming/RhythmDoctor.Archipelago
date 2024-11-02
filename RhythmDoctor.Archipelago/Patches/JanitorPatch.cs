@@ -6,9 +6,9 @@ namespace RhythmDoctor.Archipelago.Patches;
 /// </summary>
 internal static class JanitorPatch
 {
-//  [HarmonyPostfix]
+  //  [HarmonyPostfix]
   static void Postfix()
   {
-//    __instance.text.text = __instance.text.text + " / Archipelago v" + MyPluginInfo.PLUGIN_VERSION;
+    //    __instance.text.text = __instance.text.text + " / Archipelago v" + MyPluginInfo.PLUGIN_VERSION;
   }
 }
