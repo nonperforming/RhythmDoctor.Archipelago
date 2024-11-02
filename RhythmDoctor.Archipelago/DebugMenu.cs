@@ -12,9 +12,14 @@ public class DebugMenu : MonoBehaviour
       .WithNamingConvention(HyphenatedNamingConvention.Instance)
       .Build();
 
-    if (GUI.Button(new Rect(30, 30, 300, 50), "Create ItemsData"))
+    if (GUI.Button(new Rect(30, 30, 300, 20), "Toggle RD Debug"))
     {
-      ItemsData itemsData = new();
+      DebugSettings.instance.Debug = !DebugSettings.instance.Debug;
+    }
+
+    if (GUI.Button(new Rect(30, 60, 300, 20), "Create ItemsData"))
+    {
+      ItemsData itemsData = DataFileHelper.GetItemsData();
       Plugin.Logger.LogInfo(serializer.Serialize(itemsData));
     }
     // if (GUI.Button(new Rect(30, 130, 300, 50), "Create LocationsData"))
