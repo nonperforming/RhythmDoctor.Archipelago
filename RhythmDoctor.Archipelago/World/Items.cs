@@ -2,5 +2,23 @@ namespace RhythmDoctor.Archipelago.World;
 
 internal class Items
 {
-  // TODO: Load from World/data/items.yml
+  public static void GetItem()
+  {
+
+  }
+
+  public static void LevelItem()
+  {
+
+  }
+
+  public static void KeyItem()
+  {
+
+  }
+
+  public static void TrapItem()
+  {
+
+  }
 }

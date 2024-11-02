@@ -1,6 +1,4 @@
-using System.Runtime.Serialization;
-
-namespace RhythmDoctor.Archipelago.World;
+namespace RhythmDoctor.Archipelago.World.Structures;
 
 public struct ItemsData
 {
@@ -10,30 +8,6 @@ public struct ItemsData
   public List<Item> Keys;
   [YamlMember(Alias = "filler")]
   public Dictionary<FillerType, List<Item>> Filler;
-}
-
-public struct Item
-{
-  [YamlMember(Alias = "name")]
-  public string Name;
-  [YamlMember(Alias = "id")]
-  public ulong ID;
-  [YamlMember(Alias = "classification")]
-  public ItemClassification Classification;
-}
-
-public enum Ward
-{
-  [EnumMember(Value = "main-ward")]
-  MainWard,
-  [EnumMember(Value = "svt-ward")]
-  SVTWard,
-  [EnumMember(Value = "train")]
-  Train,
-  [EnumMember(Value = "physiotherapy-ward")]
-  PhysiotherapyWard,
-  [EnumMember(Value = "basement")]
-  Basement,
 }
 
 public enum ItemClassification
