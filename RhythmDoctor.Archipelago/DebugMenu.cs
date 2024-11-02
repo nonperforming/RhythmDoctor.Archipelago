@@ -3,8 +3,17 @@ namespace RhythmDoctor.Archipelago;
 
 public class DebugMenu : MonoBehaviour
 {
+  private bool Activated = false;
+
+  private void Update()
+  {
+    if (Input.GetKeyDown(KeyCode.F3)) Activated = !Activated;
+  }
+
   private void OnGUI()
   {
+    if (!Activated) return;
+
     // Background
     GUI.Box(new Rect(10, 10, 320, 370), "Rhythm Doctor Archipelago Debug");
 
