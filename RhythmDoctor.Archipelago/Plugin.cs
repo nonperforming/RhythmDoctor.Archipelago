@@ -1,5 +1,3 @@
-using System.Collections;
-
 namespace RhythmDoctor.Archipelago;
 
 /// <summary>
@@ -17,7 +15,6 @@ public class Plugin : BaseUnityPlugin
     //typeof(CustomLevelsWardUIPatch),
     typeof(ForceCNYAvailablePatch),
     //typeof(JanitorPatch),
-    typeof(LevelSelectPatch),
     typeof(VersionTextPatch),
   ];
 
