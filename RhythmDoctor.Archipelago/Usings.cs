@@ -10,9 +10,12 @@ global using RhythmDoctor.Archipelago.Client;
 global using RhythmDoctor.Archipelago.Helpers;
 global using RhythmDoctor.Archipelago.Patches;
 global using RhythmDoctor.Archipelago.World;
+global using RhythmDoctor.Archipelago.World.Dictionaries;
+global using RhythmDoctor.Archipelago.World.Enums;
 global using RhythmDoctor.Archipelago.World.Structures;
 
 global using System;
+global using System.Collections;
 global using System.Collections.Generic;
 global using System.IO;
 global using System.Runtime.Serialization;
