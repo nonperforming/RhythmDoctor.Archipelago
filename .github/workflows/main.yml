@@ -1,11 +1,5 @@
 name: Build
 on:
-  pull_request:
-    paths-ignore:
-      - "**LICENSE"
-      - "**.editorconfig"
-      - "**.git**"
-      - "!.github/workflows/**"
   push:
     paths-ignore:
       - "**LICENSE"
@@ -28,10 +22,7 @@ jobs:
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4.1.0
-
+         
       - name: Build client
         run: dotnet publish RhythmDoctor.Archipelago --configuration Debug --output build --verbosity detailed
 

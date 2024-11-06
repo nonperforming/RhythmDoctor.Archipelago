@@ -12,12 +12,14 @@ internal static class LevelSelectPatch
   [HarmonyPostfix]
   static void Prefix(scnLevelSelect __instance)
   {
-    if (patched) return;
+    if (patched)
+      return;
 
     // Make all levels visible
     foreach (Level level in Enum.GetValues(typeof(Level)))
     {
-      if (level == Level.OrientalTechno) return; // Don't lock 1-1 - Oriental Techno: it is always available
+      if (level == Level.OrientalTechno)
+        return; // Don't lock 1-1 - Oriental Techno: it is always available
       Persistence.SetLevelRank(level, Rank.NotAvailable);
     }
 
@@ -38,6 +40,6 @@ internal static class LevelSelectPatch
 
   [HarmonyReversePatch]
   [HarmonyPatch("FindSelectableEntity")]
-  public static SelectableEntity FindSelectableEntity(object instance, string name)
-    => throw new NotImplementedException("Stub method called");
+  public static SelectableEntity FindSelectableEntity(object instance, string name) =>
+    throw new NotImplementedException("Stub method called");
 }

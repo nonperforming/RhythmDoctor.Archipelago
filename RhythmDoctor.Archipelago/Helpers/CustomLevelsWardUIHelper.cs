@@ -1,10 +1,9 @@
-
-
 namespace RhythmDoctor.Archipelago.Helpers;
 
 internal static class CustomLevelsWardUIHelper
 {
   static GameObject TabTemplate = scnCLS.instance.transform.Find("Library Tab").gameObject;
+
   // FIXME: Does this break on scene reloads? (Reference to GameObject is destroyed)
   // Do we need to cache GameObject.Find in the first place? It should not be called often
   //GameObject WardOptionsContainer
@@ -17,7 +16,13 @@ internal static class CustomLevelsWardUIHelper
   //
   //GameObject _WardOptionsContainer;
 
-  internal static void CreateCustomTab(string label, int wardID, Action action, Sprite? icon = null, AudioClip? selectAudio = null)
+  internal static void CreateCustomTab(
+    string label,
+    int wardID,
+    Action action,
+    Sprite? icon = null,
+    AudioClip? selectAudio = null
+  )
   {
     Assert.IsFalse(Enum.IsDefined(typeof(scnCLS.WardOptionName), wardID), "Cannot use existing WardOptionName");
 
