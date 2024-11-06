@@ -369,6 +369,7 @@ act-5:
     - name: 5-3 - Seventh-Inning Stretch - S Rank # Note only possible rank is S-, S, S+
       id: 82_104_121_68_114_103
       classification: default
+  5-B1:
     - name: 5-B1 - Rhythm Weightlifter - Level 1 Clear
       id: 82_104_121_68_114_104
       clasification: excluded
