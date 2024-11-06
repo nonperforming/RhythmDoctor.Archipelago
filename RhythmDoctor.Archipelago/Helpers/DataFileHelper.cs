@@ -40,6 +40,12 @@ internal static class DataFileHelper
     string itemsData = GetDataFile(DataFileType.Items);
     return Deserializer.Deserialize<ItemsData>(itemsData);
   }
+
+  internal static LocationsData GetLocationsData()
+  {
+    string locationsData = GetDataFile(DataFileType.Locations);
+    return Deserializer.Deserialize<LocationsData>(locationsData);
+  }
 }
 
 internal enum DataFileType

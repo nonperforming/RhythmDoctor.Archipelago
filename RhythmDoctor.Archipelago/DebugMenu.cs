@@ -31,11 +31,11 @@ public class DebugMenu : MonoBehaviour
       ItemsData itemsData = DataFileHelper.GetItemsData();
       Plugin.Logger.LogInfo(serializer.Serialize(itemsData));
     }
-    // if (GUI.Button(new Rect(30, 130, 300, 50), "Create LocationsData"))
-    // {
-    //   ItemsData locationsData = new LocationsData();
-    //   Plugin.Logger.LogInfo(serializer.Serialize(locationsData));
-    // }
+    if (GUI.Button(new Rect(30, 90, 300, 20), "Create LocationsData"))
+    {
+      LocationsData locationsData = DataFileHelper.GetLocationsData();
+      Plugin.Logger.LogInfo(serializer.Serialize(locationsData));
+    }
     // if (GUI.Button(new Rect(30, 230, 300, 50), "Create OptionsData"))
     // {
     //   ItemsData optionsData = new OptionsData();
