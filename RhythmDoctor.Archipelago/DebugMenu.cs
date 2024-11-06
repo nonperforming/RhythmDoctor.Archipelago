@@ -7,19 +7,19 @@ public class DebugMenu : MonoBehaviour
 
   private void Update()
   {
-    if (Input.GetKeyDown(KeyCode.F3)) Activated = !Activated;
+    if (Input.GetKeyDown(KeyCode.F3))
+      Activated = !Activated;
   }
 
   private void OnGUI()
   {
-    if (!Activated) return;
+    if (!Activated)
+      return;
 
     // Background
     GUI.Box(new Rect(10, 10, 320, 370), "Rhythm Doctor Archipelago Debug");
 
-    ISerializer serializer = new SerializerBuilder()
-      .WithNamingConvention(HyphenatedNamingConvention.Instance)
-      .Build();
+    ISerializer serializer = new SerializerBuilder().WithNamingConvention(HyphenatedNamingConvention.Instance).Build();
 
     if (GUI.Button(new Rect(30, 30, 300, 20), "Toggle RD Debug"))
     {

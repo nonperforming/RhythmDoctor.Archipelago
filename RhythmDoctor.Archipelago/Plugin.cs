@@ -34,7 +34,6 @@ public class Plugin : BaseUnityPlugin
     }
   }
 
-
 #if DEBUG
   private void Start()
   {
