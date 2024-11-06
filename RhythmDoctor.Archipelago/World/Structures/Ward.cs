@@ -12,4 +12,6 @@ public enum Ward
   PhysiotherapyWard,
   [EnumMember(Value = "basement")]
   Basement,
+  [EnumMember(Value = "art-room")]
+  ArtRoom,
 }
