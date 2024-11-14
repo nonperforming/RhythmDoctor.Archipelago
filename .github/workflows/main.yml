@@ -24,7 +24,7 @@ jobs:
           key: ${{ runner.os }}-nuget
          
       - name: Build client
-        run: dotnet publish RhythmDoctor.Archipelago --configuration Debug --output build --verbosity detailed
+        run: dotnet publish RhythmDoctor.Archipelago --configuration Debug --output build --verbosity normal
 
       - name: Copy APWorld data
         run: |
