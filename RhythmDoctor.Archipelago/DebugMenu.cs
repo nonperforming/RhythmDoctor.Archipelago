@@ -3,49 +3,98 @@ namespace RhythmDoctor.Archipelago;
 
 public class DebugMenu : MonoBehaviour
 {
-  private bool Activated = false;
+  private bool _activatedMain = false;
+  private bool _activatedData = false;
+  private bool _activatedMenu = false;
+
+  private void Start()
+  {
+    Plugin.Logger.LogInfo("Debug menu started");
+  }
 
   private void Update()
   {
     if (Input.GetKeyDown(KeyCode.F3))
-      Activated = !Activated;
+    {
+      Plugin.Logger.LogInfo("Toggled Main Debug menu to " + !_activatedMain);
+      _activatedMain = !_activatedMain;
+    }
+    if (Input.GetKeyDown(KeyCode.F4))
+    {
+      Plugin.Logger.LogInfo("Toggled Data Debug menu to " + !_activatedData);
+      _activatedData = !_activatedData;
+    }
+    if (Input.GetKeyDown(KeyCode.F5))
+    {
+      Plugin.Logger.LogInfo("Toggled Menu Debug menu to " + !_activatedMenu);
+      _activatedMenu = !_activatedMenu;
+    }
   }
 
   private void OnGUI()
   {
-    if (!Activated)
-      return;
-
-    // Background
-    GUI.Box(new Rect(10, 10, 320, 370), "Rhythm Doctor Archipelago Debug");
-
-    ISerializer serializer = new SerializerBuilder().WithNamingConvention(HyphenatedNamingConvention.Instance).Build();
-
-    if (GUI.Button(new Rect(30, 30, 300, 20), "Toggle RD Debug"))
+    if (_activatedMain)
     {
-      DebugSettings.instance.Debug = !DebugSettings.instance.Debug;
+      GUI.Box(new Rect(10, 10, 320, 60), "Rhythm Doctor Archipelago Main Debug");
+
+      if (GUI.Button(new Rect(30, 30, 300, 20), "Toggle RD Debug"))
+      {
+        Plugin.Logger.LogInfo("Toggling RD Debug to " + !DebugSettings.instance.Debug);
+        DebugSettings.instance.Debug = !DebugSettings.instance.Debug;
+      }
     }
 
-    if (GUI.Button(new Rect(30, 60, 300, 20), "Create ItemsData"))
+    if (_activatedData)
     {
-      ItemsData itemsData = DataFileHelper.GetItemsData();
-      Plugin.Logger.LogInfo(serializer.Serialize(itemsData));
+      GUI.Box(new Rect(10, 10, 320, 150), "Rhythm Doctor Archipelago Data Debug");
+
+      ISerializer serializer =
+        new SerializerBuilder().WithNamingConvention(HyphenatedNamingConvention.Instance).Build();
+
+      if (GUI.Button(new Rect(30, 30, 300, 20), "Create ItemsData"))
+      {
+        Plugin.Logger.LogInfo("Creating ItemsData");
+        ItemsData itemsData = DataHelper.GetItemsData();
+        Plugin.Logger.LogInfo(serializer.Serialize(itemsData));
+      }
+      if (GUI.Button(new Rect(30, 60, 300, 20), "Create LocationsData"))
+      {
+        Plugin.Logger.LogInfo("Creating LocationsData");
+        LocationsData locationsData = DataHelper.GetLocationsData();
+        Plugin.Logger.LogInfo(serializer.Serialize(locationsData));
+      }
+      if (GUI.Button(new Rect(30, 90, 300, 20), "Create OptionsData"))
+      {
+        Plugin.Logger.LogInfo("Creating OptionsData");
+        throw new NotImplementedException();
+        //OptionsData optionsData = DataHelper.GetOptionsData();
+        //Plugin.Logger.LogInfo(serializer.Serialize(optionsData));
+      }
+      if (GUI.Button(new Rect(30, 120, 300, 20), "Create WorldData"))
+      {
+        Plugin.Logger.LogInfo("Creating WorldData");
+        throw new NotImplementedException();
+        //WorldData worldData = DataHelper.GetWorldData();
+        //Plugin.Logger.LogInfo(serializer.Serialize(worldData));
+      }
     }
-    if (GUI.Button(new Rect(30, 90, 300, 20), "Create LocationsData"))
+
+    if (_activatedMenu)
     {
-      LocationsData locationsData = DataFileHelper.GetLocationsData();
-      Plugin.Logger.LogInfo(serializer.Serialize(locationsData));
+      GUI.Box(new Rect(10, 10, 320, 60), "Rhythm Doctor Archipelago Menu Debug");
+
+      if (GUI.Button(new Rect(30, 30, 300, 20), "Create Archipelago Menu Item"))
+      {
+        Plugin.Logger.LogInfo("Creating Archipelago Menu Item");
+        CustomLevelsWardUIHelper.CreateCustomTab(
+          "Archipelago",
+          10,
+          () => { Plugin.Logger.LogInfo("Archipelago button pressed"); },
+          AssetHelper.LoadSprite(new WardIcons(), "archipelago.png"), // TODO: enum the asset name??
+          null
+        );
+      }
     }
-    // if (GUI.Button(new Rect(30, 230, 300, 50), "Create OptionsData"))
-    // {
-    //   ItemsData optionsData = new OptionsData();
-    //   Plugin.Logger.LogInfo(serializer.Serialize(optionsData));
-    // }
-    // if (GUI.Button(new Rect(30, 330, 300, 50), "Create OptionsData"))
-    // {
-    //   ItemsData worldOptions = new OptionsData();
-    //   Plugin.Logger.LogInfo(serializer.Serialize(worldOptions));
-    // }
   }
 }
 #endif
