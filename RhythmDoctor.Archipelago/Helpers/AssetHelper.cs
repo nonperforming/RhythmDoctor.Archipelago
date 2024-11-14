@@ -6,8 +6,7 @@ internal static class AssetHelper
     => LoadSprite(LoadTexture(assetType, assetName));
   internal static Sprite LoadSprite(Texture2D texture2D)
   {
-    return Sprite.Create(textu
-    re2D, new Rect(0, 0, texture2D.width, texture2D.height), Vector2.zero, 1);
+    return Sprite.Create(texture2D, new Rect(0, 0, texture2D.width, texture2D.height), Vector2.zero, 1);
   }
 
   internal static Texture2D LoadTexture(IAssetType assetType, string assetName)
