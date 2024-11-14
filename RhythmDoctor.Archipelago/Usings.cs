@@ -1,4 +1,9 @@
 global using Archipelago.MultiClient.Net;
+global using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
+global using Archipelago.MultiClient.Net.Enums;
+global using Archipelago.MultiClient.Net.Helpers;
+global using Archipelago.MultiClient.Net.MessageLog.Messages;
+global using Archipelago.MultiClient.Net.Models;
 
 global using BepInEx;
 global using BepInEx.Logging;
