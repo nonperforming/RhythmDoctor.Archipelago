@@ -2,9 +2,9 @@ using RhythmDoctor.Archipelago.World.Enums;
 
 namespace RhythmDoctor.Archipelago.World.Dictionaries;
 
-public static class InternalToFriendlyName
+internal static class InternalToFriendlyName
 {
-  public static Dictionary<Level, LevelStage> InternalNameDictionary =
+  internal static Dictionary<Level, LevelStage> InternalNameDictionary =
     new()
     {
       #region Act 1 - Main Ward
