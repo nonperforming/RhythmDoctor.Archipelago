@@ -1,7 +1,6 @@
-namespace RhythmDoctor.Archipelago.World
+namespace RhythmDoctor.Archipelago.World;
+
+public class OptionsData
 {
-  public class OptionsData
-  {
-    
-  }
+  // TODO
 }

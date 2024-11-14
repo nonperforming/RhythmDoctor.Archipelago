@@ -2,22 +2,22 @@ namespace RhythmDoctor.Archipelago.World;
 
 internal class Items
 {
-  public static void GetItem()
+  internal static void GetItem()
   {
 
   }
 
-  public static void LevelItem()
+  internal static void LevelItem()
   {
 
   }
 
-  public static void KeyItem()
+  internal static void KeyItem()
   {
 
   }
 
-  public static void TrapItem()
+  internal static void TrapItem()
   {
 
   }
