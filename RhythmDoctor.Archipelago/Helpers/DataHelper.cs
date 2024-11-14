@@ -1,17 +1,13 @@
-using System.Reflection;
-
 namespace RhythmDoctor.Archipelago.Helpers;
 
-internal static class DataFileHelper
+internal static class DataHelper
 {
-  private static IDeserializer Deserializer = new DeserializerBuilder()
+  private static readonly IDeserializer Deserializer = new DeserializerBuilder()
     .WithNamingConvention(HyphenatedNamingConvention.Instance)
     .Build();
 
   private static string GetDataFile(DataFileType fileType)
   {
-    string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
-
     string fileName;
     switch (fileType)
     {
@@ -28,10 +24,10 @@ internal static class DataFileHelper
         fileName = "world.yml";
         break;
       default:
-        throw new ArgumentOutOfRangeException(nameof(fileType), fileType, "File type is not supported.");
+        throw new ArgumentOutOfRangeException(nameof(fileType), fileType, "File type is not supported");
     }
 
-    string path = Path.Combine(assemblyFolder, "World", "data", fileName);
+    string path = Path.Combine(Paths.Data, fileName);
     return File.ReadAllText(path);
   }
 
