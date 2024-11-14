@@ -70,8 +70,6 @@ internal sealed class Client
   {
     ItemInfo item = helper.PeekItem();
 
-
-
     Plugin.Logger.LogDebug($"Successfully received item {item.ItemName} - {item.ItemId}");
     helper.DequeueItem();
   }

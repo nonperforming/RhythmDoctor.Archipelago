@@ -48,8 +48,9 @@ public class DebugMenu : MonoBehaviour
     {
       GUI.Box(new Rect(10, 10, 320, 150), "Rhythm Doctor Archipelago Data Debug");
 
-      ISerializer serializer =
-        new SerializerBuilder().WithNamingConvention(HyphenatedNamingConvention.Instance).Build();
+      ISerializer serializer = new SerializerBuilder()
+        .WithNamingConvention(HyphenatedNamingConvention.Instance)
+        .Build();
 
       if (GUI.Button(new Rect(30, 30, 300, 20), "Create ItemsData"))
       {
@@ -86,15 +87,21 @@ public class DebugMenu : MonoBehaviour
       if (GUI.Button(new Rect(30, 30, 300, 20), "Create Archipelago Menu Item"))
       {
         Plugin.Logger.LogInfo("Creating Archipelago Menu Item");
+
         CustomLevelsWardUIHelper.CreateCustomTab(
           "Archipelago",
           10,
-          () => { Plugin.Logger.LogInfo("Archipelago button pressed"); },
+          CustomTabAction,
           AssetHelper.LoadSprite(new WardIcons(), "archipelago.png"), // TODO: enum the asset name??
           null
         );
       }
     }
+  }
+
+  private void CustomTabAction()
+  {
+    Plugin.Logger.LogInfo("Archipelago button pressed");
   }
 }
 #endif
