@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>gg.archipelago.rhythmdoctor</AssemblyName>
     <TargetName>RhythmDoctor.Archipelago</TargetName>
-    <Product>RhythmDoctor.Archpelago</Product>
+    <Product>RhythmDoctor.Archipelago</Product>
     <Version>0.0.1</Version>
     <LangVersion>latest</LangVersion>
     <RestoreAdditionalProjectSources>
@@ -80,5 +80,11 @@
     <Reference Include="UnityEngine.UI">
       <HintPath>libs\UnityEngine.UI.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="World\assets\wardicons\archipelago.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
