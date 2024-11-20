@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: "nuget"
+    directory: "/RhythmDoctor.Archipelago"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "nonperforming"
+    ignore:
+      - dependency-name: "UnityEngine.Modules"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "nonperforming"
