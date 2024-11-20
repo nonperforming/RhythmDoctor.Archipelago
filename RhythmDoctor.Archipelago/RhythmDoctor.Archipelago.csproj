@@ -59,6 +59,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Data files -->
     <None Include="..\World\data\items.yml" Link="World\data\items.yml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -71,6 +72,11 @@
     <None Include="..\World\data\world.yml" Link="World\data\world.yml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+
+    <!-- Assets -->
+    <None Update="World\assets\wardicons\archipelago.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -80,11 +86,5 @@
     <Reference Include="UnityEngine.UI">
       <HintPath>libs\UnityEngine.UI.dll</HintPath>
     </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="World\assets\wardicons\archipelago.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 </Project>
