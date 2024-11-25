@@ -7,7 +7,7 @@ internal static class LogClearLevel
   [HarmonyPrefix]
   internal static void ShowAndSaveRank(bool bossLevelFailed = false, bool onlySavePersistence = false)
   {
-    Plugin.Logger.LogInfo(
+    Plugin.Logger?.LogInfo(
       @$"--- HUD.ShowAndSaveRank(bool bossLevelFailed = {bossLevelFailed}, bool onlySavePersistence = {onlySavePersistence})
 Rank: {scnGame.instance.currentLevel.GetRankFromMistakes().ToString()}
 Mistakes: {scnGame.instance.mistakesManager.mistakes}
@@ -20,17 +20,13 @@ Level ID: {scnGame.instance.levelIdentifier}
   [HarmonyPrefix]
   internal static void AdvanceGameover(HUD __instance, bool isPlayer = false)
   {
-    Plugin.Logger.LogInfo(
+    Plugin.Logger?.LogInfo(
       $@"--- HUD.AdvanceGameover(bool isPlayer = {isPlayer})
-State: {trueGameover(__instance)}
+State: {__instance.trueGameover}
 Cutscene: {scnGame.levelToLoadSource == LevelSource.CutscenesPath}
 Custom: {scnGame.instance.currentLevel.customGameover}
 Skip Rank Text: {scnGame.instance.currentLevel.skipRankText}
 ---"
     );
   }
-
-  [HarmonyPatch(typeof(HUD), "trueGameover", MethodType.Getter)]
-  [HarmonyReversePatch]
-  public static int trueGameover(HUD instance) => throw new NotImplementedException("Stub method called");
 }
