@@ -12,9 +12,9 @@ internal static class VersionTextPatch
   {
     string text = __instance.text.text += " / Archipelago v" + MyPluginInfo.PLUGIN_VERSION;
 
-    #if DEBUG
+#if DEBUG
     text += "D";
-    #endif
+#endif
 
     __instance.text.text = text;
   }

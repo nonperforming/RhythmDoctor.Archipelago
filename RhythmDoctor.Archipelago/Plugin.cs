@@ -16,10 +16,9 @@ public class Plugin : BaseUnityPlugin
     typeof(ForceCNYAvailablePatch),
     //typeof(JanitorPatch),
     typeof(VersionTextPatch),
-
-    #if DEBUG
+#if DEBUG
     typeof(LogClearLevel),
-    #endif
+#endif
   ];
 
   /// <summary>
