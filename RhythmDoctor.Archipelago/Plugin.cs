@@ -7,8 +7,8 @@ namespace RhythmDoctor.Archipelago;
 [BepInProcess("Rhythm Doctor.exe")]
 public class Plugin : BaseUnityPlugin
 {
-  internal static Client.Client? client;
-  internal static new ManualLogSource Logger = null!;
+  internal static Client.Client? Client;
+  internal static new ManualLogSource? Logger = null;
 
   private static readonly Type[] Patches =
   [
