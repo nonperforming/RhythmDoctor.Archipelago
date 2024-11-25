@@ -1,2 +1,8 @@
-libs/*
+# Do not include game DLLs - we cannot distribute them
+# TODO: Remove this when Nitrox.Discovery is implemented, then only use this
+#  folder for stubbed DLLs: for CI
+libs/
 !libs/.gitkeep
+
+# Do not ignore debugging scripts used
+!Debug*

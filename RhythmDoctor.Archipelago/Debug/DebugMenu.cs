@@ -1,5 +1,5 @@
 #if DEBUG
-namespace RhythmDoctor.Archipelago;
+namespace RhythmDoctor.Archipelago.Debug;
 
 public class DebugMenu : MonoBehaviour
 {

@@ -10,6 +10,12 @@ internal static class VersionTextPatch
   [HarmonyPostfix]
   static void Postfix(RDVersionText __instance)
   {
-    __instance.text.text += " / Archipelago v" + MyPluginInfo.PLUGIN_VERSION;
+    string text = __instance.text.text += " / Archipelago v" + MyPluginInfo.PLUGIN_VERSION;
+
+    #if DEBUG
+    text += "D";
+    #endif
+
+    __instance.text.text = text;
   }
 }

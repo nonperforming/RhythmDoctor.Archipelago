@@ -16,6 +16,10 @@ public class Plugin : BaseUnityPlugin
     typeof(ForceCNYAvailablePatch),
     //typeof(JanitorPatch),
     typeof(VersionTextPatch),
+
+    #if DEBUG
+    typeof(LogClearLevel),
+    #endif
   ];
 
   /// <summary>
@@ -26,6 +30,8 @@ public class Plugin : BaseUnityPlugin
     Logger = base.Logger;
     Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} loaded");
 
+    // TODO: Is there a simpler way to PatchAll()?
+    //  Unless we give Harmony the Type, it doesn't seem to apply the patch.
     Logger.LogInfo("Applying patches");
     foreach (Type patch in Patches)
     {
@@ -43,7 +49,7 @@ public class Plugin : BaseUnityPlugin
   private IEnumerator CreateDebugMenu()
   {
     Logger.LogInfo("Creating debug menu");
-    GameObject debugMenu = new("Archipelago Debug Menu");
+    GameObject debugMenu = new("RhythmDoctor.Archipelago Debug");
     DontDestroyOnLoad(debugMenu);
     debugMenu.AddComponent<DebugMenu>();
 

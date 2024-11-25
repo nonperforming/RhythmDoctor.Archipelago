@@ -12,6 +12,10 @@ global using HarmonyLib;
 
 global using RhythmDoctor.Archipelago;
 global using RhythmDoctor.Archipelago.Client;
+#if DEBUG
+global using RhythmDoctor.Archipelago.Debug;
+global using RhythmDoctor.Archipelago.Debug.Patches;
+#endif
 global using RhythmDoctor.Archipelago.Helpers;
 global using RhythmDoctor.Archipelago.Patches;
 global using RhythmDoctor.Archipelago.World;

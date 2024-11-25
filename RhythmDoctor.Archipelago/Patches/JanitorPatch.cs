@@ -1,8 +1,7 @@
 namespace RhythmDoctor.Archipelago.Patches;
 
-//[HarmonyPatch(typeof(RDVersionText), "SetPage")]
 /// <summary>
-/// TODO
+/// Force all Janitors to be visible.
 /// </summary>
 internal static class JanitorPatch
 {

@@ -86,5 +86,8 @@
     <Reference Include="UnityEngine.UI">
       <HintPath>libs\UnityEngine.UI.dll</HintPath>
     </Reference>
+    <Reference Include="RDTools">
+      <HintPath>libs\RDTools.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
