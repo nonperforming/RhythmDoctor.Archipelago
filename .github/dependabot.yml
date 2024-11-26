@@ -8,6 +8,7 @@ updates:
       - "nonperforming"
     ignore:
       - dependency-name: "UnityEngine.Modules"
+      - dependency-name: "Microsoft.NETFramework.ReferenceAssemblies"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
