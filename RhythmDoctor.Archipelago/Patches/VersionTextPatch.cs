@@ -6,7 +6,7 @@ namespace RhythmDoctor.Archipelago.Patches;
 [HarmonyPatch(typeof(RDVersionText))]
 internal static class VersionTextPatch
 {
-  [HarmonyPatch("SetPage")]
+  [HarmonyPatch(nameof(RDVersionText.SetPage))]
   [HarmonyPostfix]
   static void Postfix(RDVersionText __instance)
   {

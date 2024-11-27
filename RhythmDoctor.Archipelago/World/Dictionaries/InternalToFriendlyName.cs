@@ -1,5 +1,3 @@
-using RhythmDoctor.Archipelago.World.Enums;
-
 namespace RhythmDoctor.Archipelago.World.Dictionaries;
 
 internal static class InternalToFriendlyName

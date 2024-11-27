@@ -12,6 +12,10 @@ internal sealed class Client
 
   Client(string server, string username, string? password = null)
   {
+    _items = new();
+    _locations = new();
+    _options = new();
+
     CreateSession(server);
   }
 

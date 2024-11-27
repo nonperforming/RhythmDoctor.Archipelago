@@ -3,30 +3,30 @@ namespace RhythmDoctor.Archipelago.Debug;
 
 public class DebugMenu : MonoBehaviour
 {
-  private bool _activatedMain = false;
-  private bool _activatedData = false;
-  private bool _activatedMenu = false;
+  private bool _activatedMain;
+  private bool _activatedData;
+  private bool _activatedMenu;
 
   private void Start()
   {
-    Plugin.Logger.LogInfo("Debug menu started");
+    Plugin.Logger?.LogInfo("Debug menu started");
   }
 
   private void Update()
   {
     if (Input.GetKeyDown(KeyCode.F3))
     {
-      Plugin.Logger.LogInfo("Toggled Main Debug menu to " + !_activatedMain);
+      Plugin.Logger?.LogInfo("Toggled Main Debug menu to " + !_activatedMain);
       _activatedMain = !_activatedMain;
     }
     if (Input.GetKeyDown(KeyCode.F4))
     {
-      Plugin.Logger.LogInfo("Toggled Data Debug menu to " + !_activatedData);
+      Plugin.Logger?.LogInfo("Toggled Data Debug menu to " + !_activatedData);
       _activatedData = !_activatedData;
     }
     if (Input.GetKeyDown(KeyCode.F5))
     {
-      Plugin.Logger.LogInfo("Toggled Menu Debug menu to " + !_activatedMenu);
+      Plugin.Logger?.LogInfo("Toggled Menu Debug menu to " + !_activatedMenu);
       _activatedMenu = !_activatedMenu;
     }
   }
@@ -39,7 +39,7 @@ public class DebugMenu : MonoBehaviour
 
       if (GUI.Button(new Rect(30, 30, 300, 20), "Toggle RD Debug"))
       {
-        Plugin.Logger.LogInfo("Toggling RD Debug to " + !DebugSettings.instance.Debug);
+        Plugin.Logger?.LogInfo("Toggling RD Debug to " + !DebugSettings.instance.Debug);
         DebugSettings.instance.Debug = !DebugSettings.instance.Debug;
       }
     }
@@ -54,26 +54,26 @@ public class DebugMenu : MonoBehaviour
 
       if (GUI.Button(new Rect(30, 30, 300, 20), "Create ItemsData"))
       {
-        Plugin.Logger.LogInfo("Creating ItemsData");
+        Plugin.Logger?.LogInfo("Creating ItemsData");
         ItemsData itemsData = DataHelper.GetItemsData();
-        Plugin.Logger.LogInfo(serializer.Serialize(itemsData));
+        Plugin.Logger?.LogInfo(serializer.Serialize(itemsData));
       }
       if (GUI.Button(new Rect(30, 60, 300, 20), "Create LocationsData"))
       {
-        Plugin.Logger.LogInfo("Creating LocationsData");
+        Plugin.Logger?.LogInfo("Creating LocationsData");
         LocationsData locationsData = DataHelper.GetLocationsData();
-        Plugin.Logger.LogInfo(serializer.Serialize(locationsData));
+        Plugin.Logger?.LogInfo(serializer.Serialize(locationsData));
       }
       if (GUI.Button(new Rect(30, 90, 300, 20), "Create OptionsData"))
       {
-        Plugin.Logger.LogInfo("Creating OptionsData");
+        Plugin.Logger?.LogInfo("Creating OptionsData");
         throw new NotImplementedException();
         //OptionsData optionsData = DataHelper.GetOptionsData();
         //Plugin.Logger.LogInfo(serializer.Serialize(optionsData));
       }
       if (GUI.Button(new Rect(30, 120, 300, 20), "Create WorldData"))
       {
-        Plugin.Logger.LogInfo("Creating WorldData");
+        Plugin.Logger?.LogInfo("Creating WorldData");
         throw new NotImplementedException();
         //WorldData worldData = DataHelper.GetWorldData();
         //Plugin.Logger.LogInfo(serializer.Serialize(worldData));
@@ -86,7 +86,7 @@ public class DebugMenu : MonoBehaviour
 
       if (GUI.Button(new Rect(30, 30, 300, 20), "Create Archipelago Menu Item"))
       {
-        Plugin.Logger.LogInfo("Creating Archipelago Menu Item");
+        Plugin.Logger?.LogInfo("Creating Archipelago Menu Item");
 
         CustomLevelsWardUIHelper.CreateCustomTab(
           "Archipelago",
@@ -101,7 +101,7 @@ public class DebugMenu : MonoBehaviour
 
   private void CustomTabAction()
   {
-    Plugin.Logger.LogInfo("Archipelago button pressed");
+    Plugin.Logger?.LogInfo("Archipelago button pressed");
   }
 }
 #endif
