@@ -15,9 +15,12 @@ public class Plugin : BaseUnityPlugin
     //typeof(CustomLevelsWardUIPatch),
     typeof(ForceCNYAvailablePatch),
     //typeof(JanitorPatch),
+    typeof(SkipTutorialPatch),
     typeof(VersionTextPatch),
+
 #if DEBUG
-    typeof(LogClearLevel),
+    typeof(LogClearLevelPatch),
+    typeof(LogRDPrintPatch),
 #endif
   ];
 
