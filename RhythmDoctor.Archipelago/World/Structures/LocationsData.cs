@@ -2,6 +2,12 @@ namespace RhythmDoctor.Archipelago.World;
 
 public struct LocationsData
 {
+  public LocationsData()
+  {
+    Plugin.Logger?.LogInfo("Creating LocationsData");
+    this = DataHelper.GetLocationsData();
+  }
+
   [YamlMember(Alias = "act-1")]
   public Dictionary<LevelStage, List<Item>> Act1Levels;
 
