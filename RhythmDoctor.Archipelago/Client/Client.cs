@@ -10,13 +10,14 @@ internal sealed class Client
   internal Options options;
   internal World.World world;
 
-  Client(string server, string username, string? password = null)
+  public Client(string server, string username, string? password = null, bool deathLink = false)
   {
     items = new();
     locations = new();
     options = new();
 
     CreateSession(server);
+    Connect(username, password, deathLink);
   }
 
   internal ArchipelagoSession CreateSession(string server)
@@ -30,7 +31,7 @@ internal sealed class Client
   {
     if (session == null)
     {
-      throw new ArgumentNullException("Session is null");
+      throw new NullReferenceException("Session is null");
     }
 
     if (deathLink)

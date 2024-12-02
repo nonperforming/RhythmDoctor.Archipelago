@@ -7,6 +7,13 @@ public class DebugMenu : MonoBehaviour
   private bool _activatedData;
   private bool _activatedMenu;
 
+  private string _url = "archipelago.gg";
+  // ReSharper disable once NullableWarningSuppressionIsUsed
+  private string _username = null!;
+  // ReSharper disable once NullableWarningSuppressionIsUsed
+  private string _password = null!;
+  private bool _deathLink;
+
   private void Start()
   {
     Plugin.Logger?.LogInfo("Debug menu started");
@@ -16,17 +23,17 @@ public class DebugMenu : MonoBehaviour
   {
     if (Input.GetKeyDown(KeyCode.F3))
     {
-      Plugin.Logger?.LogInfo("Toggled Main Debug menu to " + !_activatedMain);
+      Plugin.Logger?.LogDebug("Toggled Main Debug menu to " + !_activatedMain);
       _activatedMain = !_activatedMain;
     }
     if (Input.GetKeyDown(KeyCode.F4))
     {
-      Plugin.Logger?.LogInfo("Toggled Data Debug menu to " + !_activatedData);
+      Plugin.Logger?.LogDebug("Toggled Data Debug menu to " + !_activatedData);
       _activatedData = !_activatedData;
     }
     if (Input.GetKeyDown(KeyCode.F5))
     {
-      Plugin.Logger?.LogInfo("Toggled Menu Debug menu to " + !_activatedMenu);
+      Plugin.Logger?.LogDebug("Toggled Menu Debug menu to " + !_activatedMenu);
       _activatedMenu = !_activatedMenu;
     }
   }
@@ -35,18 +42,35 @@ public class DebugMenu : MonoBehaviour
   {
     if (_activatedMain)
     {
-      GUI.Box(new Rect(10, 10, 320, 60), "Rhythm Doctor Archipelago Main Debug");
+      GUI.Box(new Rect(10, 10, 330, 160), "Rhythm Doctor Archipelago Main Debug");
 
       if (GUI.Button(new Rect(30, 30, 300, 20), "Toggle RD Debug"))
       {
         Plugin.Logger?.LogInfo("Toggling RD Debug to " + !DebugSettings.instance.Debug);
         DebugSettings.instance.Debug = !DebugSettings.instance.Debug;
       }
+
+      GUI.Label(new Rect(30, 50, 150, 20), "URL");
+      _url = GUI.TextField(new Rect(180, 50, 150, 20), _url);
+
+      GUI.Label(new Rect(30, 70, 150, 20), "Username");
+      _username = GUI.TextField(new Rect(180, 70, 150, 20), _username);
+
+      GUI.Label(new Rect(30, 90, 150, 20), "Password");
+      _password = GUI.TextField(new Rect(180, 90, 150, 20), _password);
+
+      GUI.Label(new Rect(30, 110, 150, 20), "Death Link");
+      _deathLink = GUI.Toggle(new Rect(180, 110, 150, 20), _deathLink, "");
+
+      if (GUI.Button(new Rect(30, 130, 300, 20), "Connect"))
+      {
+        Plugin.Client = new Client.Client(_url, _username, _password);
+      }
     }
 
     if (_activatedData)
     {
-      GUI.Box(new Rect(10, 10, 320, 150), "Rhythm Doctor Archipelago Data Debug");
+      GUI.Box(new Rect(10, 10, 330, 150), "Rhythm Doctor Archipelago Data Debug");
 
       ISerializer serializer = new SerializerBuilder()
         .WithNamingConvention(HyphenatedNamingConvention.Instance)
@@ -82,7 +106,7 @@ public class DebugMenu : MonoBehaviour
 
     if (_activatedMenu)
     {
-      GUI.Box(new Rect(10, 10, 320, 60), "Rhythm Doctor Archipelago Menu Debug");
+      GUI.Box(new Rect(10, 10, 330, 60), "Rhythm Doctor Archipelago Menu Debug");
 
       if (GUI.Button(new Rect(30, 30, 300, 20), "Create Archipelago Menu Item"))
       {
