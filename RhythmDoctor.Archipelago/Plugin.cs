@@ -17,10 +17,8 @@ public class Plugin : BaseUnityPlugin
     //typeof(JanitorPatch),
     typeof(SkipTutorialPatch),
     typeof(VersionTextPatch),
-
 #if DEBUG
     typeof(LogClearLevelPatch),
-    typeof(LogRDPrintPatch),
 #endif
   ];
 
