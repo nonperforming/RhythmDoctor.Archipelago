@@ -6,7 +6,7 @@ public struct Item
   public string Name;
 
   [YamlMember(Alias = "id")]
-  public ulong ID;
+  public uint ID;
 
   [YamlMember(Alias = "classification")]
   public ItemClassification Classification;
