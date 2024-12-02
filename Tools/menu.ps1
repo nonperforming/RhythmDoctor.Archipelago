@@ -25,6 +25,7 @@ function Prompt-Menu
     {
       Write-Host "===== Main Menu =====" -BackgroundColor Blue
       Write-Host " 1: Test" -ForegroundColor Blue
+      Write-Host " 2: Format using CSharpier" -ForegroundColor Blue
       Write-Host " v: Print variables" -ForegroundColor Blue
       Write-Host " o: Set options" -ForegroundColor Blue
       Write-Host " e: Exit script" -ForegroundColor Blue
@@ -58,6 +59,11 @@ function Prompt-Menu
           Write-Host "Cleaning up" -BackgroundColor Magenta
           Remove-Item -Recurse $BuildPath
           continue
+        }
+        "2"
+        {
+          Write-Host "Formatting using csharpier" -BackgroundColor Red
+          dotnet csharpier $RepositoryPath
         }
         "v"
         {
