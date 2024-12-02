@@ -22,7 +22,7 @@ Level ID: {scnGame.instance.levelIdentifier}
       return;
     }
 
-    LevelStage levelStage = InternalToFriendlyName.InternalNameDictionary[internalLevelName];
+    LevelStage levelStage = LevelHelper.InternalToFriendlyNameDictionary[internalLevelName];
     Plugin.Logger?.LogDebug($"Stage to clear: {levelStage.ToString()}");
   }
 
