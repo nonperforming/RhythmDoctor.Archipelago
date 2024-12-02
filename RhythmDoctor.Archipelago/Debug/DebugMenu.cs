@@ -8,8 +8,10 @@ public class DebugMenu : MonoBehaviour
   private bool _activatedMenu;
 
   private string _url = "archipelago.gg";
+
   // ReSharper disable once NullableWarningSuppressionIsUsed
   private string _username = null!;
+
   // ReSharper disable once NullableWarningSuppressionIsUsed
   private string _password = null!;
   private bool _deathLink;
