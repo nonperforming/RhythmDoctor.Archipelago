@@ -12,6 +12,7 @@ public class Plugin : BaseUnityPlugin
 
   private static readonly Type[] Patches =
   [
+    typeof(ClearLocationPatch),
     //typeof(CustomLevelsWardUIPatch),
     typeof(ForceCNYAvailablePatch),
     //typeof(JanitorPatch),
@@ -48,7 +49,7 @@ public class Plugin : BaseUnityPlugin
 
   private IEnumerator CreateDebugMenu()
   {
-    Logger.LogInfo("Creating debug menu");
+    Logger?.LogInfo("Creating debug menu");
     GameObject debugMenu = new("RhythmDoctor.Archipelago Debug");
     DontDestroyOnLoad(debugMenu);
     debugMenu.AddComponent<DebugMenu>();
