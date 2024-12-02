@@ -154,17 +154,16 @@ internal static class LevelHelper
   /// <param name="stage">Stage to check</param>
   /// <returns>True if boss stage, otherwise false</returns>
   internal static bool IsBoss(LevelStage stage) =>
-    stage == LevelStage.BattlewornInsomniac ||
-    stage == LevelStage.AllTheTimes ||
-    stage == LevelStage.OneShiftMore ||
-    stage == LevelStage.SuperBattlewornInsomniac ||
-    stage == LevelStage.DreamsDontStop;
+    stage == LevelStage.BattlewornInsomniac
+    || stage == LevelStage.AllTheTimes
+    || stage == LevelStage.OneShiftMore
+    || stage == LevelStage.SuperBattlewornInsomniac
+    || stage == LevelStage.DreamsDontStop;
 
   /// <summary>
   /// Check if a level has checkpoints
   /// </summary>
   /// <param name="stage">Stage to check</param>
   /// <returns>True if has checkpoints, otherwise false</returns>
-  internal static bool HasCheckpoints(LevelStage stage) =>
-    stage == LevelStage.DreamsDontStop;
+  internal static bool HasCheckpoints(LevelStage stage) => stage == LevelStage.DreamsDontStop;
 }

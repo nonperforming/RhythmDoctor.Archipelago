@@ -77,7 +77,7 @@ internal class Locations
       }
     }
 
-    #if DEBUG
+#if DEBUG
     // Sanity checks
     foreach (long id in ids)
     {
@@ -87,7 +87,7 @@ internal class Locations
         Plugin.Logger?.LogError($"ID {id} is out of range");
       }
     }
-    #endif
+#endif
 
     return ids.ToArray();
   }
