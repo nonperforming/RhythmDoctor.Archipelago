@@ -5,7 +5,7 @@ public class ClearLocationPatch
 {
   [HarmonyPatch(nameof(HUD.ShowAndSaveRank))]
   [HarmonyPrefix]
-  internal static void Prefix(bool bossLevelFailed = false, bool onlySavePersistence = false)
+  internal static void Prefix(bool bossLevelFailed, bool onlySavePersistence)
   {
     // Is onlySavePersistence is currently only used in custom levels?
     // "there's a function for custom levels to skip the rank text [rank screen] at the end"
