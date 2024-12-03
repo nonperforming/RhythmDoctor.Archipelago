@@ -25,18 +25,18 @@ public class DebugMenu : MonoBehaviour
   {
     if (Input.GetKeyDown(KeyCode.F3))
     {
-      Plugin.Logger?.LogDebug("Toggled Main Debug menu to " + !_activatedMain);
       _activatedMain = !_activatedMain;
+      Plugin.Logger?.LogDebug("Toggled Main Debug menu to " + _activatedMain);
     }
     if (Input.GetKeyDown(KeyCode.F4))
     {
-      Plugin.Logger?.LogDebug("Toggled Data Debug menu to " + !_activatedData);
       _activatedData = !_activatedData;
+      Plugin.Logger?.LogDebug("Toggled Data Debug menu to " + _activatedData);
     }
     if (Input.GetKeyDown(KeyCode.F5))
     {
-      Plugin.Logger?.LogDebug("Toggled Menu Debug menu to " + !_activatedMenu);
       _activatedMenu = !_activatedMenu;
+      Plugin.Logger?.LogDebug("Toggled Menu Debug menu to " + _activatedMenu);
     }
   }
 
