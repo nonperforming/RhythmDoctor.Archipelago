@@ -14,7 +14,11 @@ function Update-Paths
   Set-Variable -Name "BuildPath" -Value (Join-Path -Path $RepositoryPath -ChildPath "build") -Scope script
 
   Set-Variable -Name "GameExecutable" -Value (Join-Path -Path $InstallPath -ChildPath "Rhythm Doctor.exe") -Scope script
-  Set-Variable -Name "PluginPath" -Value (Join-Path -Path $InstallPath -ChildPath "BepInEx/plugins") -Scope script
+
+  Set-Variable -Name "BepInExPath" -Value (Join-Path -Path $InstallPath -ChildPath "BepInEx") -Scope script
+  Set-Variable -Name "PluginPath" -Value (Join-Path -Path $BepInExPath -ChildPath "plugins") -Scope script
+  Set-Variable -Name "ConfigPath" -Value (Join-Path -Path $BepInExPath -ChildPath "config") -Scope script
+  Set-Variable -Name "LogFile" -Value (Join-Path -Path $BepInExPath -ChildPath "LogOutput.log") -Scope script
 }
 
 function Prompt-Menu
@@ -26,6 +30,8 @@ function Prompt-Menu
       Write-Host "===== Main Menu =====" -BackgroundColor Blue
       Write-Host " 1: Test" -ForegroundColor Blue
       Write-Host " 2: Format using CSharpier" -ForegroundColor Blue
+      Write-Host ""
+      Write-Host " 3: Open log" -ForegroundColor Blue
       Write-Host " v: Print variables" -ForegroundColor Blue
       Write-Host " o: Set options" -ForegroundColor Blue
       Write-Host " e: Exit script" -ForegroundColor Blue
@@ -35,7 +41,7 @@ function Prompt-Menu
       switch ($Selection)
       {
         "1"
-        {
+        {        
           Write-Host "Building" -BackgroundColor Magenta
           dotnet publish $ProjectPath --configuration Debug --output $BuildPath
 
@@ -54,16 +60,24 @@ function Prompt-Menu
           Copy-Item -Path $BuildPath/YamlDotNet.dll -Destination $PluginPath
 
           Write-Host "Starting Rhythm Doctor" -BackgroundColor Magenta
-          Start-Process -FilePath $GameExecutable -WorkingDirectory $InstallPath
+          Stop-Process -Name "Rhythm Doctor" -Confirm
+          Start-Process -Confirm -FilePath $GameExecutable -WorkingDirectory $InstallPath
 
           Write-Host "Cleaning up" -BackgroundColor Magenta
           Remove-Item -Recurse $BuildPath
+          
           continue
         }
         "2"
         {
           Write-Host "Formatting using csharpier" -BackgroundColor Red
           dotnet csharpier $RepositoryPath
+          continue
+        }
+        "3"
+        {
+          Invoke-Item $LogFile
+        	continue
         }
         "v"
         {
@@ -74,7 +88,11 @@ function Prompt-Menu
           Write-Host "Build Path: $BuildPath" -ForegroundColor Yellow
           Write-Host
           Write-Host "Game Executable: $GameExecutable" -ForegroundColor Yellow
+          Write-Host 
+          Write-Host "BepInEx Path: $BepInExPath" -ForegroundColor Yellow
           Write-Host "Plugin Path: $PluginPath" -ForegroundColor Yellow
+          Write-Host "Config Path: $ConfigPath" -ForegroundColor Yellow
+          Write-Host "Log Path: $LogFile" -ForegroundColor Yellow
           Write-Host "=====================" -BackgroundColor Yellow
           continue
         }
