@@ -29,9 +29,10 @@ function Prompt-Menu
     {
       Write-Host "===== Main Menu =====" -BackgroundColor Blue
       Write-Host " 1: Test" -ForegroundColor Blue
-      Write-Host " 2: Format using CSharpier" -ForegroundColor Blue
+      Write-Host " 2: Restart Rhythm Doctor" -ForegroundColor Blue
+      Write-Host " 3: Format using CSharpier" -ForegroundColor Blue
       Write-Host ""
-      Write-Host " 3: Open log" -ForegroundColor Blue
+      Write-Host " l: Open log" -ForegroundColor Blue
       Write-Host " v: Print variables" -ForegroundColor Blue
       Write-Host " o: Set options" -ForegroundColor Blue
       Write-Host " e: Exit script" -ForegroundColor Blue
@@ -70,11 +71,16 @@ function Prompt-Menu
         }
         "2"
         {
+        	Stop-Process -Name "Rhythm Doctor"
+          Start-Process -FilePath $GameExecutable -WorkingDirectory $InstallPath
+        }
+        "3"
+        {
           Write-Host "Formatting using csharpier" -BackgroundColor Red
           dotnet csharpier $RepositoryPath
           continue
         }
-        "3"
+        "l"
         {
           Invoke-Item $LogFile
         	continue
