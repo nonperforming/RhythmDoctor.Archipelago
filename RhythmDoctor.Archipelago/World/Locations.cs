@@ -11,10 +11,11 @@ internal class Locations
 
   private long[] GetIDsForStage(LevelStage stage, Rank rank)
   {
+    throw new NotImplementedException();
     // TODO: Is there a better way we could do this?
-    List<long> ids = new(3);
+    /*List<long> ids = new(3);
     Area area = LevelHelper.LevelToAreaDictionary[stage];
-    long offset = _data.Levels[area][stage][0].ID;
+    long offset = _data.Locations[area][stage][0].ID;
 
     // Boss levels are handled differently from regular levels.
     // Note that bonus levels (excluding Rhythm Weightlifter) have a rank much like regular levels, so they are considered as such.
@@ -89,7 +90,7 @@ internal class Locations
     }
 #endif
 
-    return ids.ToArray();
+    return ids.ToArray();*/
   }
 
   /// <summary>

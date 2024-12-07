@@ -1,12 +1,6 @@
-namespace RhythmDoctor.Archipelago.World;
+namespace RhythmDoctor.Archipelago.World.Structures;
 
 public struct LocationsData
 {
-  public LocationsData()
-  {
-    Plugin.Logger?.LogInfo("Creating LocationsData");
-    this = DataHelper.GetLocationsData();
-  }
-
-  public Dictionary<Area, Dictionary<LevelStage, List<Item>>> Levels;
+  public Dictionary<Region, Dictionary<LevelStage, List<Location>>> Locations;
 }
