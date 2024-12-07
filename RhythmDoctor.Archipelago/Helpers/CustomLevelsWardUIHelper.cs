@@ -10,7 +10,9 @@ internal static class CustomLevelsWardUIHelper
     AudioClip? selectAudio = null
   )
   {
-    Plugin.Logger.LogInfo($"Creating custom tab {label}: {wardID}");
+    // TODO: Using GameObject.Find is a potentially costly method.
+    //       If possible, we should cache these results.
+    Plugin.Logger?.LogInfo($"Creating custom tab {label}: {wardID}");
     Assert.IsFalse(Enum.IsDefined(typeof(scnCLS.WardOptionName), wardID), "Cannot use existing WardOptionName");
     GameObject tabTemplate = GameObject.Find("Library Tab").gameObject;
     GameObject tab = UnityEngine.Object.Instantiate(tabTemplate, scnCLS.instance.wardOptionsContainer.transform, false);

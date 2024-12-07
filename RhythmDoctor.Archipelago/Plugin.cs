@@ -15,8 +15,9 @@ public class Plugin : BaseUnityPlugin
     typeof(ClearLocationPatch),
     //typeof(CustomLevelsWardUIPatch),
     typeof(ForceCNYAvailablePatch),
-    //typeof(JanitorPatch),
+    typeof(JanitorPatch),
     //typeof(SkipTutorialPatch), // Disabled due to bugs with 1-2 and 3-X. See class for more information
+    //typeof(UnlockLevelFromItemPatch),
     typeof(VersionTextPatch),
 #if DEBUG
     typeof(LogClearLevelPatch),

@@ -6,6 +6,7 @@ namespace RhythmDoctor.Archipelago.Patches;
 [HarmonyPatch(typeof(scnCLS))]
 internal static class CustomLevelsWardUIPatch
 {
+  // TODO: Implement
   internal static Dictionary<int, Action> LevelWardOptions = [];
 
   [HarmonyPatch(nameof(scnCLS.SelectWardOption))]

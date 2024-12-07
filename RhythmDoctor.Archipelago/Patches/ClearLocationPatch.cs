@@ -1,11 +1,11 @@
 namespace RhythmDoctor.Archipelago.Patches;
 
 [HarmonyPatch(typeof(HUD))]
-public class ClearLocationPatch
+internal class ClearLocationPatch
 {
   [HarmonyPatch(nameof(HUD.ShowAndSaveRank))]
   [HarmonyPrefix]
-  internal static void Prefix(bool bossLevelFailed, bool onlySavePersistence)
+  static void ClearLocationPrefix(bool bossLevelFailed, bool onlySavePersistence)
   {
     // Is onlySavePersistence is currently only used in custom levels?
     // "there's a function for custom levels to skip the rank text [rank screen] at the end"
@@ -29,6 +29,6 @@ public class ClearLocationPatch
     Rank rank = scnGame.instance.currentLevel.GetRankFromMistakes();
     Plugin.Logger?.LogDebug($"Stage to clear: {stage.ToString()} with rank {rank.ToString()}");
 
-    Plugin.Client?.locations.SendLocation(stage, rank);
+    Plugin.Client.locations.SendLocation(stage, rank);
   }
 }

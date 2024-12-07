@@ -12,7 +12,7 @@ namespace RhythmDoctor.Archipelago.Patches;
 /// ...but doesn't for some reason.
 /// </summary>
 [HarmonyPatch(typeof(scnBase))]
-internal static class SkipTutorialPatch
+static class SkipTutorialPatch
 {
   [HarmonyPatch(nameof(scnBase.GoToLevel))]
   [HarmonyPrefix]
