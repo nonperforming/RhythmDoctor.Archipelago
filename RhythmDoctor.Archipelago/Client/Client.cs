@@ -2,41 +2,46 @@ namespace RhythmDoctor.Archipelago.Client;
 
 internal sealed class Client
 {
-  private ArchipelagoSession? _session;
-  private DeathLinkService? _deathLinkService;
+  internal ArchipelagoSession? session;
+  internal DeathLinkService? deathLinkService;
 
-  private Items _items;
-  private Locations _locations;
-  private Options _options;
-  private World.World _world;
+  internal Items items;
+  internal Locations locations;
+  internal Options options;
+  internal World.World world;
 
-  Client(string server, string username, string? password = null)
+  public Client(string server, string username, string? password = null, bool deathLink = false)
   {
+    items = new();
+    locations = new();
+    options = new();
+
     CreateSession(server);
+    Connect(username, password, deathLink);
   }
 
   internal ArchipelagoSession CreateSession(string server)
   {
-    Plugin.Logger.LogInfo($"Creating Archipelago session to {server}");
-    _session = ArchipelagoSessionFactory.CreateSession(server);
-    return _session;
+    Plugin.Logger?.LogInfo($"Creating Archipelago session to {server}");
+    session = ArchipelagoSessionFactory.CreateSession(server);
+    return session;
   }
 
   internal void Connect(string name, string? password = null, bool deathLink = false)
   {
-    if (_session == null)
+    if (session == null)
     {
-      throw new ArgumentNullException("Session is null");
+      throw new NullReferenceException("Session is null");
     }
 
     if (deathLink)
     {
-      _deathLinkService = _session.CreateDeathLinkService();
-      _deathLinkService.EnableDeathLink();
-      _deathLinkService.OnDeathLinkReceived += DeathLinkRecieved;
+      deathLinkService = session.CreateDeathLinkService();
+      deathLinkService.EnableDeathLink();
+      deathLinkService.OnDeathLinkReceived += DeathLinkRecieved;
     }
 
-    LoginResult loginResult = _session.TryConnectAndLogin(
+    LoginResult loginResult = session.TryConnectAndLogin(
       "Rhythm Doctor",
       name,
       ItemsHandlingFlags.AllItems,
@@ -49,11 +54,11 @@ internal sealed class Client
 
     if (loginResult.Successful)
     {
-      Plugin.Logger.LogInfo($"Successfully connected to {name} as {_session.ConnectionInfo.Uuid}");
+      Plugin.Logger?.LogInfo($"Successfully connected to {name} as {session.ConnectionInfo.Uuid}");
 
-      Plugin.Logger.LogDebug("Binding events");
-      _session.MessageLog.OnMessageReceived += MessageRecieved;
-      _session.Items.ItemReceived += ItemReceived;
+      Plugin.Logger?.LogDebug("Binding events");
+      session.MessageLog.OnMessageReceived += MessageRecieved;
+      session.Items.ItemReceived += ItemReceived;
     }
     else
     {
@@ -63,20 +68,20 @@ internal sealed class Client
 
   internal void MessageRecieved(LogMessage message)
   {
-    Plugin.Logger.LogInfo($"Recieved message {message.ToString()}");
+    Plugin.Logger?.LogInfo($"Received message {message}");
   }
 
   internal void ItemReceived(ReceivedItemsHelper helper)
   {
     ItemInfo item = helper.PeekItem();
 
-    Plugin.Logger.LogDebug($"Successfully received item {item.ItemName} - {item.ItemId}");
+    Plugin.Logger?.LogDebug($"Successfully received item {item.ItemName} - {item.ItemId}");
     helper.DequeueItem();
   }
 
   internal void DeathLinkRecieved(DeathLink deathLink)
   {
-    Plugin.Logger.LogInfo($"DeathLink from {deathLink.Source} by {deathLink.Cause} at {deathLink.Timestamp}");
+    Plugin.Logger?.LogInfo($"DeathLink from {deathLink.Source} by {deathLink.Cause} at {deathLink.Timestamp}");
     // TODO: Implement
   }
 }

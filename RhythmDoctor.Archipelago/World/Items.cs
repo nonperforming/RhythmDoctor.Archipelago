@@ -2,6 +2,13 @@ namespace RhythmDoctor.Archipelago.World;
 
 internal class Items
 {
+  private ItemsData _data;
+
+  public Items()
+  {
+    _data = new();
+  }
+
   internal static void GetItem()
   {
     // TODO

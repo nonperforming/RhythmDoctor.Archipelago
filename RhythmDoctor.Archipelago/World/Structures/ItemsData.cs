@@ -2,6 +2,12 @@ namespace RhythmDoctor.Archipelago.World.Structures;
 
 public struct ItemsData
 {
+  public ItemsData()
+  {
+    Plugin.Logger?.LogInfo("Creating ItemsData");
+    this = DataHelper.GetItemsData();
+  }
+
   [YamlMember(Alias = "levels")]
   public Dictionary<Ward, List<Item>> Levels;
 
@@ -10,28 +16,4 @@ public struct ItemsData
 
   [YamlMember(Alias = "filler")]
   public Dictionary<FillerType, List<Item>> Filler;
-}
-
-public enum ItemClassification
-{
-  [EnumMember(Value = "progression")]
-  Progression,
-
-  [EnumMember(Value = "filler")]
-  Filler,
-
-  [EnumMember(Value = "trap")]
-  Trap,
-}
-
-public enum FillerType
-{
-  [EnumMember(Value = "junk")]
-  Junk,
-
-  [EnumMember(Value = "powerups")]
-  Powerups,
-
-  [EnumMember(Value = "traps")]
-  Traps,
 }

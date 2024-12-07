@@ -7,15 +7,21 @@ namespace RhythmDoctor.Archipelago;
 [BepInProcess("Rhythm Doctor.exe")]
 public class Plugin : BaseUnityPlugin
 {
-  internal static Client.Client? client;
-  internal static new ManualLogSource Logger = null!;
+  internal static Client.Client? Client;
+  internal static new ManualLogSource? Logger = null;
 
   private static readonly Type[] Patches =
   [
+    typeof(ClearLocationPatch),
     //typeof(CustomLevelsWardUIPatch),
     typeof(ForceCNYAvailablePatch),
-    //typeof(JanitorPatch),
+    typeof(JanitorPatch),
+    //typeof(SkipTutorialPatch), // Disabled due to bugs with 1-2 and 3-X. See class for more information
+    //typeof(UnlockLevelFromItemPatch),
     typeof(VersionTextPatch),
+#if DEBUG
+    typeof(LogClearLevelPatch),
+#endif
   ];
 
   /// <summary>
@@ -26,6 +32,8 @@ public class Plugin : BaseUnityPlugin
     Logger = base.Logger;
     Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} loaded");
 
+    // TODO: Is there a simpler way to PatchAll()?
+    //  Unless we give Harmony the Type, it doesn't seem to apply the patch.
     Logger.LogInfo("Applying patches");
     foreach (Type patch in Patches)
     {
@@ -42,8 +50,8 @@ public class Plugin : BaseUnityPlugin
 
   private IEnumerator CreateDebugMenu()
   {
-    Logger.LogInfo("Creating debug menu");
-    GameObject debugMenu = new("Archipelago Debug Menu");
+    Logger?.LogInfo("Creating debug menu");
+    GameObject debugMenu = new("RhythmDoctor.Archipelago Debug");
     DontDestroyOnLoad(debugMenu);
     debugMenu.AddComponent<DebugMenu>();
 

@@ -1,0 +1,19 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Copy plugin" type="ShConfigurationType">
+    <option name="SCRIPT_TEXT" value="Set-Variable -Name &quot;InstallPath&quot; -Value &quot;C:\Program Files (x86)\Steam\steamapps\common\Rhythm Doctor&quot;; Set-Variable -Name &quot;BepInExPath&quot; -Value (Join-Path -Path $InstallPath -ChildPath &quot;BepInEx&quot;); Set-Variable -Name &quot;PluginPath&quot; -Value (Join-Path -Path $BepInExPath -ChildPath &quot;plugins&quot;); Remove-Item -Recurse -Path $PluginPath/World; Remove-Item -Path $PluginPath/Archipelago.MultiClient.Net.dll; Remove-Item -Path $PluginPath/RhythmDoctor.Archipelago.dll; Remove-Item -Path $PluginPath/RhythmDoctor.Archipelago.pdb; Remove-Item -Path $PluginPath/YamlDotNet.dll; Copy-Item -Recurse -Path build/World -Destination $PluginPath; Copy-Item -Path build/Archipelago.MultiClient.Net.dll -Destination $PluginPath; Copy-Item -Path build/RhythmDoctor.Archipelago.dll -Destination $PluginPath; Copy-Item -Path build/RhythmDoctor.Archipelago.pdb -Destination $PluginPath; Copy-Item -Path build/YamlDotNet.dll -Destination $PluginPath" />
+    <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
+    <option name="SCRIPT_PATH" value="" />
+    <option name="SCRIPT_OPTIONS" value="" />
+    <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
+    <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
+    <option name="INTERPRETER_PATH" value="powershell.exe" />
+    <option name="INTERPRETER_OPTIONS" value="" />
+    <option name="EXECUTE_IN_TERMINAL" value="true" />
+    <option name="EXECUTE_SCRIPT_FILE" value="false" />
+    <envs />
+    <method v="2">
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Publish Debug" run_configuration_type="DotNetFolderPublish" />
+    </method>
+  </configuration>
+</component>

@@ -6,10 +6,16 @@ namespace RhythmDoctor.Archipelago.Patches;
 [HarmonyPatch(typeof(RDVersionText))]
 internal static class VersionTextPatch
 {
-  [HarmonyPatch("SetPage")]
+  [HarmonyPatch(nameof(RDVersionText.SetPage))]
   [HarmonyPostfix]
   static void Postfix(RDVersionText __instance)
   {
-    __instance.text.text += " / Archipelago v" + MyPluginInfo.PLUGIN_VERSION;
+    string text = __instance.text.text += " / Archipelago v" + MyPluginInfo.PLUGIN_VERSION;
+
+#if DEBUG
+    text += "D";
+#endif
+
+    __instance.text.text = text;
   }
 }
