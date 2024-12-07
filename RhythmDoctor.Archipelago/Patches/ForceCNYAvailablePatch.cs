@@ -8,7 +8,7 @@ internal static class ForceCNYAvailablePatch
 {
   [HarmonyPatch(nameof(scnLevelSelect.CheckCNY))]
   [HarmonyPrefix]
-  static void Prefix(ref bool __runOriginal, ref bool __result)
+  static void ForceCNYPatch(ref bool __runOriginal, ref bool __result)
   {
     Plugin.Logger?.LogDebug("Forcing CNY check");
     __result = true;
