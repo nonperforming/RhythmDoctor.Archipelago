@@ -11,14 +11,20 @@ function Update-Paths
 
   Set-Variable -Name "RepositoryPath" -Value (Join-Path -Resolve -Path $PSScriptRoot -ChildPath ..) -Scope script
   Set-Variable -Name "ProjectPath" -Value (Join-Path -Path $RepositoryPath -ChildPath "RhythmDoctor.Archipelago") -Scope script
+  Set-Variable -Name "ProjectFilePath" -Value (Join-Path -Path $ProjectPath -ChildPath "RhythmDoctor.Archipelago.csproj") -Scope script
   Set-Variable -Name "BuildPath" -Value (Join-Path -Path $RepositoryPath -ChildPath "build") -Scope script
 
   Set-Variable -Name "GameExecutable" -Value (Join-Path -Path $InstallPath -ChildPath "Rhythm Doctor.exe") -Scope script
+  Set-Variable -Name "GameAssembly" -Value (Join-Path -Path $InstallPath -ChildPath "Rhythm Doctor_Data\Managed\Assembly-CSharp.dll") -Scope script
 
   Set-Variable -Name "BepInExPath" -Value (Join-Path -Path $InstallPath -ChildPath "BepInEx") -Scope script
   Set-Variable -Name "PluginPath" -Value (Join-Path -Path $BepInExPath -ChildPath "plugins") -Scope script
   Set-Variable -Name "ConfigPath" -Value (Join-Path -Path $BepInExPath -ChildPath "config") -Scope script
   Set-Variable -Name "LogFile" -Value (Join-Path -Path $BepInExPath -ChildPath "LogOutput.log") -Scope script
+
+  Set-Variable -Name "RenderDocPath" -Value (Join-Path -Path (scoop prefix renderdoc) -ChildPath "qrenderdoc.exe") -Scope script
+  Set-Variable -Name "ILSpyPath" -Value (Join-Path -Path (scoop prefix ilspy) -ChildPath "ILSpy.exe") -Scope script
+  Set-Variable -Name "dnSpyExPath" -Value (Join-Path -Path (scoop prefix dnspyex) -ChildPath "dnSpy.exe") -Scope script
 }
 
 function Prompt-Menu
@@ -31,7 +37,8 @@ function Prompt-Menu
       Write-Host " 1: Test" -ForegroundColor Blue
       Write-Host " 2: Restart Rhythm Doctor" -ForegroundColor Blue
       Write-Host " 3: Format using CSharpier" -ForegroundColor Blue
-      Write-Host ""
+      Write-Host
+      Write-Host " t: Tools" -ForegroundColor Blue
       Write-Host " l: Open log" -ForegroundColor Blue
       Write-Host " v: Print variables" -ForegroundColor Blue
       Write-Host " o: Set options" -ForegroundColor Blue
@@ -42,7 +49,7 @@ function Prompt-Menu
       switch ($Selection)
       {
         "1"
-        {        
+        {
           Write-Host "Building" -BackgroundColor Magenta
           dotnet publish $ProjectPath --configuration Debug --output $BuildPath
 
@@ -66,12 +73,12 @@ function Prompt-Menu
 
           Write-Host "Cleaning up" -BackgroundColor Magenta
           Remove-Item -Recurse $BuildPath
-          
+
           continue
         }
         "2"
         {
-        	Stop-Process -Name "Rhythm Doctor"
+          Stop-Process -Name "Rhythm Doctor"
           Start-Process -FilePath $GameExecutable -WorkingDirectory $InstallPath
         }
         "3"
@@ -80,10 +87,15 @@ function Prompt-Menu
           dotnet csharpier $RepositoryPath
           continue
         }
+        "t"
+        {
+          Prompt-Tools
+          continue
+        }
         "l"
         {
           Invoke-Item $LogFile
-        	continue
+          continue
         }
         "v"
         {
@@ -91,14 +103,20 @@ function Prompt-Menu
           Write-Host "Install Path: $InstallPath" -ForegroundColor Yellow
           Write-Host "Repository Path: $RepositoryPath" -ForegroundColor Yellow
           Write-Host "Project Path: $ProjectPath" -ForegroundColor Yellow
+          Write-Host ".csproj Path: $ProjectFilePath" -ForegroundColor Yellow
           Write-Host "Build Path: $BuildPath" -ForegroundColor Yellow
           Write-Host
           Write-Host "Game Executable: $GameExecutable" -ForegroundColor Yellow
-          Write-Host 
+          Write-Host "Game Assembly: $GameAssembly" -ForegroundColor Yellow
+          Write-Host
           Write-Host "BepInEx Path: $BepInExPath" -ForegroundColor Yellow
           Write-Host "Plugin Path: $PluginPath" -ForegroundColor Yellow
           Write-Host "Config Path: $ConfigPath" -ForegroundColor Yellow
           Write-Host "Log Path: $LogFile" -ForegroundColor Yellow
+          Write-Host
+          Write-Host "RenderDoc Path: $RenderDocPath" -ForegroundColor Yellow
+          Write-Host "ILSpy Path: $ILSpyPath" -ForegroundColor Yellow
+          Write-Host "dnSpyEx Path: $dnSpyExPath" -ForegroundColor Yellow
           Write-Host "=====================" -BackgroundColor Yellow
           continue
         }
@@ -121,6 +139,7 @@ function Prompt-Menu
     {
       Write-Host "===== Option Menu =====" -BackgroundColor Green
       Write-Host " 1: Set game directory (Currently $($InstallPath))" -ForegroundColor Green
+      Write-Host
       Write-Host " e: Exit submenu" -ForegroundColor Green
       Write-Host "=======================" -BackgroundColor Green
       $Selection = (Read-Host " >").ToUpper();
@@ -131,6 +150,56 @@ function Prompt-Menu
         {
           $InstallPath = Read-Host "Enter game directory path"
           Update-Paths
+          continue
+        }
+        "e"
+        {
+          return
+        }
+      }
+    }
+  }
+
+  function Prompt-Tools
+  {
+    while ($true)
+    {
+      Write-Host "===== Tools  =====" -BackgroundColor Red
+      Write-Host " 1: JetBrains Rider (Toolbox)" -ForegroundColor Red
+      Write-Host " 2: Visual Studio Code (Standalone)" -ForegroundColor Red
+      Write-Host " 3: RenderDoc (Scoop)" -ForegroundColor Red
+      Write-Host " 4: ILSpy (Scoop)" -ForegroundColor Red
+      Write-Host " 5: dnSpyEx (Scoop)" -ForegroundColor Red
+      Write-Host
+      Write-Host " e: Exit submenu" -ForegroundColor Red
+      Write-Host "==================" -BackgroundColor Red
+      $Selection = (Read-Host " >").ToUpper();
+
+      switch ($Selection)
+      {
+        "1"
+        {
+          rider $ProjectFilePath
+          continue
+        }
+        "2"
+        {
+          code $RepositoryPath
+          continue
+        }
+        "3"
+        {
+          & $RenderDocPath
+          continue
+        }
+        "4"
+        {
+          & $ILSpyPath $GameAssembly
+          continue
+        }
+        "5"
+        {
+          & $dnSpyExPath $GameAssembly
           continue
         }
         "e"
