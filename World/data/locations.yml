@@ -10,7 +10,8 @@
 # NOTE: Bosses have Clear and Perfect Clear locations (excluding 5-X which also has Checkpointless Clear)
 #       S Rank/Perfect locations can be toggled off in options.yml
 
-act-1:
+main-ward:
+  # Act 1
   1-1:
     - name: 1-1 - Samurai Techno - B Rank
       id: 82_104_121_68_114_000
@@ -79,163 +80,163 @@ act-1:
       id: 82_104_121_68_114_019
       classification: default
 
-act-2:
-  2-1:
-    - name: 2-1 - Lo-fi Hip-Hop Beats To Treat Patients To - B Rank
-      id: 82_104_121_68_114_020
-      classification: default
-    - name: 2-1 - Lo-fi Hip-Hop Beats To Treat Patients To - A Rank
-      id: 82_104_121_68_114_021
-      classification: default
-    - name: 2-1 - Lo-fi Hip-Hop Beats To Treat Patients To - S Rank
-      id: 82_104_121_68_114_022
-      classification: default
-  2-1N:
-    - name: 2-1N - wish i could care less - B Rank
-      id: 82_104_121_68_114_023
-      classification: default
-    - name: 2-1N - wish i could care less - A Rank
-      id: 82_104_121_68_114_024
-      classification: default
-    - name: 2-1N - wish i could care less - S Rank
-      id: 82_104_121_68_114_025
-      classification: default
-  2-2:
-    - name: 2-2 - Supraventricular Tachycardia - B Rank
-      id: 82_104_121_68_114_026
-      classification: default
-    - name: 2-2 - Supraventricular Tachycardia - A Rank
-      id: 82_104_121_68_114_027
-      classification: default
-    - name: 2-2 - Supraventricular Tachycardia - S Rank
-      id: 82_104_121_68_114_028
-      classification: default
-  2-2N:
-    - name: 2-2N - Unreachable - B Rank
-      id: 82_104_121_68_114_029
-      classification: default
-    - name: 2-2N - Unreachable - A Rank
-      id: 82_104_121_68_114_030
-      classification: default
-    - name: 2-2N - Unreachable - S Rank
-      id: 82_104_121_68_114_031
-      classification: default
-  2-3:
-    - name: 2-3 - Puff Piece - B Rank
-      id: 82_104_121_68_114_032
-      classification: default
-    - name: 2-3 - Puff Piece - A Rank
-      id: 82_104_121_68_114_033
-      classification: default
-    - name: 2-3 - Puff Piece - S Rank
-      id: 82_104_121_68_114_034
-      classification: default
-  2-3N:
-    - name: 2-3N - Bomb-Sniffing Pomeranian - B Rank
-      id: 82_104_121_68_114_035
-      classification: default
-    - name: 2-3N - Bomb-Sniffing Pomeranian - A Rank
-      id: 82_104_121_68_114_036
-      classification: default
-    - name: 2-3N - Bomb-Sniffing Pomeranian - S Rank
-      id: 82_104_121_68_114_037
-      classification: default
-  2-4:
-    - name: 2-4 - Song of the Sea - S+ Rank # Note only possible rank is F-, S+
-      id: 82_104_121_68_114_038
-      classification: default
-  2-4N:
-    - name: 2-4N - Song of the Sea (Night) - S+ Rank # Note only possible rank is F-, S+
-      id: 82_104_121_68_114_039
-      classification: default
-  2-X:
-    - name: 2-X - All The Times - Clear
-      id: 82_104_121_68_114_040
-      classification: priority
-    - name: 2-X - All The Times - Perfect Clear
-      id: 82_104_121_68_114_041
-      classification: default
-  2-B1:
-    - name: 2-B1 - Beans Hopper - B Rank
-      id: 82_104_121_68_114_042
-      classification: excluded
-    - name: 2-B1 - Beans Hopper - A Rank
-      id: 82_104_121_68_114_043
-      classification: excluded
-    - name: 2-B1 - Beans Hopper - S Rank
-      id: 82_104_121_68_114_044
-      classification: excluded
-
-act-3:
+  # Act 3
   3-1:
     - name: 3-1 - Sleepy Garden - B Rank
-      id: 82_104_121_68_114_045
+      id: 82_104_121_68_114_020
       classification: default
     - name: 3-1 - Sleepy Garden - A Rank
-      id: 82_104_121_68_114_046
+      id: 82_104_121_68_114_021
       classification: default
     - name: 3-1 - Sleepy Garden - S Rank
-      id: 82_104_121_68_114_047
+      id: 82_104_121_68_114_022
       classification: default
   3-1N:
     - name: 3-1N - Lounge - B Rank
-      id: 82_104_121_68_114_048
+      id: 82_104_121_68_114_023
       classification: default
     - name: 3-1N - Lounge - A Rank
-      id: 82_104_121_68_114_049
+      id: 82_104_121_68_114_024
       classification: default
     - name: 3-1N - Lounge - S Rank
-      id: 82_104_121_68_114_050
+      id: 82_104_121_68_114_025
       classification: default
   3-2:
     - name: 3-2 - Classy - B Rank
-      id: 82_104_121_68_114_051
+      id: 82_104_121_68_114_026
       classification: default
     - name: 3-2 - Classy - A Rank
-      id: 82_104_121_68_114_052
+      id: 82_104_121_68_114_027
       classification: default
     - name: 3-2 - Classy - S Rank
-      id: 82_104_121_68_114_053
+      id: 82_104_121_68_114_028
       classification: default
   3-2N:
     - name: 3-2N - Classy (Night) - B Rank
-      id: 82_104_121_68_114_054
+      id: 82_104_121_68_114_029
       classification: default
     - name: 3-2N - Classy (Night) - A Rank
-      id: 82_104_121_68_114_055
+      id: 82_104_121_68_114_030
       classification: default
     - name: 3-2N - Classy (Night) - S Rank
-      id: 82_104_121_68_114_056
+      id: 82_104_121_68_114_031
       classification: default
   3-3:
     - name: 3-3 - Distant Duet - B Rank
-      id: 82_104_121_68_114_057
+      id: 82_104_121_68_114_032
       classification: default
     - name: 3-3 - Distant Duet - A Rank
-      id: 82_104_121_68_114_058
+      id: 82_104_121_68_114_033
       classification: default
     - name: 3-3 - Distant Duet - S Rank
-      id: 82_104_121_68_114_059
+      id: 82_104_121_68_114_034
       classification: default
   3-3N:
     - name: 3-3N - Distant Duet (Night) - B Rank
-      id: 82_104_121_68_114_060
+      id: 82_104_121_68_114_035
       classification: default
     - name: 3-3N - Distant Duet (Night) - A Rank
-      id: 82_104_121_68_114_061
+      id: 82_104_121_68_114_036
       classification: default
     - name: 3-3N - Distant Duet (Night) - S Rank
-      id: 82_104_121_68_114_062
+      id: 82_104_121_68_114_037
       classification: default
   3-X:
     - name: 3-X - One Shift More - Clear
-      id: 82_104_121_68_114_063
+      id: 82_104_121_68_114_038
       classification: priority
     - name: 3-X - One Shift More - Perfect Clear
-      id: 82_104_121_68_114_064
+      id: 82_104_121_68_114_039
       classification: default
 
-act-4:
+svt-ward:
+  2-1:
+    - name: 2-1 - Lo-fi Hip-Hop Beats To Treat Patients To - B Rank
+      id: 82_104_121_68_114_040
+      classification: default
+    - name: 2-1 - Lo-fi Hip-Hop Beats To Treat Patients To - A Rank
+      id: 82_104_121_68_114_041
+      classification: default
+    - name: 2-1 - Lo-fi Hip-Hop Beats To Treat Patients To - S Rank
+      id: 82_104_121_68_114_042
+      classification: default
+  2-1N:
+    - name: 2-1N - wish i could care less - B Rank
+      id: 82_104_121_68_114_043
+      classification: default
+    - name: 2-1N - wish i could care less - A Rank
+      id: 82_104_121_68_114_044
+      classification: default
+    - name: 2-1N - wish i could care less - S Rank
+      id: 82_104_121_68_114_045
+      classification: default
+  2-2:
+    - name: 2-2 - Supraventricular Tachycardia - B Rank
+      id: 82_104_121_68_114_046
+      classification: default
+    - name: 2-2 - Supraventricular Tachycardia - A Rank
+      id: 82_104_121_68_114_047
+      classification: default
+    - name: 2-2 - Supraventricular Tachycardia - S Rank
+      id: 82_104_121_68_114_048
+      classification: default
+  2-2N:
+    - name: 2-2N - Unreachable - B Rank
+      id: 82_104_121_68_114_049
+      classification: default
+    - name: 2-2N - Unreachable - A Rank
+      id: 82_104_121_68_114_050
+      classification: default
+    - name: 2-2N - Unreachable - S Rank
+      id: 82_104_121_68_114_051
+      classification: default
+  2-3:
+    - name: 2-3 - Puff Piece - B Rank
+      id: 82_104_121_68_114_052
+      classification: default
+    - name: 2-3 - Puff Piece - A Rank
+      id: 82_104_121_68_114_053
+      classification: default
+    - name: 2-3 - Puff Piece - S Rank
+      id: 82_104_121_68_114_054
+      classification: default
+  2-3N:
+    - name: 2-3N - Bomb-Sniffing Pomeranian - B Rank
+      id: 82_104_121_68_114_055
+      classification: default
+    - name: 2-3N - Bomb-Sniffing Pomeranian - A Rank
+      id: 82_104_121_68_114_056
+      classification: default
+    - name: 2-3N - Bomb-Sniffing Pomeranian - S Rank
+      id: 82_104_121_68_114_057
+      classification: default
+  2-4:
+    - name: 2-4 - Song of the Sea - S+ Rank # Note only possible rank is F-, S+
+      id: 82_104_121_68_114_058
+      classification: default
+  2-4N:
+    - name: 2-4N - Song of the Sea (Night) - S+ Rank # Note only possible rank is F-, S+
+      id: 82_104_121_68_114_059
+      classification: default
+  2-X:
+    - name: 2-X - All The Times - Clear
+      id: 82_104_121_68_114_060
+      classification: priority
+    - name: 2-X - All The Times - Perfect Clear
+      id: 82_104_121_68_114_061
+      classification: default
+  2-B1:
+    - name: 2-B1 - Beans Hopper - B Rank
+      id: 82_104_121_68_114_062
+      classification: excluded
+    - name: 2-B1 - Beans Hopper - A Rank
+      id: 82_104_121_68_114_063
+      classification: excluded
+    - name: 2-B1 - Beans Hopper - S Rank
+      id: 82_104_121_68_114_064
+      classification: excluded
+
+train:
   4-1:
     - name: 4-1 - Training Doctor's Train Ride Performance - B Rank
       id: 82_104_121_68_114_065
@@ -324,7 +325,7 @@ act-4:
       id: 82_104_121_68_114_090
       classification: default
 
-act-5:
+physiotherapy-ward:
   5-1:
     - name: 5-1 - Lucky Break - B Rank
       id: 82_104_121_68_114_091
