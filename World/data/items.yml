@@ -8,7 +8,7 @@
 # https://github.com/ArchipelagoMW/Archipelago/blob/main/docs/world%20api.md#items
 
 # Offset is 82_104_121_68_114_000 - RhyDr in ASCII
-# Gives us room to input 3 numbers before going over the 1-(2^53)-1 limit
+# Gives us room to input 3 numbers before going over the 1 to (2^53)-1 limit
 
 # Boss songs are not included here - they unlock after a specific number of
 #  levels are cleared in its Act.
@@ -21,7 +21,7 @@
 # X-0 - Helping Hands unlocks when all Acts' bosses are complete.
 
 levels:
-  - main-ward:
+  main-ward:
     - name: 1-1 - Samurai Techno
       id: 82_104_121_68_114_000
       classification: progression
@@ -37,170 +37,173 @@ levels:
     - name: 1-CNY - Chinese New Year
       id: 82_104_121_68_114_004
       classification: progression
+    - name: 1-BOO - theme of really spooky bird
+      id: 82_104_121_68_114_005
 
     - name: 3-1 - Sleepy Garden
-      id: 82_104_121_68_114_005
-      classification: progression
-    - name: 3-1N - Lounge
       id: 82_104_121_68_114_006
       classification: progression
-    - name: 3-2 - Classy
+    - name: 3-1N - Lounge
       id: 82_104_121_68_114_007
       classification: progression
-    - name: 3-2N - Classy (Night)
+    - name: 3-2 - Classy
       id: 82_104_121_68_114_008
       classification: progression
-    - name: 3-3 - Distant Duet
+    - name: 3-2N - Classy (Night)
       id: 82_104_121_68_114_009
       classification: progression
-    - name: 3-3N - Distant Duet (Night)
+    - name: 3-3 - Distant Duet
       id: 82_104_121_68_114_010
       classification: progression
-
-  - svt-ward:
-    - name: 2-1 - Lo-fi Hip-Hop Beats To Treat Patients To
+    - name: 3-3N - Distant Duet (Night)
       id: 82_104_121_68_114_011
       classification: progression
-    - name: 2-1N - wish i could care less
+
+  svt-ward:
+    - name: 2-1 - Lo-fi Hip-Hop Beats To Treat Patients To
       id: 82_104_121_68_114_012
       classification: progression
-    - name: 2-2 - Supraventricular Tachycardia
+    - name: 2-1N - wish i could care less
       id: 82_104_121_68_114_013
       classification: progression
-    - name: 2-2N - Unreachable
+    - name: 2-2 - Supraventricular Tachycardia
       id: 82_104_121_68_114_014
       classification: progression
-    - name: 2-3 - Puff Piece
+    - name: 2-2N - Unreachable
       id: 82_104_121_68_114_015
       classification: progression
-    - name: 2-3N - Bomb-Sniffing Pomeranian
+    - name: 2-3 - Puff Piece
       id: 82_104_121_68_114_016
       classification: progression
-    - name: 2-4 - Song of the Sea
+    - name: 2-3N - Bomb-Sniffing Pomeranian
       id: 82_104_121_68_114_017
       classification: progression
-    - name: 2-4N - Song of the Sea (Night)
+    - name: 2-4 - Song of the Sea
       id: 82_104_121_68_114_018
       classification: progression
-    - name: 2-B1 - Beans Hopper
+    - name: 2-4N - Song of the Sea (Night)
       id: 82_104_121_68_114_019
       classification: progression
-
-  - train: # Choo Choo! :)
-    - name: 4-1 - Training Doctor's Train Ride Performance
+    - name: 2-B1 - Beans Hopper
       id: 82_104_121_68_114_020
       classification: progression
-    - name: 4-1N - Rollerdisco Rumble
+
+  train: # Choo Choo! :)
+    - name: 4-1 - Training Doctor's Train Ride Performance
       id: 82_104_121_68_114_021
       classification: progression
-    - name: 4-2 - Invisible
+    - name: 4-1N - Rollerdisco Rumble
       id: 82_104_121_68_114_022
       classification: progression
-    - name: 4-2N - Invisible (Night)
+    - name: 4-2 - Invisible
       id: 82_104_121_68_114_023
       classification: progression
-    - name: 4-3 - Steinway
+    - name: 4-2N - Invisible (Night)
       id: 82_104_121_68_114_024
       classification: progression
-    - name: 4-3N - Steinway Reprise
+    - name: 4-3 - Steinway
       id: 82_104_121_68_114_025
       classification: progression
-    - name: 4-4 - Know You
+    - name: 4-3N - Steinway Reprise
       id: 82_104_121_68_114_026
       classification: progression
-    - name: 4-4N - Murmurs
+    - name: 4-4 - Know You
       id: 82_104_121_68_114_027
       classification: progression
-
-  - physiotherapy-ward:
-    - name: 5-1 - Lucky Break
+    - name: 4-4N - Murmurs
       id: 82_104_121_68_114_028
       classification: progression
-    - name: 5-1N - One Slip Too Late
+
+  physiotherapy-ward:
+    - name: 5-1 - Lucky Break
       id: 82_104_121_68_114_029
       classification: progression
-    - name: 5-2 - Lo-fi Beats For Patients To Chill To
+    - name: 5-1N - One Slip Too Late
       id: 82_104_121_68_114_030
       classification: progression
-    - name: 5-2N - Unsustainable Inconsolable
+    - name: 5-2 - Lo-fi Beats For Patients To Chill To
       id: 82_104_121_68_114_031
       classification: progression
-    - name: 5-3 - Seventh Inning Stretch
+    - name: 5-2N - Unsustainable Inconsolable
       id: 82_104_121_68_114_032
       classification: progression
-    - name: 5-B1 - Rhythm Weightlifter
+    - name: 5-3 - Seventh Inning Stretch
       id: 82_104_121_68_114_033
       classification: progression
-
-  - basement:
-    - name: X-FTS - Fixations Towards the Stars
+    - name: 5-B1 - Rhythm Weightlifter
       id: 82_104_121_68_114_034
       classification: progression
-    - name: X-KOB - Kingdom of Balloons
+
+  basement:
+    - name: X-FTS - Fixations Towards the Stars
       id: 82_104_121_68_114_035
       classification: progression
-    - name: X-WOT - Worn Out Tapes
+    - name: X-KOB - Kingdom of Balloons
       id: 82_104_121_68_114_036
       classification: progression
-    - name: X-MAT - Meet and Tweet
+    - name: X-WOT - Worn Out Tapes
       id: 82_104_121_68_114_037
       classification: progression
-    - name: MD-1 - Blackest Luxury Car
+    - name: X-MAT - Meet and Tweet
       id: 82_104_121_68_114_038
       classification: progression
-    - name: MD-2 - tape/stop/night
+    - name: MD-1 - Blackest Luxury Car
       id: 82_104_121_68_114_039
       classification: progression
-    - name: MD-3 - The 90's Decision
+    - name: MD-2 - tape/stop/night
       id: 82_104_121_68_114_040
       classification: progression
-    - name: X-1 - Art Exercise
+    - name: MD-3 - The 90's Decision
       id: 82_104_121_68_114_041
+      classification: progression
+    - name: X-1 - Art Exercise
+      id: 82_104_121_68_114_042
       classification: progression
 
 keys:
   - name: SVT Ward Key
-    id: 82_104_121_68_114_042
-    classification: progression
-  - name: Train Key
     id: 82_104_121_68_114_043
     classification: progression
-  - name: Physiotherapy Ward Key
+  - name: Train Key
     id: 82_104_121_68_114_044
     classification: progression
-  - name: Basement Key
+  - name: Physiotherapy Ward Key
     id: 82_104_121_68_114_045
+    classification: progression
+  - name: Basement Key
+    id: 82_104_121_68_114_046
     classification: progression
 
 filler:
-  - name: Sleeve Paint
-    id: 82_104_121_68_114_046
-    classification: filler
-  - name: Samurai.
-    id: 82_104_121_68_114_047
-    classification: filler
-
-  - powerups:
-    - name: Strengthened Heart
+  junk:
+    - name: Sleeve Paint
+      id: 82_104_121_68_114_047
+      classification: filler
+    - name: Samurai.
       id: 82_104_121_68_114_048
       classification: filler
-    - name: Easy Mode
+
+  powerups:
+    - name: Strengthened Heart
       id: 82_104_121_68_114_049
       classification: filler
-
-  - traps:
-    - name: Fragile Heart Trap
+    - name: Easy Mode
       id: 82_104_121_68_114_050
-      classification: trap
-    - name: Hard Mode Trap
+      classification: filler
+
+  traps:
+    - name: Fragile Heart Trap
       id: 82_104_121_68_114_051
       classification: trap
-    - name: Connectifia Abortus Trap
+    - name: Hard Mode Trap
       id: 82_104_121_68_114_052
       classification: trap
-    - name: Randomize Characters
+    - name: Connectifia Abortus Trap
       id: 82_104_121_68_114_053
+      classification: trap
+    - name: Randomize Characters
+      id: 82_104_121_68_114_054
       classification: filler
     - name: Scramble Beat Sounds
-      id: 82_104_121_68_114_054
+      id: 82_104_121_68_114_055
       classification: filler

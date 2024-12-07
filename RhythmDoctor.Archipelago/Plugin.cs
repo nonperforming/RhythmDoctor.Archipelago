@@ -1,5 +1,3 @@
-using System.Reflection;
-
 namespace RhythmDoctor.Archipelago;
 
 /// <summary>
@@ -17,7 +15,6 @@ public class Plugin : BaseUnityPlugin
     //typeof(CustomLevelsWardUIPatch),
     typeof(ForceCNYAvailablePatch),
     //typeof(JanitorPatch),
-    typeof(LevelSelectPatch),
     typeof(VersionTextPatch),
   ];
 
@@ -36,4 +33,21 @@ public class Plugin : BaseUnityPlugin
       Harmony.CreateAndPatchAll(patch);
     }
   }
+
+#if DEBUG
+  private void Start()
+  {
+    StartCoroutine(nameof(CreateDebugMenu), 5.0f);
+  }
+
+  private IEnumerator CreateDebugMenu()
+  {
+    Logger.LogInfo("Creating debug menu");
+    GameObject debugMenu = new("Archipelago Debug Menu");
+    DontDestroyOnLoad(debugMenu);
+    debugMenu.AddComponent<DebugMenu>();
+
+    yield return null;
+  }
+#endif
 }

@@ -400,3 +400,6 @@ FodyWeavers.xsd
 # Libraries
 libs
 !.gitkeep
+
+# Build folder
+build/*
