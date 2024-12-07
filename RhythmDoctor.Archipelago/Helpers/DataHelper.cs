@@ -2,11 +2,11 @@ namespace RhythmDoctor.Archipelago.Helpers;
 
 internal static class DataHelper
 {
-  private static readonly IDeserializer Deserializer = new DeserializerBuilder()
+  internal static readonly IDeserializer Deserializer = new DeserializerBuilder()
     .WithNamingConvention(HyphenatedNamingConvention.Instance)
     .Build();
 
-  private static string GetDataFile(DataFileType fileType)
+  internal static string GetDataFile(DataFileType fileType)
   {
     string fileName;
     switch (fileType)
@@ -44,7 +44,7 @@ internal static class DataHelper
   }
 }
 
-internal enum DataFileType
+public enum DataFileType
 {
   Items,
   Locations,
