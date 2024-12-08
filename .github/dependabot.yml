@@ -9,6 +9,7 @@ updates:
     ignore:
       - dependency-name: "UnityEngine.Modules"
       - dependency-name: "Microsoft.NETFramework.ReferenceAssemblies"
+      - dependency-name: "csharpier"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
