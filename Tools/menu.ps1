@@ -20,6 +20,7 @@ function Update-Paths
   Set-Variable -Name "BepInExPath" -Value (Join-Path -Path $InstallPath -ChildPath "BepInEx") -Scope script
   Set-Variable -Name "PluginPath" -Value (Join-Path -Path $BepInExPath -ChildPath "plugins") -Scope script
   Set-Variable -Name "ConfigPath" -Value (Join-Path -Path $BepInExPath -ChildPath "config") -Scope script
+  Set-Variable -Name "DoorstopConfigFile" -Value (Join-Path -Path $InstallPath -ChildPath "doorstop_config.ini") -Scope script
   Set-Variable -Name "LogFile" -Value (Join-Path -Path $BepInExPath -ChildPath "LogOutput.log") -Scope script
 
   Set-Variable -Name "RenderDocPath" -Value (Join-Path -Path (scoop prefix renderdoc) -ChildPath "qrenderdoc.exe") -Scope script
@@ -27,6 +28,114 @@ function Update-Paths
   Set-Variable -Name "dnSpyExPath" -Value (Join-Path -Path (scoop prefix dnspyex) -ChildPath "dnSpy.exe") -Scope script
 }
 
+#region Actions
+function Launch-RhythmDoctor
+{
+  param (
+    $Stop
+  )
+
+  if ($Stop)
+  {
+    Stop-Process -Confirm -Name "Rhythm Doctor"
+  }
+  Start-Process -Confirm -FilePath $GameExecutable -WorkingDirectory $InstallPath
+}
+
+function Build-Project
+{
+  dotnet publish $ProjectPath --configuration Debug --output $BuildPath
+}
+
+function Clean-OldPluginFiles
+{
+  Remove-Item -Recurse -Path $PluginPath/World
+  Remove-Item -Path $PluginPath/Archipelago.MultiClient.Net.dll
+  Remove-Item -Path $PluginPath/RhythmDoctor.Archipelago.dll
+  Remove-Item -Path $PluginPath/RhythmDoctor.Archipelago.pdb
+  Remove-Item -Path $PluginPath/YamlDotNet.dll
+}
+
+function Copy-Plugin
+{
+  Copy-Item -Recurse -Path $BuildPath/World -Destination $PluginPath
+  Copy-Item -Path $BuildPath/Archipelago.MultiClient.Net.dll -Destination $PluginPath
+  Copy-Item -Path $BuildPath/RhythmDoctor.Archipelago.dll -Destination $PluginPath
+  Copy-Item -Path $BuildPath/RhythmDoctor.Archipelago.pdb -Destination $PluginPath
+  Copy-Item -Path $BuildPath/YamlDotNet.dll -Destination $PluginPath
+}
+
+function Clean-BuildFolder
+{
+  Remove-Item -Recurse $BuildPath
+}
+#endregion
+
+#region Check
+function Check-PowerShellVersion
+{
+  if ($PSVersionTable.PSVersion.Major -lt 7)
+  {
+    Write-Host "You need PowerShell 7 or higher to run this script."
+    Write-Host "Please install it using your favourite package manager."
+    Write-Host
+    Write-Host "    WinGet: winget install -e --id Microsoft.PowerShell"
+    Write-Host "     Scoop: scoop install pwsh"
+    Write-Host "Chocolatey: choco install pwsh"
+    exit
+  }
+}
+
+function Import-IniModule
+{
+  if (Get-Module -ListAvailable -Name PsIni)
+  {
+    if (Get-Module -Name PsIni)
+    {
+      # Already imported
+      return $true
+    }
+
+    Import-Module -Name PsIni
+    return $true
+  }
+
+  Write-Host "You need the PSIni module for this option."
+  Write-Host "Please install it, or this option will be unavailable"
+
+  $response = Read-Host "Install PSIni? (y/n)".ToLower()
+  if ($response -eq "y")
+  {
+    Install-Module -Scope CurrentUser -Name PsIni
+    Import-IniModule
+  }
+  else {
+    return $false
+  }
+}
+
+function Get-DoorstopConfig
+{
+  if (!(Import-IniModule))
+  {
+    return
+  }
+
+  Set-Variable -Name "DoorstopConfig" -Value (Get-IniContent $DoorstopConfigFile) -Scope script
+}
+
+function Save-DoorstopConfig
+{
+  if (!(Import-IniModule) -and !$DoorstopConfig)
+  {
+    return
+  }
+
+  $DoorstopConfig | Out-IniFile -FilePath "$DoorstopConfigFile" -Force
+}
+#endregion
+
+#region Menus
 function Prompt-Menu
 {
   function Prompt-Main
@@ -51,29 +160,19 @@ function Prompt-Menu
         "1"
         {
           Write-Host "Building" -BackgroundColor Magenta
-          dotnet publish $ProjectPath --configuration Debug --output $BuildPath
+          Build-Project
 
           Write-Host "Cleaning old files" -BackgroundColor Magenta
-          Remove-Item -Recurse -Path $PluginPath/World
-          Remove-Item -Path $PluginPath/Archipelago.MultiClient.Net.dll
-          Remove-Item -Path $PluginPath/RhythmDoctor.Archipelago.dll
-          Remove-Item -Path $PluginPath/RhythmDoctor.Archipelago.pdb
-          Remove-Item -Path $PluginPath/YamlDotNet.dll
+          Clean-OldPluginFiles
 
           Write-Host "Copying files" -BackgroundColor Magenta
-          Copy-Item -Recurse -Path $BuildPath/World -Destination $PluginPath
-          Copy-Item -Path $BuildPath/Archipelago.MultiClient.Net.dll -Destination $PluginPath
-          Copy-Item -Path $BuildPath/RhythmDoctor.Archipelago.dll -Destination $PluginPath
-          Copy-Item -Path $BuildPath/RhythmDoctor.Archipelago.pdb -Destination $PluginPath
-          Copy-Item -Path $BuildPath/YamlDotNet.dll -Destination $PluginPath
+          Copy-Plugin
 
           Write-Host "Starting Rhythm Doctor" -BackgroundColor Magenta
-          Stop-Process -Name "Rhythm Doctor" -Confirm
-          Start-Process -Confirm -FilePath $GameExecutable -WorkingDirectory $InstallPath
+          Launch-RhythmDoctor -Stop $true
 
           Write-Host "Cleaning up" -BackgroundColor Magenta
-          Remove-Item -Recurse $BuildPath
-
+          Clean-BuildFolder
           continue
         }
         "2"
@@ -112,6 +211,7 @@ function Prompt-Menu
           Write-Host "BepInEx Path: $BepInExPath" -ForegroundColor Yellow
           Write-Host "Plugin Path: $PluginPath" -ForegroundColor Yellow
           Write-Host "Config Path: $ConfigPath" -ForegroundColor Yellow
+          Write-Host "Doorstop Config Path: $DoorstopConfigFile" -ForegroundColor Yellow
           Write-Host "Log Path: $LogFile" -ForegroundColor Yellow
           Write-Host
           Write-Host "RenderDoc Path: $RenderDocPath" -ForegroundColor Yellow
@@ -137,8 +237,18 @@ function Prompt-Menu
   {
     while ($true)
     {
+      if (!(Import-IniModule))
+      {
+        return
+      }
+
+      Get-DoorstopConfig
+
       Write-Host "===== Option Menu =====" -BackgroundColor Green
       Write-Host " 1: Set game directory (Currently $($InstallPath))" -ForegroundColor Green
+      Write-Host " 2: Toggle BepInEx enabled (Currently $($DoorstopConfig["General"]["enabled"]))" -ForegroundColor Green
+      Write-Host " 3: Toggle debugger enabled (Currently $($DoorstopConfig["UnityMono"]["debug_enabled"]))" -ForegroundColor Green
+      Write-Host " 4: Toggle debugger suspend enabled (Currently $($DoorstopConfig["UnityMono"]["debug_suspend"]))" -ForegroundColor Green
       Write-Host
       Write-Host " e: Exit submenu" -ForegroundColor Green
       Write-Host "=======================" -BackgroundColor Green
@@ -150,6 +260,49 @@ function Prompt-Menu
         {
           $InstallPath = Read-Host "Enter game directory path"
           Update-Paths
+          continue
+        }
+        "2"
+        {
+          # We need this weird bodge instead of negating using '!'
+          # as 'true' will toggle to false,
+          # but not the other way around.
+          # Very strange behaviour!
+          if ($DoorstopConfig["General"]["enabled"] -eq $true)
+          {
+            $toSetTo = "false"
+          }
+          else {
+            $toSetTo = "true"
+          }
+          $DoorstopConfig["General"]["enabled"] = $toSetTo
+          Save-DoorstopConfig
+          continue
+        }
+        "3"
+        {
+          if ($DoorstopConfig["UnityMono"]["debug_enabled"] -eq $true)
+          {
+            $toSetTo = "false"
+          }
+          else {
+            $toSetTo = "true"
+          }
+          $DoorstopConfig["UnityMono"]["debug_enabled"] = $toSetTo
+          Save-DoorstopConfig
+          continue
+        }
+        "4"
+        {
+          if ($DoorstopConfig["UnityMono"]["debug_suspend"] -eq $true)
+          {
+            $toSetTo = "false"
+          }
+          else {
+            $toSetTo = "true"
+          }
+          $DoorstopConfig["UnityMono"]["debug_suspend"] = $toSetTo
+          Save-DoorstopConfig
           continue
         }
         "e"
@@ -212,7 +365,13 @@ function Prompt-Menu
 
   Prompt-Main
 }
+#endregion
+
+#region Main
+Check-PowerShellVersion
+
 
 Update-Paths -Initial $true
 
 Prompt-Menu
+#endregion
