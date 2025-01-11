@@ -11,7 +11,7 @@ internal static class JanitorPatch
   /// <summary>
   /// Open the Archipelago Ward when interacting with the Janitor.
   ///
-  /// <seealso cref="CustomLevelsWardUIHelper"/>
+  /// <seealso cref="CustomLevelsWardHelper"/>
   /// </summary>
   /// <param name="__instance">Instance of <see cref="scnLevelSelect"/> that ran <see cref="scnLevelSelect.PerformEntityAction"/></param>
   /// <param name="__runOriginal">Whether to run the original method or not. This will be set to false if interacting with the Janitor.</param>

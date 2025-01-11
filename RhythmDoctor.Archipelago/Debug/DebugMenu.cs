@@ -114,7 +114,7 @@ public class DebugMenu : MonoBehaviour
       {
         Plugin.Logger?.LogInfo("Creating Archipelago Menu Item");
 
-        CustomLevelsWardUIHelper.CreateCustomTab(
+        CustomLevelsWardHelper.CreateCustomTab(
           "Archipelago",
           10,
           CustomTabAction,

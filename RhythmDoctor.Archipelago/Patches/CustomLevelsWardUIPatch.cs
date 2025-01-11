@@ -7,13 +7,13 @@ namespace RhythmDoctor.Archipelago.Patches;
 internal static class CustomLevelsWardUIPatch
 {
   // TODO: Implement
-  internal static Dictionary<int, Action> LevelWardOptions = [];
+  internal static Dictionary<int, Action> CustomLevelWardOptions = [];
 
   [HarmonyPatch(nameof(scnCLS.SelectWardOption))]
   [HarmonyPostfix]
   static void Postfix(scnCLS __instance)
   {
-    foreach (KeyValuePair<int, Action> pair in LevelWardOptions)
+    foreach (KeyValuePair<int, Action> pair in CustomLevelWardOptions)
     {
       if ((int)scnCLS.instance.CurrentWardOption.name == pair.Key)
       {
