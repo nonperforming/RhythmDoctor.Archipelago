@@ -39,7 +39,7 @@ levels:
       classification: progression
     - name: 1-BOO - theme of really spooky bird
       id: 82_104_121_68_114_005
-
+      classification: progression
     - name: 3-1 - Sleepy Garden
       id: 82_104_121_68_114_006
       classification: progression
