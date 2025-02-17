@@ -79,7 +79,8 @@ internal sealed class Client
     }
     else
     {
-      throw new Exception($"Failed to connect to {name}");
+      // FIXME: Shouldn't use a generic exception?
+      throw new Exception($"Unknown error: failed to connect to {name}");
     }
   }
 

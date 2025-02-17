@@ -1,10 +1,10 @@
 #if DEBUG
 namespace RhythmDoctor.Archipelago.Debug.Patches;
 
-[HarmonyPatch]
+[HarmonyPatch(typeof(HUD))]
 internal static class LogClearLevelPatch
 {
-  [HarmonyPatch(typeof(HUD), nameof(HUD.ShowAndSaveRank))]
+  [HarmonyPatch(nameof(HUD.ShowAndSaveRank))]
   [HarmonyPrefix]
   internal static void ShowAndSaveRank(bool bossLevelFailed = false, bool onlySavePersistence = false)
   {

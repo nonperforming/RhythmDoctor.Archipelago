@@ -33,7 +33,6 @@ global using System.Runtime.Serialization;
 global using System.Threading.Tasks;
 
 global using UnityEngine;
-global using UnityEngine.Assertions;
 global using UnityEngine.UI;
 
 global using YamlDotNet.Serialization;

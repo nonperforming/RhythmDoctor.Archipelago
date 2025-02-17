@@ -43,9 +43,7 @@ internal static class JanitorPatch
   [HarmonyPrefix]
   static void TextJanitorPatch(int index, scnLevelSelect __instance, ref bool __runOriginal)
   {
-    SelectableObject? selectableObject = __instance.selectableEntities[index] as SelectableObject;
-
-    if (selectableObject == null)
+    if (__instance.selectableEntities[index] is not SelectableObject selectableObject)
     {
       // This can be due to selecting a character/stage - in which case selectableObject will return null
       //  when trying to cast to SelectableObject
