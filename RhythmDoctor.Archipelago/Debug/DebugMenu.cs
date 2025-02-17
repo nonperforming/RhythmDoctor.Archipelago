@@ -6,6 +6,7 @@ public class DebugMenu : MonoBehaviour
   private bool _activatedMain;
   private bool _activatedData;
   private bool _activatedMenu;
+  private bool _activatedLevels;
 
   private string _url = "archipelago.gg";
 
@@ -37,6 +38,11 @@ public class DebugMenu : MonoBehaviour
     {
       _activatedMenu = !_activatedMenu;
       Plugin.Logger?.LogDebug("Toggled Menu Debug menu to " + _activatedMenu);
+    }
+    if (Input.GetKeyDown(KeyCode.F6))
+    {
+      _activatedLevels = !_activatedLevels;
+      Plugin.Logger?.LogDebug("Toggled Levels Debug menu to " + _activatedLevels);
     }
   }
 
@@ -121,6 +127,60 @@ public class DebugMenu : MonoBehaviour
           AssetHelper.LoadSprite(new WardIcons(), "archipelago.png"), // TODO: enum the asset name??
           null
         );
+      }
+    }
+
+    if (_activatedLevels)
+    {
+      GUI.Box(new Rect(10, 10, 330, 200), "Rhythm Doctor Archipelago Levels Debug");
+
+      if (GUI.Button(new Rect(30, 30, 300, 20), "Lock all"))
+      {
+        foreach (Level level in Enum.GetValues(typeof(Level)))
+        {
+          Persistence.SetLevelRank(level, Rank.NotAvailable, force: true);
+        }
+        scnBase.GoToScene("scnLevelSelect");
+      }
+
+      if (GUI.Button(new Rect(30, 60, 300, 20), "Unlock all"))
+      {
+        foreach (Level level in Enum.GetValues(typeof(Level)))
+        {
+          Persistence.SetLevelRank(level, Rank.NotFinished, force: true);
+        }
+        scnBase.GoToLevelSelect();
+      }
+
+      if (GUI.Button(new Rect(30, 90, 300, 20), "Unlock all entrances"))
+      {
+        scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToSVTWard"));
+        scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToTrain"));
+        scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToBasement"));
+        scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToAthleteWard"));
+      }
+
+      if (GUI.Button(new Rect(30, 120, 300, 20), "Unlock level 3-1"))
+      {
+        Persistence.SetLevelRank(Level.Garden, Rank.NotFinished);
+        scnBase.GoToLevelSelect();
+      }
+
+      if (GUI.Button(new Rect(30, 150, 300, 20), "Unlock level 3-2N"))
+      {
+        Persistence.SetLevelRank(Level.Lounge, Rank.NotFinished);
+        scnBase.GoToLevelSelect();
+      }
+
+      if (GUI.Button(new Rect(30, 180, 300, 20), "S+ selected level"))
+      {
+        if (scnLevelSelect.instance.selectedEntity is not SelectableCharacter selectableCharacter)
+          return;
+
+        Level selectedLevel = selectableCharacter.levels[scnLevelSelect.instance.currentDifficulty];
+        Persistence.SetLevelRank(selectedLevel, Rank.Splus, force: true);
+        Persistence.SetLastPlayedLevel(selectedLevel);
+        scnBase.GoToLevelSelect();
       }
     }
   }
