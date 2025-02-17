@@ -20,6 +20,7 @@ global using RhythmDoctor.Archipelago.Helpers;
 global using RhythmDoctor.Archipelago.Patches;
 global using RhythmDoctor.Archipelago.World;
 global using RhythmDoctor.Archipelago.World.Enums;
+global using RhythmDoctor.Archipelago.World.Enums.Options;
 global using RhythmDoctor.Archipelago.World.Structures;
 
 global using System;

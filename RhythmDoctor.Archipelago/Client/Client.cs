@@ -4,6 +4,7 @@ internal sealed class Client
 {
   internal ArchipelagoSession? session;
   internal DeathLinkService? deathLinkService;
+  internal SlotData? slotData;
 
   internal Items items;
   internal Locations locations;
@@ -52,9 +53,25 @@ internal sealed class Client
       true
     );
 
-    if (loginResult.Successful)
+    if (loginResult is LoginFailure loginFailure)
     {
-      Plugin.Logger?.LogInfo($"Successfully connected to {name} as {session.ConnectionInfo.Uuid}");
+      Plugin.Logger?.LogError(loginFailure.Errors);
+      Plugin.Logger?.LogError(loginFailure.ErrorCodes);
+
+      // FIXME: Shouldn't use a generic exception for this
+      throw new Exception();
+    }
+    else if (loginResult is LoginSuccessful loginSuccessful)
+    {
+      Plugin.Logger?.LogInfo(
+        $"Successfully connected to {loginSuccessful.Slot}/{name} as {session.ConnectionInfo.Uuid}"
+      );
+
+      slotData = new()
+      {
+        BossUnlockRequirement = (BossUnlockRequirement)loginSuccessful.SlotData["boss_unlock_requirement"],
+        EndGoal = (EndGoal)loginSuccessful.SlotData["end_goal"],
+      };
 
       Plugin.Logger?.LogDebug("Binding events");
       session.MessageLog.OnMessageReceived += MessageRecieved;
