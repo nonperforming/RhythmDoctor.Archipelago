@@ -27,6 +27,7 @@ global using System.Collections;
 global using System.Collections.Generic;
 global using System.Diagnostics.CodeAnalysis;
 global using System.IO;
+global using System.Reflection.Emit;
 global using System.Runtime.Serialization;
 
 global using UnityEngine;
