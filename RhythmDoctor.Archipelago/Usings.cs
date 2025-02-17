@@ -29,6 +29,7 @@ global using System.Diagnostics.CodeAnalysis;
 global using System.IO;
 global using System.Reflection.Emit;
 global using System.Runtime.Serialization;
+global using System.Threading.Tasks;
 
 global using UnityEngine;
 global using UnityEngine.Assertions;

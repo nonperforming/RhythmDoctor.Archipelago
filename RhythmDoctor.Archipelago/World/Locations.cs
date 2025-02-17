@@ -9,13 +9,12 @@ internal class Locations
     _data = new();
   }
 
-  private long[] GetIDsForStage(LevelStage stage, Rank rank)
+  internal long[] GetIDsForStage(LevelStage stage, Rank rank)
   {
-    throw new NotImplementedException();
     // TODO: Is there a better way we could do this?
-    /*List<long> ids = new(3);
-    Area area = LevelHelper.LevelToAreaDictionary[stage];
-    long offset = _data.Locations[area][stage][0].ID;
+    List<long> ids = new(3);
+    Region region = LevelHelper.ActToRegionDictionary[LevelHelper.LevelToActDictionary[stage]];
+    long offset = _data.Locations[region][stage][0].ID;
 
     // Boss levels are handled differently from regular levels.
     // Note that bonus levels (excluding Rhythm Weightlifter) have a rank much like regular levels, so they are considered as such.
@@ -90,7 +89,7 @@ internal class Locations
     }
 #endif
 
-    return ids.ToArray();*/
+    return ids.ToArray();
   }
 
   /// <summary>
@@ -99,21 +98,21 @@ internal class Locations
   /// <param name="stage">The stage played</param>
   /// <param name="rank">The rank achieved</param>
   /// <exception cref="NullReferenceException">Client is not connected/null, or locations data is not populated</exception>
-  internal void SendLocation(LevelStage stage, Rank rank)
+  internal async Task SendLocation(LevelStage stage, Rank rank)
   {
     if (Plugin.Client == null || Plugin.Client.session == null)
     {
       throw new NullReferenceException("Client is not connected/null");
     }
-
     if (Plugin.Client.locations == null)
     {
       throw new NullReferenceException("Locations data is not populated");
     }
 
     long[] ids = GetIDsForStage(stage, rank);
-    Plugin.Logger?.LogInfo($"Sending location IDs {String.Join(", ", ids)}");
+    Plugin.Logger?.LogInfo($"Sending location IDs {string.Join(", ", ids)}");
+    await Plugin.Client.session.Locations.ScoutLocationsAsync(ids);
 
-    Plugin.Client.session.Locations.CompleteLocationChecks(ids);
+    await Plugin.Client.session.Locations.CompleteLocationChecksAsync(ids);
   }
 }

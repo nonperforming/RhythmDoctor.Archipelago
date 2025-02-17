@@ -502,6 +502,7 @@ locations:
         classification: default
 
   art-room:
+    # These locations won't be put in the world if the end goal is set to it
     X-0:
       - name: X-0 - Helping Hands - B Rank
         id: 82_104_121_68_114_143
