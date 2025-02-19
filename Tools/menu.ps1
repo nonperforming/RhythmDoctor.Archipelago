@@ -32,28 +32,40 @@ function Update-Paths
 function Launch-RhythmDoctor
 {
   param (
-    $Stop
+    $Stop,
+    $Confirm
   )
 
-  if ($Stop)
+  if ($Confirm)
   {
-    Stop-Process -Confirm -Name "Rhythm Doctor"
+    if ($Stop)
+    {
+      Stop-Process -Confirm -Name "Rhythm Doctor" -ErrorAction SilentlyContinue
+    }
+    Start-Process -Confirm -FilePath $GameExecutable -WorkingDirectory $InstallPath
   }
-  Start-Process -Confirm -FilePath $GameExecutable -WorkingDirectory $InstallPath
+  else {
+    if ($Stop)
+    {
+      Stop-Process -Name "Rhythm Doctor" -ErrorAction SilentlyContinue
+    }
+    Start-Process -FilePath $GameExecutable -WorkingDirectory $InstallPath
+  }
 }
 
 function Build-Project
 {
   dotnet publish $ProjectPath --configuration Debug --output $BuildPath
+  return $?
 }
 
 function Clean-OldPluginFiles
 {
-  Remove-Item -Recurse -Path $PluginPath/World
-  Remove-Item -Path $PluginPath/Archipelago.MultiClient.Net.dll
-  Remove-Item -Path $PluginPath/RhythmDoctor.Archipelago.dll
-  Remove-Item -Path $PluginPath/RhythmDoctor.Archipelago.pdb
-  Remove-Item -Path $PluginPath/YamlDotNet.dll
+  Remove-Item -Recurse -Path $PluginPath/World -ErrorAction SilentlyContinue
+  Remove-Item -Path $PluginPath/Archipelago.MultiClient.Net.dll -ErrorAction SilentlyContinue
+  Remove-Item -Path $PluginPath/RhythmDoctor.Archipelago.dll -ErrorAction SilentlyContinue
+  Remove-Item -Path $PluginPath/RhythmDoctor.Archipelago.pdb -ErrorAction SilentlyContinue
+  Remove-Item -Path $PluginPath/YamlDotNet.dll -ErrorAction SilentlyContinue
 }
 
 function Copy-Plugin
@@ -67,7 +79,7 @@ function Copy-Plugin
 
 function Clean-BuildFolder
 {
-  Remove-Item -Recurse $BuildPath
+  Remove-Item -Recurse $BuildPath -ErrorAction SilentlyContinue
 }
 #endregion
 
@@ -160,7 +172,10 @@ function Prompt-Menu
         "1"
         {
           Write-Host "Building" -BackgroundColor Magenta
-          Build-Project
+          if (-Not Build-Project)
+          {
+            continue;
+          }
 
           Write-Host "Cleaning old files" -BackgroundColor Magenta
           Clean-OldPluginFiles
@@ -169,7 +184,7 @@ function Prompt-Menu
           Copy-Plugin
 
           Write-Host "Starting Rhythm Doctor" -BackgroundColor Magenta
-          Launch-RhythmDoctor -Stop $true
+          Launch-RhythmDoctor -Stop $true -Confirm $false
 
           Write-Host "Cleaning up" -BackgroundColor Magenta
           Clean-BuildFolder
@@ -177,8 +192,7 @@ function Prompt-Menu
         }
         "2"
         {
-          Stop-Process -Name "Rhythm Doctor"
-          Start-Process -FilePath $GameExecutable -WorkingDirectory $InstallPath
+          Launch-RhythmDoctor -Stop $true -Confirm $false
         }
         "3"
         {
@@ -369,7 +383,6 @@ function Prompt-Menu
 
 #region Main
 Check-PowerShellVersion
-
 
 Update-Paths -Initial $true
 
