@@ -12,9 +12,8 @@ internal static class DataHelper
     {
       DataFileType.Items => "items.yml",
       DataFileType.Locations => "locations.yml",
-      DataFileType.Options => "options.yml",
       DataFileType.World => "world.yml",
-      _ => throw new ArgumentOutOfRangeException(nameof(fileType), fileType, "File type is not supported"),
+      _ => throw new ArgumentOutOfRangeException(nameof(fileType), fileType, "File is not supported"),
     };
 
     string path = Path.Combine(Paths.Data, fileName);
@@ -38,6 +37,5 @@ public enum DataFileType
 {
   Items,
   Locations,
-  Options,
   World,
 }
