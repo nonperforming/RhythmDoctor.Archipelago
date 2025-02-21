@@ -55,8 +55,7 @@ function Launch-RhythmDoctor
 
 function Build-Project
 {
-  dotnet publish $ProjectPath --configuration Debug --output $BuildPath
-  return $?
+  return dotnet publish $ProjectPath --configuration Debug --output $BuildPath
 }
 
 function Clean-OldPluginFiles
@@ -172,10 +171,7 @@ function Prompt-Menu
         "1"
         {
           Write-Host "Building" -BackgroundColor Magenta
-          if (-Not Build-Project)
-          {
-            continue;
-          }
+          Build-Project
 
           Write-Host "Cleaning old files" -BackgroundColor Magenta
           Clean-OldPluginFiles
