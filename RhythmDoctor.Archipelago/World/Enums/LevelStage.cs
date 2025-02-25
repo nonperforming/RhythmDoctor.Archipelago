@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace RhythmDoctor.Archipelago.World.Enums;
 
 public enum LevelStage
@@ -313,4 +315,19 @@ public enum LevelStage
   [EnumMember(Value = "X-0")]
   HelpingHands
   #endregion
+}
+
+internal static class LevelStageExtensions
+{
+  public static string? GetEnumMember(this LevelStage @enum)
+  {
+    EnumMemberAttribute? attr = @enum
+      .GetType()
+      .GetMember(@enum.ToString())
+      .FirstOrDefault()
+      ?.GetCustomAttributes(false)
+      .OfType<EnumMemberAttribute>()
+      .FirstOrDefault();
+    return attr == null ? null : attr.Value;
+  }
 }

@@ -16,6 +16,7 @@ internal sealed class Client
     items = new();
     locations = new();
     options = new();
+    world = new();
 
     CreateSession(server);
     Connect(username, password, deathLink);
@@ -23,7 +24,7 @@ internal sealed class Client
 
   internal ArchipelagoSession CreateSession(string server)
   {
-    Plugin.Logger?.LogInfo($"Creating Archipelago session to {server}");
+    Plugin.Logger.LogInfo($"Creating Archipelago session to {server}");
     session = ArchipelagoSessionFactory.CreateSession(server);
     return session;
   }
@@ -55,15 +56,15 @@ internal sealed class Client
 
     if (loginResult is LoginFailure loginFailure)
     {
-      Plugin.Logger?.LogError(loginFailure.Errors);
-      Plugin.Logger?.LogError(loginFailure.ErrorCodes);
+      Plugin.Logger.LogError(loginFailure.Errors);
+      Plugin.Logger.LogError(loginFailure.ErrorCodes);
 
       // FIXME: Shouldn't use a generic exception for this
       throw new Exception();
     }
     else if (loginResult is LoginSuccessful loginSuccessful)
     {
-      Plugin.Logger?.LogInfo(
+      Plugin.Logger.LogInfo(
         $"Successfully connected to {loginSuccessful.Slot}/{name} as {session.ConnectionInfo.Uuid}"
       );
 
@@ -76,6 +77,10 @@ internal sealed class Client
       Plugin.Logger.LogDebug("Binding events");
       session.MessageLog.OnMessageReceived += MessageRecieved;
       session.Items.ItemReceived += ItemReceived;
+
+      // TODO: We need to process items already in our inventory!
+      //       The player might have gotten items while offline (i.e: playing async)
+      //       Iterate through session.Items.AllItemsReceived, and process them accordingly.
     }
     else
     {
@@ -93,7 +98,13 @@ internal sealed class Client
   {
     ItemInfo item = helper.PeekItem();
 
-    Plugin.Logger?.LogDebug($"Successfully received item {item.ItemName} - {item.ItemId}");
+    if (items.IsKeyItem(item))
+    {
+      Plugin.Logger.LogInfo($"Got key {item.ItemName} - {item.ItemId}");
+    }
+    else if (items.IsLevelItem(item)) { }
+
+    Plugin.Logger.LogDebug($"Successfully received item {item.ItemName} - {item.ItemId}");
     helper.DequeueItem();
   }
 
