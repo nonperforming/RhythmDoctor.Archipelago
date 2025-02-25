@@ -2,6 +2,7 @@ namespace RhythmDoctor.Archipelago.Helpers;
 
 internal static class LevelHelper
 {
+  #region Dictionaries
   internal static readonly Dictionary<Level, LevelStage> InternalToFriendlyNameDictionary =
     new()
     {
@@ -230,6 +231,7 @@ internal static class LevelHelper
       { Area.Act4, Region.Train },
       { Area.Act5, Region.PhysiotherapyWard },
     };
+  #endregion
 
   /// <summary>
   /// Check if a level is a boss stage.
@@ -237,11 +239,12 @@ internal static class LevelHelper
   /// <param name="stage">Stage to check</param>
   /// <returns>True if the stage is a boss stage, otherwise false</returns>
   internal static bool IsBoss(LevelStage stage) =>
-    stage == LevelStage.BattlewornInsomniac
-    || stage == LevelStage.AllTheTimes
-    || stage == LevelStage.OneShiftMore
-    || stage == LevelStage.SuperBattlewornInsomniac
-    || stage == LevelStage.DreamsDontStop;
+    stage
+      is LevelStage.BattlewornInsomniac
+        or LevelStage.AllTheTimes
+        or LevelStage.OneShiftMore
+        or LevelStage.SuperBattlewornInsomniac
+        or LevelStage.DreamsDontStop;
 
   /// <summary>
   /// Check if a level has checkpoints
@@ -250,7 +253,11 @@ internal static class LevelHelper
   /// <returns>True if the stage has checkpoints, otherwise false</returns>
   internal static bool HasCheckpoints(LevelStage stage) => stage == LevelStage.DreamsDontStop;
 
-  internal static void UnlockEntrance(Ward wardToUnlock)
+  /// <summary>
+  /// Lock a ward's entrance.
+  /// </summary>
+  /// <param name="regionToLock">The ward to lock</param>
+  internal static void LockEntrance(Region regionToLock)
   {
     string name;
     switch (regionToLock)
@@ -276,6 +283,49 @@ internal static class LevelHelper
         );
         return;
     }
+
+    SelectableEntity selectableEntity = scnLevelSelect.instance.FindSelectableEntity(name);
+    selectableEntity.normalEnabled = false;
+    selectableEntity.hardEnabled = false;
+
+    switch (regionToLock)
+    {
+      case Region.SVTWard:
+        scnLevelSelect.instance.mainWard.svtBlockage.SetActive(true);
+        break;
+      case Region.PhysiotherapyWard:
+        scnLevelSelect.instance.mainWard.rooftopBlockade.SetActive(true);
+        break;
+    }
+  }
+
+  /// <summary>
+  /// Unlock a ward's entrance.
+  /// </summary>
+  /// <param name="regionToUnlock">The ward to unlock</param>
+  internal static void UnlockEntrance(Region regionToUnlock)
+  {
+    string name;
+    switch (regionToUnlock)
+    {
+      case Region.SVTWard:
+        name = "GoToSVTWard";
+        break;
+      case Region.Train:
+        name = "GoToTrain";
+        break;
+      case Region.PhysiotherapyWard:
+        name = "GoToAthleteWard";
+        break;
+      case Region.Basement:
+        name = "GoToBasement";
+        break;
+      case Region.ArtRoom:
+        name = "GoToArtRoom";
+        break;
+      default:
+        Plugin.Logger.LogWarning(
+          $"Trying to unlock {regionToUnlock} but it doesn't have an implementation/it is the Main Ward"
         );
         return;
     }
