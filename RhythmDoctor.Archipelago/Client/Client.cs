@@ -73,7 +73,7 @@ internal sealed class Client
         EndGoal = (EndGoal)loginSuccessful.SlotData["end_goal"],
       };
 
-      Plugin.Logger?.LogDebug("Binding events");
+      Plugin.Logger.LogDebug("Binding events");
       session.MessageLog.OnMessageReceived += MessageRecieved;
       session.Items.ItemReceived += ItemReceived;
     }
@@ -86,7 +86,7 @@ internal sealed class Client
 
   internal void MessageRecieved(LogMessage message)
   {
-    Plugin.Logger?.LogInfo($"Received message {message}");
+    Plugin.Logger.LogInfo($"Received message {message}");
   }
 
   internal void ItemReceived(ReceivedItemsHelper helper)
@@ -99,7 +99,7 @@ internal sealed class Client
 
   internal void DeathLinkRecieved(DeathLink deathLink)
   {
-    Plugin.Logger?.LogInfo($"DeathLink from {deathLink.Source} by {deathLink.Cause} at {deathLink.Timestamp}");
+    Plugin.Logger.LogInfo($"DeathLink from {deathLink.Source} by {deathLink.Cause} at {deathLink.Timestamp}");
     // TODO: Implement
   }
 }
