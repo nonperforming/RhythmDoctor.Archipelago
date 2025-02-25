@@ -8,7 +8,7 @@ namespace RhythmDoctor.Archipelago;
 public class Plugin : BaseUnityPlugin
 {
   internal static Client.Client? Client;
-  internal static new ManualLogSource? Logger = null;
+  internal static new ManualLogSource Logger = null!;
 
   private static readonly Type[] Patches =
   [
@@ -51,7 +51,7 @@ public class Plugin : BaseUnityPlugin
 
   private IEnumerator CreateDebugMenu()
   {
-    Logger?.LogInfo("Creating debug menu");
+    Logger.LogInfo("Creating debug menu");
     GameObject debugMenu = new("RhythmDoctor.Archipelago Debug");
     DontDestroyOnLoad(debugMenu);
     debugMenu.AddComponent<DebugMenu>();

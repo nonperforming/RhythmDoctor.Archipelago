@@ -10,16 +10,16 @@ internal static class CustomLevelsWardHelper
     AudioClip? selectAudio = null
   )
   {
-    Plugin.Logger?.LogDebug($"{scnCLS.instance.wardOptions.Count} ward options");
+    Plugin.Logger.LogDebug($"{scnCLS.instance.wardOptions.Count} ward options");
     for (int i = 0; i < scnCLS.instance.wardOptions.Count; i++)
     {
       scnCLS.WardOption debugOptions = scnCLS.instance.wardOptions[i];
-      Plugin.Logger?.LogDebug(debugOptions.name);
+      Plugin.Logger.LogDebug(debugOptions.name);
     }
 
     // TODO: Using GameObject.Find is a potentially costly method.
     //       If possible, we should cache these results.
-    Plugin.Logger?.LogInfo($"Creating custom tab {label}: {wardID}");
+    Plugin.Logger.LogInfo($"Creating custom tab {label}: {wardID}");
     //Assert.IsFalse(Enum.IsDefined(typeof(scnCLS.WardOptionName), wardID), "Cannot use existing WardOptionName");
     GameObject tabTemplate = GameObject.Find("Library Tab").gameObject;
     GameObject tab = UnityEngine.Object.Instantiate(tabTemplate, scnCLS.instance.wardOptionsContainer.transform, false);
@@ -52,11 +52,11 @@ internal static class CustomLevelsWardHelper
     if (icon is not null)
       wardOption.signImage.sprite = icon;
 
-    Plugin.Logger?.LogDebug($"{scnCLS.instance.wardOptions.Count} ward options");
+    Plugin.Logger.LogDebug($"{scnCLS.instance.wardOptions.Count} ward options");
     for (int i = 0; i < scnCLS.instance.wardOptions.Count; i++)
     {
       scnCLS.WardOption debugOptions = scnCLS.instance.wardOptions[i];
-      Plugin.Logger?.LogDebug(debugOptions.name);
+      Plugin.Logger.LogDebug(debugOptions.name);
     }
 
     scnCLS.instance.wardOptions.Add(wardOption); // FIXME: Silently failing, can't select ward option
@@ -64,11 +64,11 @@ internal static class CustomLevelsWardHelper
 
     // Register Action to run when user selected option
 
-    Plugin.Logger?.LogDebug($"{scnCLS.instance.wardOptions.Count} ward options");
+    Plugin.Logger.LogDebug($"{scnCLS.instance.wardOptions.Count} ward options");
     for (int i = 0; i < scnCLS.instance.wardOptions.Count; i++)
     {
       scnCLS.WardOption debugOptions = scnCLS.instance.wardOptions[i];
-      Plugin.Logger?.LogDebug(debugOptions.name);
+      Plugin.Logger.LogDebug(debugOptions.name);
     }
 
     // We do this because we might not have the option selected, leading to

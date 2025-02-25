@@ -81,10 +81,10 @@ internal class Locations
     // Sanity checks
     foreach (long id in ids)
     {
-      Plugin.Logger?.LogDebug($"Checking ID: {id}");
+      Plugin.Logger.LogDebug($"Checking ID: {id}");
       if (id < 82_104_121_68_114_000 || id > 82_104_121_68_114_999)
       {
-        Plugin.Logger?.LogError($"ID {id} is out of range");
+        Plugin.Logger.LogError($"ID {id} is out of range");
       }
     }
 #endif
@@ -110,7 +110,7 @@ internal class Locations
     }
 
     long[] ids = GetIDsForStage(stage, rank);
-    Plugin.Logger?.LogInfo($"Sending location IDs {string.Join(", ", ids)}");
+    Plugin.Logger.LogInfo($"Sending location IDs {string.Join(", ", ids)}");
     await Plugin.Client.session.Locations.ScoutLocationsAsync(ids);
 
     await Plugin.Client.session.Locations.CompleteLocationChecksAsync(ids);

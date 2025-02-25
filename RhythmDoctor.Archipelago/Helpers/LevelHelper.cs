@@ -271,8 +271,11 @@ internal static class LevelHelper
         name = "GoToArtRoom";
         break;
       default:
-        Plugin.Logger?.LogWarning(
-          $"Trying to unlock {wardToUnlock} but it doesn't have an implementation/it is the Main Ward"
+        Plugin.Logger.LogWarning(
+          $"Trying to lock {regionToLock} but it doesn't have an implementation/it is the Main Ward"
+        );
+        return;
+    }
         );
         return;
     }
