@@ -253,22 +253,23 @@ internal static class LevelHelper
   internal static void UnlockEntrance(Ward wardToUnlock)
   {
     string name;
-    switch (wardToUnlock)
+    switch (regionToLock)
     {
-      case Ward.SVTWard:
+      case Region.SVTWard:
         name = "GoToSVTWard";
         break;
-      case Ward.Train:
+      case Region.Train:
         name = "GoToTrain";
         break;
-      case Ward.PhysiotherapyWard:
+      case Region.PhysiotherapyWard:
         name = "GoToAthleteWard";
         break;
-      case Ward.Basement:
+      case Region.Basement:
         name = "GoToBasement";
         break;
-      case Ward.ArtRoom:
-        throw new NotImplementedException();
+      case Region.ArtRoom:
+        name = "GoToArtRoom";
+        break;
       default:
         Plugin.Logger?.LogWarning(
           $"Trying to unlock {wardToUnlock} but it doesn't have an implementation/it is the Main Ward"

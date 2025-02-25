@@ -1,17 +1,18 @@
+#pragma warning disable CS0649 // Field is never assigned to, and will always have its default value
 namespace RhythmDoctor.Archipelago.World.Structures;
 
 // ReSharper disable CollectionNeverUpdated.Global
 // ReSharper disable UnassignedField.Global
-public struct ItemsData
+internal struct ItemsData
 {
   [YamlMember(Alias = "levels")]
-  public Dictionary<Ward, Dictionary<LevelStage, Item>> Levels;
+  internal Dictionary<Region, Dictionary<LevelStage, Item>> Levels;
 
   [YamlMember(Alias = "keys")]
-  public Dictionary<Ward, Item> Keys;
+  internal Dictionary<Region, Item> Keys;
 
   [YamlMember(Alias = "filler")]
-  public Dictionary<FillerType, List<Item>> Filler;
+  internal Dictionary<FillerType, List<Item>> Filler;
 }
 // ReSharper restore CollectionNeverUpdated.Global
 // ReSharper restore UnassignedField.Global

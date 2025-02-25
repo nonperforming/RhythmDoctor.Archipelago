@@ -9,39 +9,39 @@ internal class Items
     _data = new();
   }
 
-  private Ward GetWardFromLevelItem(long id)
+  private Region GetWardFromLevelItem(long id)
   {
-    Ward ward;
-    if (id < _data.Levels[Ward.MainWard].Count)
+    Region region;
+    if (id < _data.Levels[Region.MainWard].Count)
     {
-      ward = Ward.MainWard;
+      region = Region.MainWard;
     }
-    else if (id < _data.Levels[Ward.SVTWard].Count)
+    else if (id < _data.Levels[Region.SVTWard].Count)
     {
-      ward = Ward.SVTWard;
+      region = Region.SVTWard;
     }
-    else if (id < _data.Levels[Ward.Train].Count)
+    else if (id < _data.Levels[Region.Train].Count)
     {
-      ward = Ward.Train;
+      region = Region.Train;
     }
-    else if (id < _data.Levels[Ward.PhysiotherapyWard].Count)
+    else if (id < _data.Levels[Region.PhysiotherapyWard].Count)
     {
-      ward = Ward.PhysiotherapyWard;
+      region = Region.PhysiotherapyWard;
     }
-    else if (id < _data.Levels[Ward.Basement].Count)
+    else if (id < _data.Levels[Region.Basement].Count)
     {
-      ward = Ward.Basement;
+      region = Region.Basement;
     }
-    else if (id < _data.Levels[Ward.ArtRoom].Count)
+    else if (id < _data.Levels[Region.ArtRoom].Count)
     {
-      ward = Ward.ArtRoom;
+      region = Region.ArtRoom;
     }
     else
     {
       throw new ArgumentOutOfRangeException($"{id} is out of range of item IDs");
     }
 
-    return ward;
+    return region;
   }
 
   internal Item GetLevelItem(LevelStage level)
@@ -108,9 +108,9 @@ internal class Items
 
   internal Item GetItem(long id)
   {
-    Ward ward = GetWardFromLevelItem(id);
+    Region region = GetWardFromLevelItem(id);
 
-    foreach (Item item in _data.Levels[ward].Values)
+    foreach (Item item in _data.Levels[region].Values)
     {
       if (item.ID == id)
       {
@@ -127,9 +127,9 @@ internal class Items
 
   internal bool IsLevelItem(long id)
   {
-    Ward ward = GetWardFromLevelItem(id);
+    Region region = GetWardFromLevelItem(id);
 
-    foreach (KeyValuePair<LevelStage, Item> key in _data.Levels[ward])
+    foreach (KeyValuePair<LevelStage, Item> key in _data.Levels[region])
     {
       if (key.Value.ID == id)
       {
@@ -145,7 +145,7 @@ internal class Items
 
   internal bool IsKeyItem(long id)
   {
-    foreach (KeyValuePair<Ward, Item> key in _data.Keys)
+    foreach (KeyValuePair<Region, Item> key in _data.Keys)
     {
       if (key.Value.ID == id)
         return true;
