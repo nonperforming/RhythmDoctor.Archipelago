@@ -31,9 +31,15 @@ internal static class ArchipelagoLoginPatch
     Plugin.Logger.LogInfo("Renaming ward options");
 
     // Get WardOptions
-    scnCLS.WardOption libraryOption = __instance.wardOptions.Find(wardOption => wardOption.name == scnCLS.WardOptionName.Library);
-    scnCLS.WardOption workshopOption = __instance.wardOptions.Find(wardOption => wardOption.name == scnCLS.WardOptionName.OpenSteamWorkshop);
-    scnCLS.WardOption importOption = __instance.wardOptions.Find(wardOption => wardOption.name == scnCLS.WardOptionName.ImportLevels);
+    scnCLS.WardOption libraryOption = __instance.wardOptions.Find(wardOption =>
+      wardOption.name == scnCLS.WardOptionName.Library
+    );
+    scnCLS.WardOption workshopOption = __instance.wardOptions.Find(wardOption =>
+      wardOption.name == scnCLS.WardOptionName.OpenSteamWorkshop
+    );
+    scnCLS.WardOption importOption = __instance.wardOptions.Find(wardOption =>
+      wardOption.name == scnCLS.WardOptionName.ImportLevels
+    );
 
     // Delete Library and Steam Workshop options
     libraryOption.rect.transform.parent.gameObject.SetActive(false);
