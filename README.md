@@ -1,5 +1,7 @@
 # RhythmDoctor.Archipelago
 
+<img align="right" src="https://raw.githubusercontent.com/nonperforming/RhythmDoctor.Archipelago/readme/.github/assets/logo.png" alt="RhythmDoctor.Archipelago logo">
+
 A mod for **Rhythm Doctor** to integrate with the [Archipelago Multi-World Randomizer](https://archipelago.gg/), allowing you to experience Rhythm Doctor alongside other games within the Archipelago ecosystem.
 
 ## Installation
@@ -25,7 +27,8 @@ To set up the Rhythm Doctor Archipelago mod, follow these steps:
 
 ## Development
 
-**Visual Studio** and **Rider**
+### **Visual Studio** and **Rider**
+
 1. Open the `.sln` file.
 2. Make your changes.
 3. Build the solution.
@@ -34,7 +37,7 @@ To set up the Rhythm Doctor Archipelago mod, follow these steps:
     - `World` folder
     - `Archipelago.MultiClient.Net.dll`
     - `YamlDotNet.dll`
-5. Launch the game. Successful installation shows the current Archipelago version.
+5. Launch the game. A successful installation will show the current mod version in the bottom left of the Main Menu.
 
 ---
 
