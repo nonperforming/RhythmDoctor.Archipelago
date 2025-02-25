@@ -1,6 +1,6 @@
 # RhythmDoctor.Archipelago
 
-<img align="right" src="https://raw.githubusercontent.com/nonperforming/RhythmDoctor.Archipelago/readme/.github/assets/logo.png" alt="RhythmDoctor.Archipelago logo">
+<img align="right" src=".github/assets/logo.png" alt="RhythmDoctor.Archipelago logo">
 
 A mod for **Rhythm Doctor** to integrate with the [Archipelago Multi-World Randomizer](https://archipelago.gg/), allowing you to experience Rhythm Doctor alongside other games within the Archipelago ecosystem.
 
