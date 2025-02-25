@@ -36,6 +36,6 @@ internal class WardIcons : IAssetType
 
 internal interface IAssetType
 {
-  public int GetValue();
-  public string GetAssetName();
+  int GetValue();
+  string GetAssetName();
 }
