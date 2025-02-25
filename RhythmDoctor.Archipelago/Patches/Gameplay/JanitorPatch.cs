@@ -1,6 +1,4 @@
-using Logger = UnityEngine.Logger;
-
-namespace RhythmDoctor.Archipelago.Patches;
+namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 
 /// <summary>
 /// Patches related to the Janitor
@@ -23,12 +21,12 @@ internal static class JanitorPatch
 
     if (currentSelectableObject == null)
     {
-      Plugin.Logger?.LogWarning("Current selectable object is null");
+      Plugin.Logger.LogWarning("Current selectable object is null");
       return;
     }
     if (currentSelectableObject.action != "talkToJanitor")
     {
-      Plugin.Logger?.LogDebug("Current selectable object's action is not talkToJanitor");
+      Plugin.Logger.LogDebug("Current selectable object's action is not talkToJanitor");
       return;
     }
 
@@ -36,7 +34,7 @@ internal static class JanitorPatch
     // Load the custom level ward, add our custom options, and delete the old options
     //__runOriginal = false;
     // TODO: Implement janitor menu patch. (additional comment to show on TODO plugins)
-    Plugin.Logger?.LogError("TODO: Implement janitor menu patch");
+    Plugin.Logger.LogError("TODO: Implement janitor menu patch");
   }
 
   [HarmonyPatch(nameof(scnLevelSelect.ShowRanksText))]
@@ -47,17 +45,17 @@ internal static class JanitorPatch
     {
       // This can be due to selecting a character/stage - in which case selectableObject will return null
       //  when trying to cast to SelectableObject
-      Plugin.Logger?.LogDebug("Selectable entities is null");
+      Plugin.Logger.LogDebug("Selectable entities is null");
       return;
     }
 
     if (!selectableObject.id.StartsWith("TalkToJanitor"))
     {
-      Plugin.Logger?.LogDebug("Selected object is not Janitor, doing nothing");
+      Plugin.Logger.LogDebug("Selected object is not Janitor, doing nothing");
       return;
     }
 
-    Plugin.Logger?.LogDebug("Overriding Janitor text");
+    Plugin.Logger.LogDebug("Overriding Janitor text");
     __runOriginal = false;
 
     __instance.ChangeTextOutline(RDConstants.data.levelSelect_notPassedLevelTextOutline);
@@ -74,7 +72,7 @@ internal static class JanitorPatch
   [HarmonyPrefix]
   static void PlaceJanitorPatch(ref bool __runOriginal)
   {
-    Plugin.Logger?.LogDebug("Bypassing PlaceJanitor");
+    Plugin.Logger.LogDebug("Bypassing PlaceJanitor");
     __runOriginal = false;
   }
 
@@ -89,7 +87,7 @@ internal static class JanitorPatch
   [HarmonyPrefix]
   static void HideJanitorPatch(ref bool __runOriginal)
   {
-    Plugin.Logger?.LogWarning("Bypassing HideJanitor. This should never be called assuming PlaceJanitor was bypassed!");
+    Plugin.Logger.LogWarning("Bypassing HideJanitor. This should never be called assuming PlaceJanitor was bypassed!");
     __runOriginal = false;
   }
   #endregion

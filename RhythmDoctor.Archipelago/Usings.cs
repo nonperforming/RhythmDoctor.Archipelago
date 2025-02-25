@@ -18,6 +18,8 @@ global using RhythmDoctor.Archipelago.Debug.Patches;
 #endif
 global using RhythmDoctor.Archipelago.Helpers;
 global using RhythmDoctor.Archipelago.Patches;
+global using RhythmDoctor.Archipelago.Patches.Gameplay;
+global using RhythmDoctor.Archipelago.Patches.Menu;
 global using RhythmDoctor.Archipelago.World;
 global using RhythmDoctor.Archipelago.World.Enums;
 global using RhythmDoctor.Archipelago.World.Enums.Options;

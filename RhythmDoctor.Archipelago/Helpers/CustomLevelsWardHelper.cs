@@ -60,7 +60,7 @@ internal static class CustomLevelsWardHelper
     }
 
     scnCLS.instance.wardOptions.Add(wardOption); // FIXME: Silently failing, can't select ward option
-    CustomLevelsWardUIPatch.CustomLevelWardOptions.Add(wardID, action);
+    ArchipelagoMenuPatch.CustomLevelWardOptions.Add(wardID, action);
 
     // Register Action to run when user selected option
 

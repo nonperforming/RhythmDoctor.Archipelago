@@ -7,19 +7,24 @@ namespace RhythmDoctor.Archipelago;
 [BepInProcess("Rhythm Doctor.exe")]
 public class Plugin : BaseUnityPlugin
 {
-  internal static Client.Client? Client;
+  internal static Client.Client Client = null!;
   internal static new ManualLogSource Logger = null!;
 
-  private static readonly Type[] Patches =
+  private static readonly Type[] MenuPatches =
   [
+    typeof(ArchipelagoLoginPatch),
+    typeof(LoadLoginMenuPatch),
+    typeof(VersionTextPatch),
+  ];
+
+  private static readonly Type[] GameplayPatches =
+  [
+    typeof(ArchipelagoMenuPatch),
     typeof(ClearLocationPatch),
-    //typeof(CustomLevelsWardUIPatch),
-    typeof(ForceLevelAvailablePatch),
     typeof(JanitorPatch),
     typeof(NicoleBlockagePatch),
     //typeof(SkipTutorialPatch), // Disabled due to bugs with 1-2 and 3-X. See class for more information
-    //typeof(UnlockLevelFromItemPatch),
-    typeof(VersionTextPatch),
+    //typeof(UnlockItemPatch),
 #if DEBUG
     typeof(LogClearLevelPatch),
 #endif
@@ -35,12 +40,46 @@ public class Plugin : BaseUnityPlugin
 
     // TODO: Is there a simpler way to PatchAll()?
     //  Unless we give Harmony the Type, it doesn't seem to apply the patch.
-    Logger.LogInfo("Applying patches");
-    foreach (Type patch in Patches)
+    ApplyMenuPatches();
+  }
+
+  public static void ApplyMenuPatches()
+  {
+    Logger.LogInfo("Unapplying previous patches");
+    Harmony.UnpatchID(MyPluginInfo.PLUGIN_GUID);
+
+    Logger.LogInfo("Applying menu patches");
+    foreach (Type patch in MenuPatches)
     {
       Logger.LogDebug($"Applying {patch.Name}");
-      Harmony.CreateAndPatchAll(patch);
+      Harmony.CreateAndPatchAll(patch, MyPluginInfo.PLUGIN_GUID);
     }
+  }
+
+  /// <summary>
+  /// Apply all our patches.
+  /// Should only be done when we have successfully signed in
+  /// </summary>
+  public static void ApplyGameplayPatches()
+  {
+    Logger.LogInfo("Unapplying previous patches");
+    Harmony.UnpatchID(MyPluginInfo.PLUGIN_GUID);
+
+    Logger.LogInfo("Applying gameplay patches");
+    foreach (Type patch in GameplayPatches)
+    {
+      Logger.LogDebug($"Applying {patch.Name}");
+      Harmony.CreateAndPatchAll(patch, MyPluginInfo.PLUGIN_GUID);
+    }
+  }
+
+  /// <summary>
+  /// Unpatch all our patches
+  /// </summary>
+  public void UnpatchAll()
+  {
+    Logger.LogInfo("Unapplying patches");
+    Harmony.UnpatchID(MyPluginInfo.PLUGIN_GUID);
   }
 
 #if DEBUG

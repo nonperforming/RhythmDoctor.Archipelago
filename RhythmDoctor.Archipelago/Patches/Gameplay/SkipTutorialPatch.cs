@@ -1,4 +1,4 @@
-namespace RhythmDoctor.Archipelago.Patches;
+namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 
 /// <summary>
 /// Prevents tutorials from being loaded
@@ -18,7 +18,7 @@ static class SkipTutorialPatch
   [HarmonyPrefix]
   static void GoToLevelPatch(string path, bool loadGameScene, ref bool attemptToLoadTutorial)
   {
-    Plugin.Logger?.LogDebug($"Forcing attemptToLoadTutorial from {attemptToLoadTutorial} to false");
+    Plugin.Logger.LogDebug($"Forcing attemptToLoadTutorial from {attemptToLoadTutorial} to false");
     attemptToLoadTutorial = false;
     scnGame.attemptToLoadTutorial = false;
   }

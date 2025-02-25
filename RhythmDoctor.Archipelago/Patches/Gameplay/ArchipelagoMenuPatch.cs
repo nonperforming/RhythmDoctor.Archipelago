@@ -1,10 +1,10 @@
-namespace RhythmDoctor.Archipelago.Patches;
+namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 
 /// <summary>
 /// Handle selecting custom tabs on the Custom Levels Ward
 /// </summary>
 [HarmonyPatch(typeof(scnCLS))]
-internal static class CustomLevelsWardUIPatch
+internal static class ArchipelagoMenuPatch
 {
   // TODO: Implement
   internal static Dictionary<int, Action> CustomLevelWardOptions = [];
