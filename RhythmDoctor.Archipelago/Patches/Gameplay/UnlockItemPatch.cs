@@ -42,7 +42,7 @@ public class UnlockItemPatch
     {
       if (Plugin.Client.items.IsLevelItem(itemInfo.ItemId))
       {
-        LevelStage? levelStage = Plugin.Client.items.GetLevelStageOfItem(itemInfo.ItemId);
+        LevelStage? levelStage = Plugin.Client.items.GetLevelStageFromItem(itemInfo.ItemId);
 
         if (levelStage == null)
         {

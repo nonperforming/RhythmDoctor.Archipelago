@@ -153,7 +153,36 @@ internal class Items
     return false;
   }
 
-  internal void TrapItem()
+  internal Region? GetKeyItem(long id)
+  {
+    foreach (KeyValuePair<Region, Item> key in _data.Keys)
+    {
+      if (key.Value.ID == id)
+        return key.Key;
+    }
+    return null;
+  }
+
+  /// <summary>
+  /// Gets the LevelStage of an item
+  /// </summary>
+  /// <returns></returns>
+  internal LevelStage? GetLevelStageFromItem(long id)
+  {
+    Region region = GetWardFromLevelItem(id);
+
+    foreach ((LevelStage levelStage, Item item) in _data.Levels[region])
+    {
+      if (id == item.ID)
+      {
+        return levelStage;
+      }
+    }
+
+    return null;
+  }
+
+  internal bool IsTrapItem()
   {
     // TODO
     throw new NotImplementedException();
