@@ -182,9 +182,16 @@ internal class Items
     return null;
   }
 
-  internal bool IsTrapItem()
+  internal bool IsTrapItem(ReceivedItemsHelper helper) => IsTrapItem(helper.PeekItem());
+  internal bool IsTrapItem(ItemInfo data) => IsTrapItem(data.ItemId);
+
+  internal bool IsTrapItem(long id)
   {
-    // TODO
-    throw new NotImplementedException();
+    foreach (Item key in _data.Filler[FillerType.Traps])
+    {
+      if (key.ID == id)
+        return true;
+    }
+    return false;
   }
 }
