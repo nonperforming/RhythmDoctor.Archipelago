@@ -183,6 +183,7 @@ internal class Items
   }
 
   internal bool IsTrapItem(ReceivedItemsHelper helper) => IsTrapItem(helper.PeekItem());
+
   internal bool IsTrapItem(ItemInfo data) => IsTrapItem(data.ItemId);
 
   internal bool IsTrapItem(long id)
