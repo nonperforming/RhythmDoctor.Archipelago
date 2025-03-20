@@ -7,17 +7,24 @@ namespace RhythmDoctor.Archipelago;
 [BepInProcess("Rhythm Doctor.exe")]
 public class Plugin : BaseUnityPlugin
 {
+  // ReSharper disable NullableWarningSuppressionIsUsed
   internal static Client.Client Client = null!;
   internal static new ManualLogSource Logger = null!;
+  // ReSharper restore NullableWarningSuppressionIsUsed
 
-  private static readonly Type[] MenuPatches =
-  [
-    typeof(ArchipelagoLoginPatch),
-    typeof(LoadLoginMenuPatch),
-    typeof(VersionTextPatch),
-  ];
+  internal const string AlwaysActivePatchesID = $"{MyPluginInfo.PLUGIN_GUID}";
+  internal const string ArchipelagoMenuPatchID = $"{MyPluginInfo.PLUGIN_GUID}.cls";
+  internal const string PostLoginPatchesID = $"{MyPluginInfo.PLUGIN_GUID}.post";
 
-  private static readonly Type[] GameplayPatches =
+  /// <summary>
+  /// Patches that are always applied regardless of Archipelago status.
+  /// </summary>
+  private static readonly Type[] AlwaysActivePatches = [typeof(ArchipelagoMenuOptionPatch), typeof(VersionTextPatch)];
+
+  /// <summary>
+  /// Patches that are applied after logging into Archipelago, and unapplied after logging out.
+  /// </summary>
+  private static readonly Type[] PostLoginPatches =
   [
     typeof(ArchipelagoMenuPatch),
     typeof(ClearLocationPatch),
@@ -30,6 +37,8 @@ public class Plugin : BaseUnityPlugin
 #endif
   ];
 
+  internal static readonly Type CustomLoginScreenPatch = typeof(ArchipelagoLoginPatch);
+
   /// <summary>
   /// Apply patches
   /// </summary>
@@ -40,46 +49,37 @@ public class Plugin : BaseUnityPlugin
 
     // TODO: Is there a simpler way to PatchAll()?
     //  Unless we give Harmony the Type, it doesn't seem to apply the patch.
-    ApplyMenuPatches();
+    ApplyPatches(AlwaysActivePatches, AlwaysActivePatchesID);
   }
 
-  public static void ApplyMenuPatches()
+  internal static void ApplyPatches(Type[] patches, string id, bool unapply = false)
   {
-    Logger.LogInfo("Unapplying previous patches");
-    Harmony.UnpatchID(MyPluginInfo.PLUGIN_GUID);
+    if (unapply)
+    {
+      Logger.LogInfo("Unapplying previous patches");
+      Harmony.UnpatchID(MyPluginInfo.PLUGIN_GUID);
+    }
+    Harmony harmony = new(id);
 
-    Logger.LogInfo("Applying menu patches");
-    foreach (Type patch in MenuPatches)
+    Logger.LogInfo($"Applying {id} patches");
+    foreach (Type patch in patches)
     {
       Logger.LogDebug($"Applying {patch.Name}");
-      Harmony.CreateAndPatchAll(patch, MyPluginInfo.PLUGIN_GUID);
+      harmony.PatchAll(patch);
     }
   }
 
-  /// <summary>
-  /// Apply all our patches.
-  /// Should only be done when we have successfully signed in
-  /// </summary>
-  public static void ApplyGameplayPatches()
+  internal static void ApplyArchipelagoMenuPatch()
   {
-    Logger.LogInfo("Unapplying previous patches");
-    Harmony.UnpatchID(MyPluginInfo.PLUGIN_GUID);
-
-    Logger.LogInfo("Applying gameplay patches");
-    foreach (Type patch in GameplayPatches)
-    {
-      Logger.LogDebug($"Applying {patch.Name}");
-      Harmony.CreateAndPatchAll(patch, MyPluginInfo.PLUGIN_GUID);
-    }
+    Logger.LogInfo("Applying Archipelago menu patch");
+    Harmony harmony = new(ArchipelagoMenuPatchID);
+    harmony.PatchAll(CustomLoginScreenPatch);
   }
 
-  /// <summary>
-  /// Unpatch all our patches
-  /// </summary>
-  public void UnpatchAll()
+  internal static void UnapplyArchipelagoMenuPatch()
   {
-    Logger.LogInfo("Unapplying patches");
-    Harmony.UnpatchID(MyPluginInfo.PLUGIN_GUID);
+    Logger.LogInfo("Unapplying Archipelago menu patch");
+    Harmony.UnpatchID(ArchipelagoMenuPatchID);
   }
 
 #if DEBUG
