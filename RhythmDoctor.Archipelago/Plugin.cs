@@ -52,13 +52,8 @@ public class Plugin : BaseUnityPlugin
     ApplyPatches(AlwaysActivePatches, AlwaysActivePatchesID);
   }
 
-  internal static void ApplyPatches(Type[] patches, string id, bool unapply = false)
+  private static void ApplyPatches(Type[] patches, string id)
   {
-    if (unapply)
-    {
-      Logger.LogInfo("Unapplying previous patches");
-      Harmony.UnpatchID(MyPluginInfo.PLUGIN_GUID);
-    }
     Harmony harmony = new(id);
 
     Logger.LogInfo($"Applying {id} patches");
@@ -67,6 +62,12 @@ public class Plugin : BaseUnityPlugin
       Logger.LogDebug($"Applying {patch.Name}");
       harmony.PatchAll(patch);
     }
+  }
+
+  internal static void UnapplyGameplayPatches()
+  {
+    Logger.LogInfo("Unapplying gameplay patches");
+    Harmony.UnpatchID(PostLoginPatchesID);
   }
 
   internal static void ApplyArchipelagoMenuPatch()

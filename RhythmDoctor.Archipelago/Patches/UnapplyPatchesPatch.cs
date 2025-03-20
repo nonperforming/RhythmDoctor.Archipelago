@@ -8,6 +8,6 @@ public class UnapplyPatchesPatch
   public static void GoToMainMenu()
   {
     // TODO: Tear down Archipelago before applying menu patches
-    Plugin.ApplyMenuPatches();
+    Plugin.UnapplyGameplayPatches();
   }
 }
