@@ -10,6 +10,7 @@ public class Plugin : BaseUnityPlugin
   // ReSharper disable NullableWarningSuppressionIsUsed
   internal static Client.Client Client = null!;
   internal static new ManualLogSource Logger = null!;
+
   // ReSharper restore NullableWarningSuppressionIsUsed
 
   internal const string AlwaysActivePatchesID = $"{MyPluginInfo.PLUGIN_GUID}";
