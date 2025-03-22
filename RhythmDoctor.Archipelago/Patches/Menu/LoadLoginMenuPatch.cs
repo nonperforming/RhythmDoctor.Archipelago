@@ -22,12 +22,23 @@ internal static class ArchipelagoMenuOptionPatch
     bool archipelagoOptionSelected =
       __instance.optionsText[__instance.currentOption].gameObject.name == ARCHIPELAGO_OBJECT_NAME;
 
-    if (archipelagoOptionSelected)
-    {
-      __runOriginal = false;
-      Plugin.ApplyArchipelagoMenuPatch();
-      __instance.PlayConfirmSound();
-      __instance.TransitionToScene("scnCLS");
-    }
+    if (!archipelagoOptionSelected)
+      return;
+
+    __runOriginal = false;
+    Plugin.ApplyArchipelagoMenuPatch();
+    __instance.PlayConfirmSound();
+    __instance.TransitionToScene("scnCLS");
+  }
+
+  [HarmonyPatch(nameof(scnMenu.Localize))]
+  [HarmonyPostfix]
+  internal static void HandleArchipelagoOptionLocalize(scnMenu __instance)
+  {
+    // TODO: Patch RDString.Get instead and actually localize
+    __instance
+      .transform.Find($"mainMenu/options/optionsContainer/{ARCHIPELAGO_OBJECT_NAME}")
+      .gameObject.GetComponent<Text>()
+      .text = "Archipelago";
   }
 }

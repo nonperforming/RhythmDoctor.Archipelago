@@ -1,7 +1,6 @@
-using Logger = UnityEngine.Logger;
-
 namespace RhythmDoctor.Archipelago.Patches.Menu;
 
+[HarmonyPatch(typeof(scnCLS))]
 internal static class ArchipelagoLoginPatch
 {
   // FIXME: This isn't matching for some reason!
@@ -23,35 +22,71 @@ internal static class ArchipelagoLoginPatch
   //     .InstructionEnumeration();
   // }
 
-  [HarmonyPatch(typeof(scnCLS), nameof(scnCLS.Awake))]
+  [HarmonyPatch(nameof(scnCLS.Start))]
   [HarmonyPostfix]
-  private static void RenameWardOptions(ref scnCLS __instance)
+  private static void ConstructArchipelagoMenu(scnCLS __instance)
   {
-    // We patch Start instead of Awake otherwise we get strange bugs with Finding certain objects
-    Plugin.Logger.LogInfo("Renaming ward options");
+    Plugin.Logger.LogInfo("Renaming custom level ward items");
 
+    #region Rename LED sign
+    Plugin.Logger.LogInfo("Renaming LED sign");
+    GameObject.Find("Canvas/Ward Container/LEDSign Container/WardTitle Text").GetComponent<Text>().text = "ARCHIPELAGO";
+    #endregion
+
+    #region Rename ward options
+    Plugin.Logger.LogInfo("Renaming ward options");
     // Get WardOptions
     scnCLS.WardOption libraryOption = __instance.wardOptions.Find(wardOption =>
       wardOption.name == scnCLS.WardOptionName.Library
     );
-    scnCLS.WardOption workshopOption = __instance.wardOptions.Find(wardOption =>
+    // TODO: ShowAllWardOptions!!!
+    scnCLS.WardOption? workshopOption = __instance.wardOptions.Find(wardOption =>
       wardOption.name == scnCLS.WardOptionName.OpenSteamWorkshop
     );
-    scnCLS.WardOption importOption = __instance.wardOptions.Find(wardOption =>
+    scnCLS.WardOption? importOption = __instance.wardOptions.Find(wardOption =>
       wardOption.name == scnCLS.WardOptionName.ImportLevels
     );
 
     // Delete Library and Steam Workshop options
-    libraryOption.rect.transform.parent.gameObject.SetActive(false);
-    workshopOption.rect.transform.parent.gameObject.SetActive(false);
-    __instance.wardOptions.Remove(libraryOption);
-    __instance.wardOptions.Remove(workshopOption);
+    if (libraryOption != null)
+    {
+      libraryOption.rect?.transform.parent?.gameObject.SetActive(false);
+      __instance.wardOptions.Remove(libraryOption);
+    }
 
-    // Import to Archipelago option
-    //importOption.rect.
+    if (workshopOption != null)
+    {
+      workshopOption.rect?.transform.parent?.gameObject.SetActive(false);
+      __instance.wardOptions.Remove(workshopOption);
+    }
+    #endregion
+
+    #region Import to Archipelago option
+    Plugin.Logger.LogInfo("Renaming Import to Archipelago option");
+    // WardOption.rect returns ImportSign Container.
+    // ImportLevels/ImportSign Container/Button/Text
+    Transform buttonObject = importOption.rect.Find("Button");
+    buttonObject.Find("Icon Image").GetComponent<Image>().sprite = AssetHelper.LoadSprite(
+      new WardIcons(),
+      "archipelago.png"
+    );
+    buttonObject.Find("Text").GetComponent<Text>().text = "Archipelago";
+    #endregion
+
+    #region Import screen
+    Plugin.Logger.LogInfo("todo import screen");
+
+    #endregion
   }
 
-  [HarmonyPatch(typeof(scnCLS), nameof(scnCLS.SelectWardOption))]
+  [HarmonyPatch(nameof(scnCLS.Exit))]
+  [HarmonyPostfix]
+  private static void UnpatchMenu()
+  {
+    Plugin.UnapplyArchipelagoMenuPatch();
+  }
+
+  [HarmonyPatch(nameof(scnCLS.SelectWardOption))]
   [HarmonyPostfix]
   private static void CustomSelectOption(ref bool __runOriginal, scnCLS __instance)
   {
@@ -61,11 +96,41 @@ internal static class ArchipelagoLoginPatch
       case scnCLS.WardOptionName.Library:
       case scnCLS.WardOptionName.OpenSteamWorkshop:
         // It should not be possible to select these, but just in case.
+        Plugin.Logger.LogWarning("Library/Steam Workshop selected in Archipelago login screen");
         return;
       default:
         // Exit or import options
         __runOriginal = true;
         break;
     }
+  }
+
+  [HarmonyPatch(typeof(LevelImporter), nameof(LevelImporter.Showing), MethodType.Setter)]
+  [HarmonyPostfix]
+  private static void ArchipelagoImportScreen()
+  {
+    GameObject levelImporterObject = scnCLS.instance.levelImporter.gameObject;
+    GameObject screenObject = levelImporterObject.transform.Find("screen").gameObject;
+    GameObject contentsObject = screenObject.transform.Find("Contents").gameObject;
+
+    GameObject urlContainerObject = contentsObject.transform.Find("InsertURL Container").gameObject;
+    GameObject addButtonObject = urlContainerObject.transform.Find("Add Button").gameObject;
+    GameObject urlInputFieldContainerObject = urlContainerObject.transform.Find("URL InputField").gameObject;
+    GameObject placeholderObject = urlInputFieldContainerObject.transform.Find("Placeholder").gameObject;
+    Text placeholderText = placeholderObject.GetComponent<Text>();
+    Text instructionsText = urlContainerObject.transform.Find("Instructions").GetComponent<Text>();
+    Text addButtonText = addButtonObject.transform.Find("Text").GetComponent<Text>();
+
+    // Open the "INSTALL LEVELS" screen
+    contentsObject.transform.Find("Draggable Content/AddURL Button").GetComponent<Button>().onClick.Invoke();
+
+    // Rename the topbar from "INSTALL LEVELS" to "ARCHIPELAGO LOGIN"
+    contentsObject.transform.Find("Top Panel/Title Text").GetComponent<Text>().text = "ARCHIPELAGO LOGIN";
+
+    urlContainerObject.transform.Find("Cancel Button").gameObject.SetActive(false);
+
+    instructionsText.text = "Put in your client information in the format given and hit Connect.";
+    placeholderText.text = "<URL>\n<Username>\n<Password>";
+    addButtonText.text = "Connect";
   }
 }
