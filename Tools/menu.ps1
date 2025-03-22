@@ -41,6 +41,7 @@ function Launch-RhythmDoctor
     if ($Stop)
     {
       Stop-Process -Confirm -Name "Rhythm Doctor" -ErrorAction SilentlyContinue
+      Start-Sleep -Seconds 1
     }
     Start-Process -Confirm -FilePath $GameExecutable -WorkingDirectory $InstallPath
   }
@@ -48,6 +49,7 @@ function Launch-RhythmDoctor
     if ($Stop)
     {
       Stop-Process -Name "Rhythm Doctor" -ErrorAction SilentlyContinue
+      Start-Sleep -Seconds 1
     }
     Start-Process -FilePath $GameExecutable -WorkingDirectory $InstallPath
   }
