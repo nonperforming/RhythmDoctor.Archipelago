@@ -5,7 +5,7 @@ internal static class NicoleBlockagePatch
 {
   [HarmonyPatch(nameof(scnLevelSelect.UnlockEntrance))]
   [HarmonyPostfix]
-  internal static void NicoleBlockageVisualPatch(ref scnLevelSelect __instance)
+  internal static void NicoleBlockageVisualPatch(scnLevelSelect __instance)
   {
     __instance.nicoleAct5Blockage.gameObject.SetActive(false);
   }
