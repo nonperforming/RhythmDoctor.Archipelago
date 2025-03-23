@@ -130,7 +130,7 @@ internal static class ArchipelagoLoginPatch
     urlContainerObject.transform.Find("Cancel Button").gameObject.SetActive(false);
 
     instructionsText.text = "Put in your client information in the format given and hit Connect.";
-    placeholderText.text = "<URL>\n<Username>\n<Password>";
+    placeholderText.text = "<URL>\n<Name>\n<Password>";
     addButtonText.text = "Connect";
   }
 }
