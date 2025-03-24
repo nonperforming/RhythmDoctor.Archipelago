@@ -32,7 +32,7 @@ jobs:
           cp -r World/data/* "build/World/data/"
 
       - name: Upload client plugin
-        uses: actions/upload-artifact@v4.6.1
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: "RhythmDoctor.Archipelago.dll"
           path: |
@@ -44,7 +44,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload APWorld
-        uses: actions/upload-artifact@v4.6.1
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: "RhythmDoctor.apworld"
           path: "World/"
