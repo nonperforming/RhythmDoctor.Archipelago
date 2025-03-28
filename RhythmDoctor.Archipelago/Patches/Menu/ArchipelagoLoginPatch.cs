@@ -72,11 +72,51 @@ internal static class ArchipelagoLoginPatch
     );
     buttonObject.Find("Text").GetComponent<Text>().text = "Archipelago";
     #endregion
+  }
 
-    #region Import screen
-    Plugin.Logger.LogInfo("todo import screen");
+  [HarmonyPatch(typeof(LevelImporter), nameof(LevelImporter.Install))]
+  [HarmonyPrefix]
+  private static void OverrideInstallButton(ref bool __runOriginal, LevelImporter __instance)
+  {
+    // ReSharper disable once GrammarMistakeInComment
+    // We let Install run up to the first yield
+    // This prevents the user from changing the text, plays a sound, and changes the CurrentContentName to Installing.
 
-    #endregion
+    __runOriginal = false;
+
+    string[] text = __instance
+      .transform.Find("screen/Contents/InsertURL Container/URL InputField")
+      .GetComponent<Text>()
+      .text.Split('\n');
+
+    string? url = text[0];
+    string? name = text[1];
+    string? password = null;
+    try
+    {
+      password = text[2];
+    }
+    catch (IndexOutOfRangeException)
+    { }
+
+    if (url.IsNullOrWhiteSpace() || name.IsNullOrWhiteSpace())
+    {
+      // Invalid information
+      return;
+    }
+
+    // Attempt to log in with the information given.
+    try
+    {
+      Plugin.Client = new Client.Client(url, name, password);
+    }
+    catch
+    {
+      throw new NotImplementedException();
+    }
+
+    // Successful login
+    __instance.cls.CLSPlaySound("sndImportInstallFinish");
   }
 
   [HarmonyPatch(nameof(scnCLS.Exit))]
