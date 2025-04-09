@@ -17,10 +17,19 @@ public class Plugin : BaseUnityPlugin
   internal const string ArchipelagoMenuPatchID = $"{MyPluginInfo.PLUGIN_GUID}.cls";
   internal const string PostLoginPatchesID = $"{MyPluginInfo.PLUGIN_GUID}.post";
 
+  // Harmony's PatchCategories are not available on HarmonyX yet.
+
   /// <summary>
   /// Patches that are always applied regardless of Archipelago status.
   /// </summary>
-  private static readonly Type[] AlwaysActivePatches = [typeof(ArchipelagoMenuOptionPatch), typeof(VersionTextPatch)];
+  private static readonly Type[] AlwaysActivePatches =
+  [
+    typeof(ArchipelagoMenuOptionPatch),
+    typeof(VersionTextPatch),
+#if DEBUG
+    typeof(LogClearLevelPatch),
+#endif
+  ];
 
   /// <summary>
   /// Patches that are applied after logging into Archipelago, and unapplied after logging out.
@@ -31,11 +40,8 @@ public class Plugin : BaseUnityPlugin
     typeof(ClearLocationPatch),
     typeof(JanitorPatch),
     typeof(NicoleBlockagePatch),
-    //typeof(SkipTutorialPatch), // Disabled due to bugs with 1-2 and 3-X. See class for more information
+    typeof(SkipTutorialPatch),
     //typeof(UnlockItemPatch),
-#if DEBUG
-    typeof(LogClearLevelPatch),
-#endif
   ];
 
   internal static readonly Type CustomLoginScreenPatch = typeof(ArchipelagoLoginPatch);

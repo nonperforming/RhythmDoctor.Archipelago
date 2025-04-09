@@ -2,24 +2,36 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 
 /// <summary>
 /// Prevents tutorials from being loaded
-/// FIXME: This doesn't actually work.
-/// 3-X and 1-2 bug and fail to load if we patch scnGame.Start
-/// even if nothing runs. Notably, these stages are mostly implemented by
-/// a custom script... but for some reason other levels with custom scripts
-/// such as X-WOT (custom heart, decompile Level_Unbeatable) work correctly.
-/// This alternative patch should in theory prevent the tutorial from being
-/// loaded outright...
-/// ...but doesn't for some reason.
 /// </summary>
-[HarmonyPatch(typeof(scnBase))]
+[HarmonyPatch(typeof(scnGame))]
 static class SkipTutorialPatch
 {
-  [HarmonyPatch(nameof(scnBase.GoToLevel))]
-  [HarmonyPrefix]
-  static void GoToLevelPatch(string path, bool loadGameScene, ref bool attemptToLoadTutorial)
+  // From https://github.com/Mysthaps/MyseIfRDPatches/blob/master/Main.cs#L223
+  [HarmonyPatch(nameof(scnGame.Start))]
+  [HarmonyTranspiler]
+  static IEnumerable<CodeInstruction> FixLesmisPatch(IEnumerable<CodeInstruction> instructions)
   {
-    Plugin.Logger.LogDebug($"Forcing attemptToLoadTutorial from {attemptToLoadTutorial} to false");
-    attemptToLoadTutorial = false;
+    return new CodeMatcher(instructions)
+      .MatchForward(false, new CodeMatch(OpCodes.Ldstr, "Level_"))
+      .Advance(3)
+      .InsertAndAdvance(
+        new CodeInstruction(OpCodes.Ldstr, ", Assembly-CSharp"),
+        new CodeInstruction(
+          OpCodes.Call,
+          AccessTools.Method("System.String:Concat", new Type[] { typeof(String), typeof(String) })
+        )
+      )
+      .InstructionEnumeration();
+  }
+
+  [HarmonyPatch(nameof(scnGame.Start))]
+  [HarmonyPrefix]
+  static void DoNotLoadTutorialPatch()
+  {
+    //if (level in )
+    Plugin.Logger.LogDebug(
+      $"Level {scnGame.internalIdentifier}: Forcing attemptToLoadTutorial from {scnGame.attemptToLoadTutorial} to false"
+    );
     scnGame.attemptToLoadTutorial = false;
   }
 }
