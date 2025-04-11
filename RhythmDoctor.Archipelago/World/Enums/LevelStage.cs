@@ -297,6 +297,7 @@ public enum LevelStage
   /// </summary>
   [EnumMember(Value = "MD-3")]
   // ReSharper disable once InconsistentNaming
+  // Can't put "'" in enum name
   The90sDecision,
 
   /// <summary>
@@ -328,6 +329,6 @@ internal static class LevelStageExtensions
       ?.GetCustomAttributes(false)
       .OfType<EnumMemberAttribute>()
       .FirstOrDefault();
-    return attr == null ? null : attr.Value;
+    return attr?.Value;
   }
 }
