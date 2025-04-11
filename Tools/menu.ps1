@@ -14,7 +14,6 @@ function Update-Paths
   Set-Variable -Name "ProjectFilePath" -Value (Join-Path -Path $ProjectPath -ChildPath "RhythmDoctor.Archipelago.csproj") -Scope script
   Set-Variable -Name "BuildPath" -Value (Join-Path -Path $RepositoryPath -ChildPath "build") -Scope script
 
-  Set-Variable -Name "GameExecutable" -Value (Join-Path -Path $InstallPath -ChildPath "Rhythm Doctor.exe") -Scope script
   Set-Variable -Name "GameAssembly" -Value (Join-Path -Path $InstallPath -ChildPath "Rhythm Doctor_Data\Managed\Assembly-CSharp.dll") -Scope script
 
   Set-Variable -Name "BepInExPath" -Value (Join-Path -Path $InstallPath -ChildPath "BepInEx") -Scope script
@@ -43,7 +42,7 @@ function Launch-RhythmDoctor
       Stop-Process -Confirm -Name "Rhythm Doctor" -ErrorAction SilentlyContinue
       Start-Sleep -Seconds 1
     }
-    Start-Process -Confirm -FilePath $GameExecutable -WorkingDirectory $InstallPath
+    Start-Process -Confirm "steam://launch/774181"
   }
   else {
     if ($Stop)
@@ -51,7 +50,7 @@ function Launch-RhythmDoctor
       Stop-Process -Name "Rhythm Doctor" -ErrorAction SilentlyContinue
       Start-Sleep -Seconds 1
     }
-    Start-Process -FilePath $GameExecutable -WorkingDirectory $InstallPath
+    Start-Process -Confirm "steam://launch/774181"
   }
 }
 
@@ -217,7 +216,6 @@ function Prompt-Menu
           Write-Host ".csproj Path: $ProjectFilePath" -ForegroundColor Yellow
           Write-Host "Build Path: $BuildPath" -ForegroundColor Yellow
           Write-Host
-          Write-Host "Game Executable: $GameExecutable" -ForegroundColor Yellow
           Write-Host "Game Assembly: $GameAssembly" -ForegroundColor Yellow
           Write-Host
           Write-Host "BepInEx Path: $BepInExPath" -ForegroundColor Yellow
