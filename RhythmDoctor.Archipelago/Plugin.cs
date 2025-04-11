@@ -1,7 +1,7 @@
 namespace RhythmDoctor.Archipelago;
 
 /// <summary>
-/// Apply all patches and create the Logger
+/// Apply AlwaysActive patches and create the Logger
 /// </summary>
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 [BepInProcess("Rhythm Doctor.exe")]
@@ -10,7 +10,6 @@ public class Plugin : BaseUnityPlugin
   // ReSharper disable NullableWarningSuppressionIsUsed
   internal static Client.Client Client = null!;
   internal static new ManualLogSource Logger = null!;
-
   // ReSharper restore NullableWarningSuppressionIsUsed
 
   internal const string AlwaysActivePatchesID = $"{MyPluginInfo.PLUGIN_GUID}";
@@ -69,6 +68,12 @@ public class Plugin : BaseUnityPlugin
       Logger.LogDebug($"Applying {patch.Name}");
       harmony.PatchAll(patch);
     }
+  }
+
+  internal static void ApplyGameplayPatches()
+  {
+    Logger.LogInfo("Applying gameplay patches");
+    ApplyPatches(PostLoginPatches, PostLoginPatchesID);
   }
 
   internal static void UnapplyGameplayPatches()

@@ -64,7 +64,7 @@ public class DebugMenu : MonoBehaviour
         break;
 
       case ActivatedGUI.Main:
-        GUI.Box(new Rect(10, 10, 330, 160), "Rhythm Doctor Archipelago Main Debug");
+        GUI.Box(new Rect(10, 10, 330, 180), "Rhythm Doctor Archipelago Main Debug");
 
         if (GUI.Button(new Rect(30, 30, 300, 20), "Toggle RD Debug"))
         {
@@ -87,6 +87,16 @@ public class DebugMenu : MonoBehaviour
         if (GUI.Button(new Rect(30, 130, 300, 20), "Connect"))
         {
           Plugin.Client = new Client.Client(_url, _username, _password);
+        }
+
+        if (GUI.Button(new Rect(30, 150, 300, 20), "Apply post-login patches"))
+        {
+          Plugin.ApplyGameplayPatches();
+        }
+
+        if (GUI.Button(new Rect(30, 170, 300, 20), "Unapply post-login patches"))
+        {
+          Plugin.UnapplyGameplayPatches();
         }
         break;
       case ActivatedGUI.Data:
