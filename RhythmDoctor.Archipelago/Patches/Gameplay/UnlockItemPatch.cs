@@ -1,10 +1,8 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 
 [HarmonyPatch(typeof(scnLevelSelect))]
-public class UnlockItemPatch
+static class UnlockItemPatch
 {
-  public static bool UpdateUnlockedItems = false;
-
   [HarmonyPatch(nameof(scnLevelSelect.LoadLevelData))]
   [HarmonyPostfix]
   static void UnlockEntitiesWithItems(scnLevelSelect __instance)

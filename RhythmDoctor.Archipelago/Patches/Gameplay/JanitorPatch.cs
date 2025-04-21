@@ -4,7 +4,7 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 /// Patches related to the Janitor
 /// </summary>
 [HarmonyPatch(typeof(scnLevelSelect))]
-internal static class JanitorPatch
+static class JanitorPatch
 {
   /// <summary>
   /// Open the Archipelago Ward when interacting with the Janitor.

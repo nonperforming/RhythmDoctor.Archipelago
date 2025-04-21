@@ -1,18 +1,18 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 
 [HarmonyPatch(typeof(scnLevelSelect))]
-internal static class NicoleBlockagePatch
+static class NicoleBlockagePatch
 {
   [HarmonyPatch(nameof(scnLevelSelect.UnlockEntrance))]
   [HarmonyPostfix]
-  internal static void NicoleBlockageVisualPatch(scnLevelSelect __instance)
+  static void NicoleBlockageVisualPatch(scnLevelSelect __instance)
   {
     __instance.nicoleAct5Blockage.gameObject.SetActive(false);
   }
 
   [HarmonyPatch(nameof(scnLevelSelect.PerformEntityAction))]
   [HarmonyTranspiler]
-  internal static IEnumerable<CodeInstruction> NicoleBlockageInteractionPatch(IEnumerable<CodeInstruction> instructions)
+  static IEnumerable<CodeInstruction> NicoleBlockageInteractionPatch(IEnumerable<CodeInstruction> instructions)
   {
     // We want to force this bool to false so Nicole doesn't tell us to go to 2-1N before entering the PT Ward:
     // bool flag = currentSelectableObject.id == "GoToAthleteWard" && !Persistence.GetLevelRank(Level.CareLess).passed;

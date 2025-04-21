@@ -37,7 +37,6 @@ public class Plugin : BaseUnityPlugin
   /// </summary>
   private static readonly Type[] PostLoginPatches =
   [
-    typeof(ArchipelagoMenuPatch),
     typeof(ClearLocationPatch),
     typeof(JanitorPatch),
     typeof(NicoleBlockagePatch),

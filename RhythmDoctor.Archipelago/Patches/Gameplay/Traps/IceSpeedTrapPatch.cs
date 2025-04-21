@@ -1,11 +1,11 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 
 [HarmonyPatch(typeof(HeartMonitor))]
-internal static class IceSpeedTrapPatch
+static class IceSpeedTrapPatch
 {
   [HarmonyPatch(nameof(HeartMonitor.Update))]
   [HarmonyPrefix]
-  internal static void ForceLevelSpeed(HeartMonitor __instance)
+  static void ForceLevelSpeed(HeartMonitor __instance)
   {
     __instance.isSpeedOptionShown = false;
     __instance.currentLevelSpeedIndex = 0;

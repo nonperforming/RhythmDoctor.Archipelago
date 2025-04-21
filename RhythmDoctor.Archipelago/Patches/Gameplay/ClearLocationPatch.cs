@@ -1,14 +1,7 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 
-internal class ClearLocationPatch
+static class ClearLocationPatch
 {
-  private string[] scouted = new string[3];
-
-  void ResetLocations()
-  {
-    scouted[0] = scouted[1] = scouted[2] = string.Empty;
-  }
-
   /// <summary>
   /// Loading a level.
   /// TODO: Is this used for 3-X?

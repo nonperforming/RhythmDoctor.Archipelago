@@ -4,7 +4,7 @@ namespace RhythmDoctor.Archipelago.Patches;
 /// Append our plugin's version to Rhythm Doctor's version on the home screen.
 /// </summary>
 [HarmonyPatch(typeof(RDVersionText))]
-internal static class VersionTextPatch
+static class VersionTextPatch
 {
   [HarmonyPatch(nameof(RDVersionText.SetPage))]
   [HarmonyPostfix]

@@ -1,7 +1,7 @@
 namespace RhythmDoctor.Archipelago.Patches.Menu;
 
 [HarmonyPatch(typeof(scnCLS))]
-internal static class ArchipelagoLoginPatch
+static class ArchipelagoLoginPatch
 {
   // FIXME: This isn't matching for some reason!
   // [HarmonyPatch(typeof(scnCLS), nameof(scnCLS.Awake))]
@@ -24,7 +24,7 @@ internal static class ArchipelagoLoginPatch
 
   [HarmonyPatch(nameof(scnCLS.Start))]
   [HarmonyPostfix]
-  private static void ConstructArchipelagoMenu(scnCLS __instance)
+  static void ConstructArchipelagoMenu(scnCLS __instance)
   {
     Plugin.Logger.LogInfo("Renaming custom level ward items");
 
@@ -75,34 +75,56 @@ internal static class ArchipelagoLoginPatch
   }
 
   [HarmonyPatch(typeof(LevelImporter), nameof(LevelImporter.Install))]
-  [HarmonyPrefix]
-  private static void OverrideInstallButton(ref bool __runOriginal, LevelImporter __instance)
+  [HarmonyPostfix]
+  static IEnumerator OverrideInstallButton(IEnumerator __result, LevelImporter __instance)
   {
-    // ReSharper disable once GrammarMistakeInComment
-    // We let Install run up to the first yield
-    // This prevents the user from changing the text, plays a sound, and changes the CurrentContentName to Installing.
-
-    __runOriginal = false;
+    // TODO: Show appropriate errors rather than silently failing
+    #region Lock input
+    __instance.cls.CLSPlaySound("sndImportInstallButtonClick");
+    __instance.ToggleInsertUrlContainer(show: false);
+    __instance.CurrentContentName = LevelImporter.ContentName.Installing;
+    __instance.stoppedInstallCoroutine = false;
+    __instance.CanToggleClearButton = false;
+    foreach (ImportLevel item in __instance.levelsToInstall)
+    {
+      item.canToggleRemoveButton = false;
+    }
+    yield return null;
+    #endregion
 
     string[] text = __instance
       .transform.Find("screen/Contents/InsertURL Container/URL InputField")
       .GetComponent<Text>()
       .text.Split('\n');
 
-    string? url = text[0];
-    string? name = text[1];
+    if (text.Length < 2)
+    {
+      // URL or Name are not present, bail out
+      __instance.CurrentContentName = LevelImporter.ContentName.LevelsInstalled;
+      __instance.cls.CLSPlaySound("sndImportInstallFinish");
+      __instance.AddLevelToErrorSection(__instance.levelsToInstall[0], "URL or Name not present");
+      yield break;
+    }
+
+    string url = text[0];
+    string name = text[1];
     string? password = null;
     try
     {
       password = text[2];
     }
     catch (IndexOutOfRangeException)
-    { }
+    {
+      // No password given.
+    }
 
     if (url.IsNullOrWhiteSpace() || name.IsNullOrWhiteSpace())
     {
-      // Invalid information
-      return;
+      // Invalid information, bail out
+      __instance.CurrentContentName = LevelImporter.ContentName.LevelsInstalled;
+      __instance.cls.CLSPlaySound("sndImportInstallFinish");
+      __instance.AddLevelToErrorSection(__instance.levelsToInstall[0], "URL or Name not present");
+      yield break;
     }
 
     // Attempt to log in with the information given.
@@ -110,25 +132,32 @@ internal static class ArchipelagoLoginPatch
     {
       Plugin.Client = new Client.Client(url, name, password);
     }
-    catch
+    catch (Exception exception)
     {
-      throw new NotImplementedException();
+      Plugin.Logger.LogError(exception);
+      // Bail out
+      __instance.CurrentContentName = LevelImporter.ContentName.LevelsInstalled;
+      __instance.cls.CLSPlaySound("sndImportInstallFinish");
+      __instance.AddLevelToErrorSection(__instance.levelsToInstall[0], exception.Message);
+      yield break;
     }
 
     // Successful login
     __instance.cls.CLSPlaySound("sndImportInstallFinish");
+
+    __instance.CurrentContentName = LevelImporter.ContentName.LevelsInstalled;
   }
 
   [HarmonyPatch(nameof(scnCLS.Exit))]
   [HarmonyPostfix]
-  private static void UnpatchMenu()
+  static void UnpatchMenu()
   {
     Plugin.UnapplyArchipelagoMenuPatch();
   }
 
   [HarmonyPatch(nameof(scnCLS.SelectWardOption))]
   [HarmonyPostfix]
-  private static void CustomSelectOption(ref bool __runOriginal, scnCLS __instance)
+  static void CustomSelectOption(ref bool __runOriginal, scnCLS __instance)
   {
     __runOriginal = false;
     switch (__instance.CurrentWardOption.name)
@@ -147,7 +176,7 @@ internal static class ArchipelagoLoginPatch
 
   [HarmonyPatch(typeof(LevelImporter), nameof(LevelImporter.Showing), MethodType.Setter)]
   [HarmonyPostfix]
-  private static void ArchipelagoImportScreen()
+  static void ArchipelagoImportScreen()
   {
     GameObject levelImporterObject = scnCLS.instance.levelImporter.gameObject;
     GameObject screenObject = levelImporterObject.transform.Find("screen").gameObject;
@@ -164,13 +193,24 @@ internal static class ArchipelagoLoginPatch
     // Open the "INSTALL LEVELS" screen
     contentsObject.transform.Find("Draggable Content/AddURL Button").GetComponent<Button>().onClick.Invoke();
 
-    // Rename the topbar from "INSTALL LEVELS" to "ARCHIPELAGO LOGIN"
+    // Rename the top bar from "INSTALL LEVELS" to "ARCHIPELAGO LOGIN"
     contentsObject.transform.Find("Top Panel/Title Text").GetComponent<Text>().text = "ARCHIPELAGO LOGIN";
 
+    // FIXME: This removes the button to go back a page but the user can still use the 'escape' keybind
     urlContainerObject.transform.Find("Cancel Button").gameObject.SetActive(false);
 
     instructionsText.text = "Put in your client information in the format given and hit Connect.";
     placeholderText.text = "<URL>\n<Name>\n<Password>";
     addButtonText.text = "Connect";
+  }
+
+  [HarmonyPatch(typeof(LevelImporter), nameof(LevelImporter.ValidateUrl))]
+  [HarmonyPrefix]
+  static void StubValidateUrl(ref bool __runOriginal, LevelImporter __instance)
+  {
+    // Seems to be called on the "install" button being clicked.
+    // Redirect it to our login patch.
+    __runOriginal = false;
+    __instance.Install_Public();
   }
 }
