@@ -10,11 +10,13 @@ public class Plugin : BaseUnityPlugin
   // ReSharper disable NullableWarningSuppressionIsUsed
   internal static Client.Client Client = null!;
   internal static new ManualLogSource Logger = null!;
+
   // ReSharper restore NullableWarningSuppressionIsUsed
 
   internal const string AlwaysActivePatchesID = $"{MyPluginInfo.PLUGIN_GUID}";
   internal const string ArchipelagoMenuPatchID = $"{MyPluginInfo.PLUGIN_GUID}.cls";
   internal const string PostLoginPatchesID = $"{MyPluginInfo.PLUGIN_GUID}.post";
+  internal const string TrapPatchesID = $"{MyPluginInfo.PLUGIN_GUID}.trap";
 
   // Harmony's PatchCategories are not available on HarmonyX yet.
 
@@ -80,6 +82,12 @@ public class Plugin : BaseUnityPlugin
   {
     Logger.LogInfo("Unapplying gameplay patches");
     Harmony.UnpatchID(PostLoginPatchesID);
+  }
+
+  internal static void UnapplyTrapPatches()
+  {
+    Logger.LogInfo("Unapplying trap patches");
+    Harmony.UnpatchID(TrapPatchesID);
   }
 
   internal static void ApplyArchipelagoMenuPatch()

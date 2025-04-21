@@ -8,7 +8,7 @@ public class DebugMenu : MonoBehaviour
     None,
     Main,
     Data,
-    Menu,
+    Patches,
     Levels,
   }
 
@@ -22,6 +22,12 @@ public class DebugMenu : MonoBehaviour
   // ReSharper disable once NullableWarningSuppressionIsUsed
   private string _password = null!;
   private bool _deathLink;
+
+  private readonly ISerializer _dataSerializer = new SerializerBuilder()
+    .WithNamingConvention(HyphenatedNamingConvention.Instance)
+    .Build();
+
+  private Harmony _trapHarmony = new(Plugin.TrapPatchesID);
 
   private void Start()
   {
@@ -37,7 +43,7 @@ public class DebugMenu : MonoBehaviour
       else if (Input.GetKeyDown(KeyCode.F4))
         return ActivatedGUI.Data;
       else if (Input.GetKeyDown(KeyCode.F5))
-        return ActivatedGUI.Menu;
+        return ActivatedGUI.Patches;
       else if (Input.GetKeyDown(KeyCode.F6))
         return ActivatedGUI.Levels;
       return ActivatedGUI.None;
@@ -88,54 +94,62 @@ public class DebugMenu : MonoBehaviour
         {
           Plugin.Client = new Client.Client(_url, _username, _password);
         }
-
-        if (GUI.Button(new Rect(30, 150, 300, 20), "Apply post-login patches"))
-        {
-          Plugin.ApplyGameplayPatches();
-        }
-
-        if (GUI.Button(new Rect(30, 170, 300, 20), "Unapply post-login patches"))
-        {
-          Plugin.UnapplyGameplayPatches();
-        }
         break;
       case ActivatedGUI.Data:
         GUI.Box(new Rect(10, 10, 330, 150), "Rhythm Doctor Archipelago Data Debug");
-
-        ISerializer serializer = new SerializerBuilder()
-          .WithNamingConvention(HyphenatedNamingConvention.Instance)
-          .Build();
 
         if (GUI.Button(new Rect(30, 30, 300, 20), "Create ItemsData"))
         {
           Plugin.Logger.LogInfo("Creating ItemsData");
           ItemsData itemsData = DataHelper.GetItemsData();
-          Plugin.Logger.LogInfo(serializer.Serialize(itemsData));
+          Plugin.Logger.LogInfo(_dataSerializer.Serialize(itemsData));
         }
         if (GUI.Button(new Rect(30, 60, 300, 20), "Create LocationsData"))
         {
           Plugin.Logger.LogInfo("Creating LocationsData");
           LocationsData locationsData = DataHelper.GetLocationsData();
-          Plugin.Logger.LogInfo(serializer.Serialize(locationsData));
+          Plugin.Logger.LogInfo(_dataSerializer.Serialize(locationsData));
         }
         if (GUI.Button(new Rect(30, 90, 300, 20), "Create OptionsData"))
         {
           Plugin.Logger.LogInfo("Creating OptionsData");
           throw new NotImplementedException();
           //OptionsData optionsData = DataHelper.GetOptionsData();
-          //Plugin.Logger.LogInfo(serializer.Serialize(optionsData));
+          //Plugin.Logger.LogInfo(_dataSerializer.Serialize(optionsData));
         }
         if (GUI.Button(new Rect(30, 120, 300, 20), "Create WorldData"))
         {
           Plugin.Logger.LogInfo("Creating WorldData");
           throw new NotImplementedException();
           //WorldData worldData = DataHelper.GetWorldData();
-          //Plugin.Logger.LogInfo(serializer.Serialize(worldData));
+          //Plugin.Logger.LogInfo(_dataSerializer.Serialize(worldData));
         }
         break;
-      case ActivatedGUI.Menu:
-        GUI.Box(new Rect(10, 10, 330, 60), "Rhythm Doctor Archipelago Menu Debug");
+      case ActivatedGUI.Patches:
+        GUI.Box(new Rect(10, 10, 330, 170), "Rhythm Doctor Archipelago Patches Debug");
+        if (GUI.Button(new Rect(30, 30, 300, 20), "Unapply trap patches"))
+        {
+          Plugin.UnapplyTrapPatches();
+        }
+        if (GUI.Button(new Rect(30, 60, 300, 20), "Apply ChilliSpeedTrapPatch"))
+        {
+          Plugin.Logger.LogInfo("Applying ChilliSpeedTrap patch");
+          _trapHarmony.PatchAll(typeof(ChilliSpeedTrapPatch));
+        }
+        if (GUI.Button(new Rect(30, 90, 300, 20), "Apply IceSpeedTrapPatch"))
+        {
+          Plugin.Logger.LogInfo("Applying IceSpeedTrap patch");
+          _trapHarmony.PatchAll(typeof(IceSpeedTrapPatch));
+        }
 
+        if (GUI.Button(new Rect(30, 120, 300, 20), "Apply post-login patches"))
+        {
+          Plugin.ApplyGameplayPatches();
+        }
+        if (GUI.Button(new Rect(30, 150, 300, 20), "Unapply post-login patches"))
+        {
+          Plugin.UnapplyGameplayPatches();
+        }
         break;
       case ActivatedGUI.Levels:
         GUI.Box(new Rect(10, 10, 330, 200), "Rhythm Doctor Archipelago Levels Debug");
