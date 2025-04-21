@@ -1,5 +1,8 @@
 namespace RhythmDoctor.Archipelago.Client;
 
+/// <summary>
+/// Archipelago client
+/// </summary>
 internal sealed class Client
 {
   internal ArchipelagoSession? session;
@@ -11,6 +14,14 @@ internal sealed class Client
   internal Options options;
   internal World.World world;
 
+  /// <summary>
+  /// Create an Archipelago client.
+  /// </summary>
+  /// <param name="server">The server to connect to</param>
+  /// <param name="username">The slot name</param>
+  /// <param name="password">The password (if any)</param>
+  /// <param name="deathLink">Whether to enable Death Link</param>
+  /// <exception cref="Exception">Login failure</exception>
   public Client(string server, string username, string? password = null, bool deathLink = false)
   {
     items = new();
@@ -19,9 +30,24 @@ internal sealed class Client
     world = new();
 
     CreateSession(server);
-    Connect(username, password, deathLink);
+    try
+    {
+      Connect(username, password, deathLink);
+    }
+    catch (Exception exception)
+    {
+      throw new Exception(
+        $"Failed to connect to server {server} under {username}: {password} (Death Link: {deathLink})",
+        exception
+      );
+    }
   }
 
+  /// <summary>
+  /// Create an Archipelago session.
+  /// </summary>
+  /// <param name="server">Server to connect to</param>
+  /// <returns>Created session</returns>
   internal ArchipelagoSession CreateSession(string server)
   {
     Plugin.Logger.LogInfo($"Creating Archipelago session to {server}");
@@ -29,6 +55,14 @@ internal sealed class Client
     return session;
   }
 
+  /// <summary>
+  ///
+  /// </summary>
+  /// <param name="name"></param>
+  /// <param name="password"></param>
+  /// <param name="deathLink"></param>
+  /// <exception cref="NullReferenceException">Session is null</exception>
+  /// <exception cref="Exception">Login failure</exception>
   internal void Connect(string name, string? password = null, bool deathLink = false)
   {
     if (session == null)
@@ -60,7 +94,7 @@ internal sealed class Client
       Plugin.Logger.LogError(loginFailure.ErrorCodes);
 
       // FIXME: Shouldn't use a generic exception for this
-      throw new Exception();
+      throw new Exception($"Failed to connect to server under {name}: {password} (Death Link: {deathLink})");
     }
     else if (loginResult is LoginSuccessful loginSuccessful)
     {
@@ -96,6 +130,7 @@ internal sealed class Client
 
   internal void ItemReceived(ReceivedItemsHelper helper)
   {
+    // TODO: Handle traps
     ItemInfo item = helper.PeekItem();
 
     if (items.IsKeyItem(item))
