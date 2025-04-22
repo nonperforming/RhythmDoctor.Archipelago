@@ -19,6 +19,7 @@ global using RhythmDoctor.Archipelago.Debug.Patches;
 global using RhythmDoctor.Archipelago.Helpers;
 global using RhythmDoctor.Archipelago.Patches;
 global using RhythmDoctor.Archipelago.Patches.Gameplay;
+global using RhythmDoctor.Archipelago.Patches.Gameplay.Powerups;
 global using RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 global using RhythmDoctor.Archipelago.Patches.Menu;
 global using RhythmDoctor.Archipelago.World;

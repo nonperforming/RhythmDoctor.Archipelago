@@ -126,27 +126,38 @@ public class DebugMenu : MonoBehaviour
         }
         break;
       case ActivatedGUI.Patches:
-        GUI.Box(new Rect(10, 10, 330, 170), "Rhythm Doctor Archipelago Patches Debug");
+        GUI.Box(new Rect(10, 10, 330, 230), "Rhythm Doctor Archipelago Patches Debug");
         if (GUI.Button(new Rect(30, 30, 300, 20), "Unapply trap patches"))
         {
           Plugin.UnapplyTrapPatches();
         }
-        if (GUI.Button(new Rect(30, 60, 300, 20), "Apply ChilliSpeedTrapPatch"))
+        if (GUI.Button(new Rect(30, 60, 300, 20), "Apply Chilli Speed Trap"))
         {
           Plugin.Logger.LogInfo("Applying ChilliSpeedTrap patch");
           _trapHarmony.PatchAll(typeof(ChilliSpeedTrapPatch));
         }
-        if (GUI.Button(new Rect(30, 90, 300, 20), "Apply IceSpeedTrapPatch"))
+        if (GUI.Button(new Rect(30, 90, 300, 20), "Apply Ice Speed Trap"))
         {
           Plugin.Logger.LogInfo("Applying IceSpeedTrap patch");
           _trapHarmony.PatchAll(typeof(IceSpeedTrapPatch));
         }
 
-        if (GUI.Button(new Rect(30, 120, 300, 20), "Apply post-login patches"))
+        if (GUI.Button(new Rect(30, 120, 300, 20), "Apply Strong Heart Powerup"))
+        {
+          Plugin.Logger.LogInfo("Applying StrongHeartPowerup patch");
+          _trapHarmony.PatchAll(typeof(StrongHeartTrapPatch));
+        }
+        if (GUI.Button(new Rect(30, 150, 300, 20), "Apply Fragile Heart Powerup"))
+        {
+          Plugin.Logger.LogInfo("Applying FragileSpeedTrap patch");
+          _trapHarmony.PatchAll(typeof(FragileHeartTrapPatch));
+        }
+
+        if (GUI.Button(new Rect(30, 180, 300, 20), "Apply post-login patches"))
         {
           Plugin.ApplyGameplayPatches();
         }
-        if (GUI.Button(new Rect(30, 150, 300, 20), "Unapply post-login patches"))
+        if (GUI.Button(new Rect(30, 210, 300, 20), "Unapply post-login patches"))
         {
           Plugin.UnapplyGameplayPatches();
         }
