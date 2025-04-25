@@ -126,7 +126,7 @@ public class DebugMenu : MonoBehaviour
         }
         break;
       case ActivatedGUI.Patches:
-        GUI.Box(new Rect(10, 10, 330, 230), "Rhythm Doctor Archipelago Patches Debug");
+        GUI.Box(new Rect(10, 10, 330, 300), "Rhythm Doctor Archipelago Patches Debug");
         if (GUI.Button(new Rect(30, 30, 300, 20), "Unapply trap patches"))
         {
           Plugin.UnapplyTrapPatches();
@@ -145,19 +145,29 @@ public class DebugMenu : MonoBehaviour
         if (GUI.Button(new Rect(30, 120, 300, 20), "Apply Strong Heart Powerup"))
         {
           Plugin.Logger.LogInfo("Applying StrongHeartPowerup patch");
-          _trapHarmony.PatchAll(typeof(StrongHeartTrapPatch));
+          _trapHarmony.PatchAll(typeof(StrongHeartPowerupPatch));
         }
         if (GUI.Button(new Rect(30, 150, 300, 20), "Apply Fragile Heart Powerup"))
         {
           Plugin.Logger.LogInfo("Applying FragileSpeedTrap patch");
           _trapHarmony.PatchAll(typeof(FragileHeartTrapPatch));
         }
+        if (GUI.Button(new Rect(30, 180, 300, 20), "Apply Easy Mode Powerup"))
+        {
+          Plugin.Logger.LogInfo("Applying EasyModePowerup patch");
+          _trapHarmony.PatchAll(typeof(EasyModePowerupPatch));
+        }
+        if (GUI.Button(new Rect(30, 210, 300, 20), "Apply Hard Mode Trap"))
+        {
+          Plugin.Logger.LogInfo("Applying HardModeTrap patch");
+          _trapHarmony.PatchAll(typeof(HardModeTrapPatch));
+        }
 
-        if (GUI.Button(new Rect(30, 180, 300, 20), "Apply post-login patches"))
+        if (GUI.Button(new Rect(30, 240, 300, 20), "Apply post-login patches"))
         {
           Plugin.ApplyGameplayPatches();
         }
-        if (GUI.Button(new Rect(30, 210, 300, 20), "Unapply post-login patches"))
+        if (GUI.Button(new Rect(30, 270, 300, 20), "Unapply post-login patches"))
         {
           Plugin.UnapplyGameplayPatches();
         }

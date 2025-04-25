@@ -1,7 +1,7 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay.Powerups;
 
 [HarmonyPatch(typeof(MistakesManager))]
-static class StrongHeartTrapPatch
+static class StrongHeartPowerupPatch
 {
   [HarmonyPatch(nameof(MistakesManager.AddMistake))]
   [HarmonyPrefix]
