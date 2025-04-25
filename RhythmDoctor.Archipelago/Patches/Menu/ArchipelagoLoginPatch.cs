@@ -26,6 +26,8 @@ static class ArchipelagoLoginPatch
   [HarmonyPostfix]
   static void ConstructArchipelagoMenu(scnCLS __instance)
   {
+    // TODO: Need to change applicable text on LevelDetail
+
     Plugin.Logger.LogInfo("Renaming custom level ward items");
 
     #region Rename LED sign
@@ -46,6 +48,9 @@ static class ArchipelagoLoginPatch
     scnCLS.WardOption? importOption = __instance.wardOptions.Find(wardOption =>
       wardOption.name == scnCLS.WardOptionName.ImportLevels
     );
+
+    // We need to deselect the Library option first otherwise we get weird issues with UI
+    __instance.ChangeToImportOption();
 
     // Delete Library and Steam Workshop options
     if (libraryOption != null)
@@ -72,6 +77,9 @@ static class ArchipelagoLoginPatch
     );
     buttonObject.Find("Text").GetComponent<Text>().text = "Archipelago";
     #endregion
+
+    // Fix UI breaking after changing selection
+    __instance._currentWardOptionIndex = 0;
   }
 
   [HarmonyPatch(typeof(LevelImporter), nameof(LevelImporter.Install))]
