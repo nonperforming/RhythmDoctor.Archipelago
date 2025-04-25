@@ -21,10 +21,7 @@ static class SkipTutorialPatch
       .Advance(3)
       .InsertAndAdvance(
         new CodeInstruction(OpCodes.Ldstr, ", Assembly-CSharp"),
-        new CodeInstruction(
-          OpCodes.Call,
-          AccessTools.Method("System.String:Concat", [typeof(String), typeof(String)])
-        )
+        new CodeInstruction(OpCodes.Call, AccessTools.Method("System.String:Concat", [typeof(String), typeof(String)]))
       )
       .InstructionEnumeration();
   }
