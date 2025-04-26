@@ -33,6 +33,13 @@ static class SkipTutorialPatch
   [HarmonyPrefix]
   static void DoNotLoadTutorialPatch()
   {
+    if (scnGame.internalIdentifier == "Intro")
+    {
+      Plugin.Logger.LogDebug("Level is intro: going to level select");
+      scnBase.GoToLevelSelect();
+      return;
+    }
+
     Plugin.Logger.LogDebug(
       $"Level {scnGame.internalIdentifier}: Forcing attemptToLoadTutorial from {scnGame.attemptToLoadTutorial} to false"
     );
