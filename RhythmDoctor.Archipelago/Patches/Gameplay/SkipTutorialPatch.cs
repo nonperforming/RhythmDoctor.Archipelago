@@ -33,16 +33,18 @@ static class SkipTutorialPatch
   [HarmonyPrefix]
   static void DoNotLoadTutorialPatch()
   {
-    if (scnGame.internalIdentifier == "Intro")
-    {
-      Plugin.Logger.LogDebug("Level is intro: going to level select");
-      scnBase.GoToLevelSelect();
-      return;
-    }
-
     Plugin.Logger.LogDebug(
       $"Level {scnGame.internalIdentifier}: Forcing attemptToLoadTutorial from {scnGame.attemptToLoadTutorial} to false"
     );
     scnGame.attemptToLoadTutorial = false;
+  }
+
+  [HarmonyPatch(typeof(Persistence), nameof(Persistence.GetFirstTimePlaying))]
+  [HarmonyPrefix]
+  static void DoNotLoadIntroPatch(ref bool __result, ref bool __runOriginal)
+  {
+    Plugin.Logger.LogDebug("Forcing first_time to false");
+    __runOriginal = false;
+    __result = false;
   }
 }
