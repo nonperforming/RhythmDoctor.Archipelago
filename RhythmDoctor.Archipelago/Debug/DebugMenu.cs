@@ -126,7 +126,7 @@ public class DebugMenu : MonoBehaviour
         }
         break;
       case ActivatedGUI.Patches:
-        GUI.Box(new Rect(10, 10, 330, 300), "Rhythm Doctor Archipelago Patches Debug");
+        GUI.Box(new Rect(10, 10, 330, 350), "Rhythm Doctor Archipelago Patches Debug");
         if (GUI.Button(new Rect(30, 30, 300, 20), "Unapply trap patches"))
         {
           Plugin.UnapplyTrapPatches();
@@ -162,12 +162,17 @@ public class DebugMenu : MonoBehaviour
           Plugin.Logger.LogInfo("Applying HardModeTrap patch");
           _trapHarmony.PatchAll(typeof(HardModeTrapPatch));
         }
+        if (GUI.Button(new Rect(30, 240, 300, 20), "Apply Ghost Tap Trap"))
+        {
+          Plugin.Logger.LogInfo("Applying GhostTapTrap patch");
+          _trapHarmony.PatchAll(typeof(GhostTapTrapPatch));
+        }
 
-        if (GUI.Button(new Rect(30, 240, 300, 20), "Apply post-login patches"))
+        if (GUI.Button(new Rect(30, 300, 300, 20), "Apply post-login patches"))
         {
           Plugin.ApplyGameplayPatches();
         }
-        if (GUI.Button(new Rect(30, 270, 300, 20), "Unapply post-login patches"))
+        if (GUI.Button(new Rect(30, 330, 300, 20), "Unapply post-login patches"))
         {
           Plugin.UnapplyGameplayPatches();
         }
