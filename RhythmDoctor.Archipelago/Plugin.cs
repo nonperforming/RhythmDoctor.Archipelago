@@ -39,7 +39,7 @@ public class Plugin : BaseUnityPlugin
   [
     typeof(ClearLocationPatch),
     typeof(JanitorPatch),
-    typeof(NicoleBlockagePatch),
+    typeof(Act5Patch),
     typeof(SkipTutorialPatch),
     //typeof(UnlockItemPatch),
   ];

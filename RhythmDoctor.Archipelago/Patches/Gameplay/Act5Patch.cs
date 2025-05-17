@@ -1,7 +1,7 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 
 [HarmonyPatch(typeof(scnLevelSelect))]
-static class NicoleBlockagePatch
+static class Act5Patch
 {
   [HarmonyPatch(nameof(scnLevelSelect.UnlockEntrance))]
   [HarmonyPostfix]
@@ -22,5 +22,12 @@ static class NicoleBlockagePatch
       .RemoveInstructions(8) // Delete all other instructions because we're going to return false regardless
       .SetOpcodeAndAdvance(OpCodes.Ldc_I4_0) // Replace ceq and push false (int32 0) onto stack
       .InstructionEnumeration();
+  }
+
+  [HarmonyPatch(nameof(scnLevelSelect.PrepareAthleteWardTransition))]
+  [HarmonyPrefix]
+  static void DoNotShowDreamBubbles(ref bool __runOriginal)
+  {
+    __runOriginal = false;
   }
 }
