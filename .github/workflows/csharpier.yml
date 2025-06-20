@@ -19,4 +19,4 @@ jobs:
         run: dotnet tool restore
 
       - name: Check formatting
-        run: dotnet csharpier --check .
+        run: dotnet tool run dotnet-csharpier --check .
