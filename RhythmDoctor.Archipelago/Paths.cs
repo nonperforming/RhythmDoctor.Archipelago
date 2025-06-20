@@ -2,6 +2,7 @@ namespace RhythmDoctor.Archipelago;
 
 internal static class Paths
 {
+  // TODO: Look into using Plugin.Info.Location
   // ReSharper disable once NullableWarningSuppressionIsUsed
   internal static readonly string Assembly = Path.GetDirectoryName(
     System.Reflection.Assembly.GetExecutingAssembly().Location

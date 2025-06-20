@@ -57,6 +57,7 @@ internal class Locations
         case Rank.Sminus:
         case Rank.S:
         case Rank.Splus:
+          // TODO: Need to check if clearing this with S-rank setting off breaks clearing locations
           ids.Add(offset + 2);
           goto case Rank.A;
         // A Rank+

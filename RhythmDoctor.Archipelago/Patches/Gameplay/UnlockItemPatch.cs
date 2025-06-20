@@ -5,7 +5,7 @@ static class UnlockItemPatch
 {
   [HarmonyPatch(nameof(scnLevelSelect.LoadLevelData))]
   [HarmonyPostfix]
-  static void UnlockEntitiesWithItems(scnLevelSelect __instance)
+  static void UnlockEntitiesWithItemsPatch(scnLevelSelect __instance)
   {
     // TODO: We should prevent entrances and levels from being unlocked in the first place.
     // foreach (Region region in Enum.GetValues(typeof(Region)))

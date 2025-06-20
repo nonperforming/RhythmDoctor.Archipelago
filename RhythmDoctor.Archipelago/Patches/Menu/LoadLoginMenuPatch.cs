@@ -3,7 +3,7 @@ namespace RhythmDoctor.Archipelago.Patches.Menu;
 [HarmonyPatch(typeof(scnMenu))]
 static class ArchipelagoMenuOptionPatch
 {
-  const string ARCHIPELAGO_OBJECT_NAME = "archipelago";
+  private const string ARCHIPELAGO_OBJECT_NAME = "archipelago";
 
   [HarmonyPatch(nameof(scnMenu.Awake))]
   [HarmonyPrefix]

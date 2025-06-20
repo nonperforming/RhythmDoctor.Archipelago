@@ -3,25 +3,6 @@ namespace RhythmDoctor.Archipelago.Patches.Menu;
 [HarmonyPatch(typeof(scnCLS))]
 static class ArchipelagoLoginPatch
 {
-  // FIXME: This isn't matching for some reason!
-  // [HarmonyPatch(typeof(scnCLS), nameof(scnCLS.Awake))]
-  // [HarmonyTranspiler]
-  // private static IEnumerable<CodeInstruction> ShowAllWardOptions(IEnumerable<CodeInstruction> instructions)
-  // {
-  //   // Steam ward option (if Steam isn't initialized) and Import ward option (if on the Steam Deck)
-  //   return new CodeMatcher()
-  //     // if (!SteamIntegration.initialized)
-  //     .MatchForward(false, new CodeMatch(OpCodes.Ldsfld, AccessTools.Field(typeof(SteamIntegration), nameof(SteamIntegration.initialized))))
-  //     .SetOpcodeAndAdvance(OpCodes.Nop) // ldsfld bool SteamIntegration::initialized
-  //     .SetOpcodeAndAdvance(OpCodes.Nop) // brtrue.s IL_01d3
-  //     // if (Persistence.GetFeatureSet() == FeatureSet.SteamDeck)
-  //     .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(Persistence), nameof(Persistence.GetFeatureSet))))
-  //     .SetOpcodeAndAdvance(OpCodes.Nop) // call valuetype FeatureSet Persistence::GetFeatureSet()
-  //     .SetOpcodeAndAdvance(OpCodes.Nop) // ldc.i4.1
-  //     .SetOpcodeAndAdvance(OpCodes.Nop) // bne.un.s IL_022e
-  //     .InstructionEnumeration();
-  // }
-
   [HarmonyPatch(nameof(scnCLS.Start))]
   [HarmonyPostfix]
   static void ConstructArchipelagoMenu(scnCLS __instance)
@@ -72,8 +53,8 @@ static class ArchipelagoLoginPatch
     // ImportLevels/ImportSign Container/Button/Text
     Transform buttonObject = importOption.rect.Find("Button");
     buttonObject.Find("Icon Image").GetComponent<Image>().sprite = AssetHelper.LoadSprite(
-      new WardIcons(),
-      "archipelago.png"
+      AssetHelper.AssetType.WardIcons.NAME,
+      AssetHelper.AssetType.WardIcons.ARCHIPELAGO
     );
     buttonObject.Find("Text").GetComponent<Text>().text = "Archipelago";
     #endregion

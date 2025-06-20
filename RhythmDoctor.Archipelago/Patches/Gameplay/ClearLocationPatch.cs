@@ -4,7 +4,6 @@ static class ClearLocationPatch
 {
   /// <summary>
   /// Loading a level.
-  /// TODO: Is this used for 3-X?
   /// </summary>
   // [HarmonyPatch(typeof(LevelBase), nameof(LevelBase.LoadLevelAsset))]
   // [HarmonyPrefix]
