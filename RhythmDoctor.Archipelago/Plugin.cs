@@ -1,7 +1,7 @@
 namespace RhythmDoctor.Archipelago;
 
 /// <summary>
-/// Apply AlwaysActive patches and create the Logger
+/// Archipelago client mod for Rhythm Doctor
 /// </summary>
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 [BepInProcess("Rhythm Doctor.exe")]
@@ -15,7 +15,7 @@ public class Plugin : BaseUnityPlugin
   #endif
   // ReSharper restore NullableWarningSuppressionIsUsed
 
-  internal const string AlwaysActivePatchesID = $"{MyPluginInfo.PLUGIN_GUID}";
+  internal const string AlwaysActivePatchesID = MyPluginInfo.PLUGIN_GUID;
   internal const string ArchipelagoMenuPatchID = $"{MyPluginInfo.PLUGIN_GUID}.cls";
   internal const string PostLoginPatchesID = $"{MyPluginInfo.PLUGIN_GUID}.post";
   internal const string TrapPatchesID = $"{MyPluginInfo.PLUGIN_GUID}.trap";
@@ -49,7 +49,7 @@ public class Plugin : BaseUnityPlugin
   internal static readonly Type CustomLoginScreenPatch = typeof(ArchipelagoLoginPatch);
 
   /// <summary>
-  /// Apply patches
+  /// Apply AlwaysActive patches and create the Logger
   /// </summary>
   private void Awake()
   {
@@ -105,6 +105,14 @@ public class Plugin : BaseUnityPlugin
     Harmony.UnpatchID(ArchipelagoMenuPatchID);
   }
 
+  ~Plugin()
+  {
+    UnapplyPatchesPatch.TearDownClientPlugin();
+    Harmony.UnpatchID(AlwaysActivePatchesID);
+    Harmony.UnpatchID(ArchipelagoMenuPatchID);
+    Harmony.UnpatchID(PostLoginPatchesID);
+    Harmony.UnpatchID(TrapPatchesID);
+  }
 #if DEBUG
   private void Start()
   {
