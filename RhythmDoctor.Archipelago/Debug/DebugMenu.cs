@@ -126,7 +126,7 @@ public class DebugMenu : MonoBehaviour
         }
         break;
       case ActivatedGUI.Patches:
-        GUI.Box(new Rect(10, 10, 330, 350), "Rhythm Doctor Archipelago Patches Debug");
+        GUI.Box(new Rect(10, 10, 330, 420), "Rhythm Doctor Archipelago Patches Debug");
         if (GUI.Button(new Rect(30, 30, 300, 20), "Clear trap queue"))
         {
           trapManager.ClearAllTraps();
