@@ -58,9 +58,9 @@ static class ClearLocationPatch
     {
       Task.Run(() => Plugin.Client.locations.SendLocation(stage, rank));
       Plugin.Client.trapManager.GetNewTraps();
-      #if DEBUG
+#if DEBUG
       Plugin.DebugMenu.trapManager.GetNewTraps();
-      #endif
+#endif
     }
   }
 

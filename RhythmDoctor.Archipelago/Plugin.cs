@@ -10,9 +10,10 @@ public class Plugin : BaseUnityPlugin
   // ReSharper disable NullableWarningSuppressionIsUsed
   internal static Client.Client Client = null!;
   internal static new ManualLogSource Logger = null!;
-  #if DEBUG
+#if DEBUG
   internal static DebugMenu DebugMenu = null!;
-  #endif
+#endif
+
   // ReSharper restore NullableWarningSuppressionIsUsed
 
   internal const string AlwaysActivePatchesID = MyPluginInfo.PLUGIN_GUID;
@@ -113,6 +114,7 @@ public class Plugin : BaseUnityPlugin
     Harmony.UnpatchID(PostLoginPatchesID);
     Harmony.UnpatchID(TrapPatchesID);
   }
+
 #if DEBUG
   private void Start()
   {
