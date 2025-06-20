@@ -1,8 +1,11 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 
 // Adapted from https://github.com/Mysthaps/MyseIfRDPatches/blob/master/GhostTapMiss.cs
-static class GhostTapTrapPatch
+class GhostTapTrapPatch : ITrap
 {
+  public string Name => "";
+  public Type[] IncompatibleWith => [typeof(GhostTapTrapPatch)];
+
   static bool EndLevel = false;
 
   [HarmonyPostfix]

@@ -27,7 +27,7 @@ public class DebugMenu : MonoBehaviour
     .WithNamingConvention(HyphenatedNamingConvention.Instance)
     .Build();
 
-  private Harmony _trapHarmony = new(Plugin.TrapPatchesID);
+  internal TrapManager trapManager = new();
 
   private void Start()
   {
@@ -127,52 +127,61 @@ public class DebugMenu : MonoBehaviour
         break;
       case ActivatedGUI.Patches:
         GUI.Box(new Rect(10, 10, 330, 350), "Rhythm Doctor Archipelago Patches Debug");
-        if (GUI.Button(new Rect(30, 30, 300, 20), "Unapply trap patches"))
+        if (GUI.Button(new Rect(30, 30, 300, 20), "Clear trap queue"))
         {
-          Plugin.UnapplyTrapPatches();
+          trapManager.ClearAllTraps();
         }
-        if (GUI.Button(new Rect(30, 60, 300, 20), "Apply Chilli Speed Trap"))
+        if (GUI.Button(new Rect(30, 60, 300, 20), "Clear all traps immediately"))
         {
-          Plugin.Logger.LogInfo("Applying ChilliSpeedTrap patch");
-          _trapHarmony.PatchAll(typeof(ChilliSpeedTrapPatch));
+          trapManager.ClearAllTraps(true);
         }
-        if (GUI.Button(new Rect(30, 90, 300, 20), "Apply Ice Speed Trap"))
+        if (GUI.Button(new Rect(30, 90, 300, 20), "Add Chilli Speed Trap"))
         {
-          Plugin.Logger.LogInfo("Applying IceSpeedTrap patch");
-          _trapHarmony.PatchAll(typeof(IceSpeedTrapPatch));
+          Plugin.Logger.LogInfo("Adding ChilliSpeedTrap patch");
+          trapManager.AddTrap(new ChilliSpeedTrapPatch());
         }
-
-        if (GUI.Button(new Rect(30, 120, 300, 20), "Apply Strong Heart Powerup"))
+        if (GUI.Button(new Rect(30, 120, 300, 20), "Add Ice Speed Trap"))
         {
-          Plugin.Logger.LogInfo("Applying StrongHeartPowerup patch");
-          _trapHarmony.PatchAll(typeof(StrongHeartPowerupPatch));
-        }
-        if (GUI.Button(new Rect(30, 150, 300, 20), "Apply Fragile Heart Powerup"))
-        {
-          Plugin.Logger.LogInfo("Applying FragileSpeedTrap patch");
-          _trapHarmony.PatchAll(typeof(FragileHeartTrapPatch));
-        }
-        if (GUI.Button(new Rect(30, 180, 300, 20), "Apply Easy Mode Powerup"))
-        {
-          Plugin.Logger.LogInfo("Applying EasyModePowerup patch");
-          _trapHarmony.PatchAll(typeof(EasyModePowerupPatch));
-        }
-        if (GUI.Button(new Rect(30, 210, 300, 20), "Apply Hard Mode Trap"))
-        {
-          Plugin.Logger.LogInfo("Applying HardModeTrap patch");
-          _trapHarmony.PatchAll(typeof(HardModeTrapPatch));
-        }
-        if (GUI.Button(new Rect(30, 240, 300, 20), "Apply Ghost Tap Trap"))
-        {
-          Plugin.Logger.LogInfo("Applying GhostTapTrap patch");
-          _trapHarmony.PatchAll(typeof(GhostTapTrapPatch));
+          Plugin.Logger.LogInfo("Adding IceSpeedTrap patch");
+          trapManager.AddTrap(new IceSpeedTrapPatch());
         }
 
-        if (GUI.Button(new Rect(30, 300, 300, 20), "Apply post-login patches"))
+        if (GUI.Button(new Rect(30, 150, 300, 20), "Add Strong Heart Powerup"))
+        {
+          Plugin.Logger.LogInfo("Adding StrongHeartPowerup patch");
+          trapManager.AddTrap(new StrongHeartPowerupPatch());
+        }
+        if (GUI.Button(new Rect(30, 180, 300, 20), "Apply Fragile Heart Powerup"))
+        {
+          Plugin.Logger.LogInfo("Adding FragileSpeedTrap patch");
+          trapManager.AddTrap(new FragileHeartTrapPatch());
+        }
+        if (GUI.Button(new Rect(30, 210, 300, 20), "Add Easy Mode Powerup"))
+        {
+          Plugin.Logger.LogInfo("Adding EasyModePowerup patch");
+          trapManager.AddTrap(new EasyModePowerupPatch());
+        }
+        if (GUI.Button(new Rect(30, 240, 300, 20), "Add Hard Mode Trap"))
+        {
+          Plugin.Logger.LogInfo("Adding HardModeTrap patch");
+          trapManager.AddTrap(new HardModeTrapPatch());
+        }
+        if (GUI.Button(new Rect(30, 270, 300, 20), "Add Ghost Tap Trap"))
+        {
+          Plugin.Logger.LogInfo("Adding GhostTapTrap patch");
+          trapManager.AddTrap(new GhostTapTrapPatch());
+        }
+        if (GUI.Button(new Rect(30, 300, 300, 20), "Recreate TrapManager"))
+        {
+          trapManager.ClearAllTraps(true);
+          trapManager = new();
+        }
+
+        if (GUI.Button(new Rect(30, 360, 300, 20), "Apply post-login patches"))
         {
           Plugin.ApplyGameplayPatches();
         }
-        if (GUI.Button(new Rect(30, 330, 300, 20), "Unapply post-login patches"))
+        if (GUI.Button(new Rect(30, 390, 300, 20), "Unapply post-login patches"))
         {
           Plugin.UnapplyGameplayPatches();
         }

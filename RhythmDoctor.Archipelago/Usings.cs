@@ -17,6 +17,7 @@ global using RhythmDoctor.Archipelago.Debug;
 global using RhythmDoctor.Archipelago.Debug.Patches;
 #endif
 global using RhythmDoctor.Archipelago.Helpers;
+global using RhythmDoctor.Archipelago.Interfaces;
 global using RhythmDoctor.Archipelago.Patches;
 global using RhythmDoctor.Archipelago.Patches.Gameplay;
 global using RhythmDoctor.Archipelago.Patches.Gameplay.Powerups;

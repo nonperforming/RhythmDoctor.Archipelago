@@ -9,6 +9,8 @@ internal sealed class Client
   internal DeathLinkService? deathLinkService;
   internal SlotData? slotData;
 
+  internal TrapManager trapManager;
+
   internal Items items;
   internal Locations locations;
   internal Options options;
@@ -24,6 +26,8 @@ internal sealed class Client
   /// <exception cref="Exception">Login failure</exception>
   public Client(string server, string username, string? password = null, bool deathLink = false)
   {
+    trapManager = new();
+
     items = new();
     locations = new();
     options = new();

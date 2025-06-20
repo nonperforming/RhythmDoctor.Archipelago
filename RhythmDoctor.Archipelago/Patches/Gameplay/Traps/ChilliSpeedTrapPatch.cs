@@ -1,8 +1,11 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 
 [HarmonyPatch(typeof(HeartMonitor))]
-static class ChilliSpeedTrapPatch
+class ChilliSpeedTrapPatch : ITrap
 {
+  public string Name => "Chilli Speed";
+  public Type[] IncompatibleWith => [typeof(ChilliSpeedTrapPatch), typeof(IceSpeedTrapPatch)];
+
   [HarmonyPatch(nameof(HeartMonitor.Update))]
   [HarmonyPrefix]
   static void ForceLevelSpeed(HeartMonitor __instance)

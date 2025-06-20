@@ -10,7 +10,9 @@ public class Plugin : BaseUnityPlugin
   // ReSharper disable NullableWarningSuppressionIsUsed
   internal static Client.Client Client = null!;
   internal static new ManualLogSource Logger = null!;
-
+  #if DEBUG
+  internal static DebugMenu DebugMenu = null!;
+  #endif
   // ReSharper restore NullableWarningSuppressionIsUsed
 
   internal const string AlwaysActivePatchesID = $"{MyPluginInfo.PLUGIN_GUID}";
@@ -83,6 +85,7 @@ public class Plugin : BaseUnityPlugin
     Harmony.UnpatchID(PostLoginPatchesID);
   }
 
+  [Obsolete("Use TrapManager")]
   internal static void UnapplyTrapPatches()
   {
     Logger.LogInfo("Unapplying trap patches");
@@ -114,6 +117,7 @@ public class Plugin : BaseUnityPlugin
     GameObject debugMenu = new("RhythmDoctor.Archipelago Debug");
     DontDestroyOnLoad(debugMenu);
     debugMenu.AddComponent<DebugMenu>();
+    DebugMenu = debugMenu.GetComponent<DebugMenu>();
 
     yield return null;
   }

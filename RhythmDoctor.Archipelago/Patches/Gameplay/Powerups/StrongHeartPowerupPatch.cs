@@ -1,8 +1,11 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay.Powerups;
 
 [HarmonyPatch(typeof(MistakesManager))]
-static class StrongHeartPowerupPatch
+class StrongHeartPowerupPatch : ITrap
 {
+  public string Name => "Strong Heart";
+  public Type[] IncompatibleWith => [];
+
   [HarmonyPatch(nameof(MistakesManager.AddMistake))]
   [HarmonyPrefix]
   static void HalfMistakeWeight(ref float weight)

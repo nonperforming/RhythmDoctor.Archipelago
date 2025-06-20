@@ -1,8 +1,13 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay.Powerups;
 
 [HarmonyPatch(typeof(Persistence))]
-static class EasyModePowerupPatch
+class EasyModePowerupPatch : ITrap
 {
+  public string Name => "Easy Mode";
+  public Type[] IncompatibleWith => [typeof(EasyModePowerupPatch), typeof(HardModeTrapPatch)];
+
+  // TODO: Lock the difficulty seen in the settings menu
+
   [HarmonyPatch(nameof(Persistence.GetDefibrillatorP1))]
   [HarmonyPatch(nameof(Persistence.GetDefibrillatorP2))]
   [HarmonyPrefix]

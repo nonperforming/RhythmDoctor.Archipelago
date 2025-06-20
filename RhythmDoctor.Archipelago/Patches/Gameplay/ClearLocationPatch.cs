@@ -17,7 +17,7 @@ static class ClearLocationPatch
 
   [HarmonyPatch(typeof(HUD), nameof(HUD.ShowAndSaveRank))]
   [HarmonyPrefix]
-  static void ClearLocationPrefix(bool bossLevelFailed, bool onlySavePersistence)
+  static void CustomClearLocationPatch(bool bossLevelFailed, bool onlySavePersistence)
   {
     // Is onlySavePersistence is currently only used in custom levels?
     // "there's a function for custom levels to skip the rank text [rank screen] at the end"
@@ -46,7 +46,23 @@ static class ClearLocationPatch
       $"Stage to clear: {stage.ToString()} with rank {rank.ToString()} ({string.Join(", ", ids)})"
     );
 
-    _ = Plugin.Client.locations.SendLocation(stage, rank);
+    bool clearedNewLocation = false;
+    foreach (long id in ids)
+    {
+      if (!Plugin.Client.session.Locations.AllLocationsChecked.Contains(id))
+      {
+        clearedNewLocation = true;
+        break;
+      }
+    }
+    if (clearedNewLocation)
+    {
+      Task.Run(() => Plugin.Client.locations.SendLocation(stage, rank));
+      Plugin.Client.trapManager.GetNewTraps();
+      #if DEBUG
+      Plugin.DebugMenu.trapManager.GetNewTraps();
+      #endif
+    }
   }
 
   [HarmonyPatch(typeof(scnLevelSelect), nameof(scnLevelSelect.CheckForCutscene))]
