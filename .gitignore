@@ -403,3 +403,6 @@ libs
 
 # Build folder
 build/*
+
+# Do not ignore the Debug folder in our project
+!RhythmDoctor.Archipelago/Debug

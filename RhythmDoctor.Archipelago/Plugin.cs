@@ -31,6 +31,7 @@ public class Plugin : BaseUnityPlugin
     typeof(ArchipelagoMenuOptionPatch),
     typeof(VersionTextPatch),
 #if DEBUG
+    typeof(CreateDebugMenuPatch),
     typeof(LogClearLevelPatch),
 #endif
   ];
@@ -108,28 +109,14 @@ public class Plugin : BaseUnityPlugin
 
   ~Plugin()
   {
+    Logger.LogWarning("Tearing down plugin. This is unsupported!");
     UnapplyPatchesPatch.TearDownClientPlugin();
     Harmony.UnpatchID(AlwaysActivePatchesID);
     Harmony.UnpatchID(ArchipelagoMenuPatchID);
     Harmony.UnpatchID(PostLoginPatchesID);
     Harmony.UnpatchID(TrapPatchesID);
-  }
-
 #if DEBUG
-  private void Start()
-  {
-    StartCoroutine(nameof(CreateDebugMenu), 5.0f);
-  }
-
-  private IEnumerator CreateDebugMenu()
-  {
-    Logger.LogInfo("Creating debug menu");
-    GameObject debugMenu = new("RhythmDoctor.Archipelago Debug");
-    DontDestroyOnLoad(debugMenu);
-    debugMenu.AddComponent<DebugMenu>();
-    DebugMenu = debugMenu.GetComponent<DebugMenu>();
-
-    yield return null;
-  }
+    Destroy(GameObject.Find($"/{CreateDebugMenuPatch.DEBUG_MENU_OBJECT_NAME}"));
 #endif
+  }
 }
