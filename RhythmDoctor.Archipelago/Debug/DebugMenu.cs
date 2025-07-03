@@ -59,7 +59,7 @@ public class DebugMenu : MonoBehaviour
 
     activatedGUI = activatedGUI == gui ? ActivatedGUI.None : gui;
 
-    Plugin.Logger.LogInfo($"Toggled activated debug GUI to {activatedGUI.ToString()}");
+    Plugin.Logger.LogDebug($"Toggled activated debug GUI to {activatedGUI.ToString()}");
   }
 
   private void OnGUI()

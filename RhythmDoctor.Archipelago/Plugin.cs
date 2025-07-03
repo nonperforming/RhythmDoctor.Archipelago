@@ -87,13 +87,6 @@ public class Plugin : BaseUnityPlugin
     Harmony.UnpatchID(PostLoginPatchesID);
   }
 
-  [Obsolete("Use TrapManager")]
-  internal static void UnapplyTrapPatches()
-  {
-    Logger.LogInfo("Unapplying trap patches");
-    Harmony.UnpatchID(TrapPatchesID);
-  }
-
   internal static void ApplyArchipelagoMenuPatch()
   {
     Logger.LogInfo("Applying Archipelago menu patch");
