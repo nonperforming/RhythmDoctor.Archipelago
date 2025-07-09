@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 #if DEBUG
 namespace RhythmDoctor.Archipelago.Debug;
 
@@ -53,6 +55,11 @@ public class DebugMenu : MonoBehaviour
   private void Update()
   {
     ActivatedGUI gui = GUIButton;
+
+    if (Input.GetKeyDown(KeyCode.F11) && Debugger.IsAttached)
+    {
+      Debugger.Break();
+    }
 
     if (gui == ActivatedGUI.None)
       return;
