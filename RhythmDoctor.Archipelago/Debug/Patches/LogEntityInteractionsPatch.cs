@@ -20,11 +20,15 @@ State: {Persistence.GetStateFromLevel(level)}
         );
         break;
       case SelectableObject selectableObject:
-        throw new NotImplementedException();
+        // TODO: Implement properly
+        Plugin.Logger.LogDebug(selectableObject);
+        break;
       // FIXME: ReSharper: ConvertTypeCheckPatternToNullCheck
       // What?
       case SelectableEntity selectableEntity:
-        throw new NotImplementedException();
+        // TODO: Implement properly
+        Plugin.Logger.LogDebug(selectableEntity);
+        break;
     }
   }
 }
