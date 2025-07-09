@@ -51,7 +51,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="UnityEngine.Modules" Version="2022.3.7" IncludeAssets="compile" />
+    <PackageReference Include="UnityEngine.Modules" Version="2022.3.33" IncludeAssets="compile" />
     <PackageReference Include="YamlDotNet" Version="16.*" />
   </ItemGroup>
 
@@ -102,5 +102,9 @@
     <None Update="World\assets\wardicons\archipelago.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="libs\Pulse\PulseLib.csproj" />
   </ItemGroup>
 </Project>

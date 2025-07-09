@@ -5,6 +5,8 @@ VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RhythmDoctor.Archipelago", "RhythmDoctor.Archipelago\RhythmDoctor.Archipelago.csproj", "{F8ECA06A-8010-4BF5-B026-52162DBC8E5C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PulseLib", "RhythmDoctor.Archipelago\libs\Pulse\PulseLib.csproj", "{C511DE87-E404-465E-ADDC-5E425B3EB9B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{F8ECA06A-8010-4BF5-B026-52162DBC8E5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8ECA06A-8010-4BF5-B026-52162DBC8E5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8ECA06A-8010-4BF5-B026-52162DBC8E5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C511DE87-E404-465E-ADDC-5E425B3EB9B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C511DE87-E404-465E-ADDC-5E425B3EB9B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C511DE87-E404-465E-ADDC-5E425B3EB9B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C511DE87-E404-465E-ADDC-5E425B3EB9B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

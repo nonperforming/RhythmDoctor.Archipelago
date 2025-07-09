@@ -17,13 +17,16 @@ To set up the Rhythm Doctor Archipelago mod, follow these steps:
 3. **Run the Game**
    Launch Rhythm Doctor once to ensure that BepInEx sets up the required folder structure.
 
-4. **Install the Mod Files**
-   - Obtain the mod files from GitHub Actions (these are debug builds and may be unstable) or from a stable release in the `Releases` section.
+4. **Install the RhythmDoctor.Archipelago plugin**
+   - Obtain the mod files from a stable release in the `Releases` section or from GitHub Actions (these are debug builds and may be unstable).
    - Place the following files in the `Rhythm Doctor\BepInEx\plugins` folder:
       - `RhythmDoctor.Archipelago.dll`
       - `World` folder
       - `Archipelago.MultiClient.Net.dll`
       - `YamlDotNet.dll`
+
+5. Install **dependencies**
+   Obtain and install [Pulse](https://github.com/nonperforming/Pulse) from [its releases page](https://github.com/nonperforming/Pulse/releases)
 
 ## Development
 

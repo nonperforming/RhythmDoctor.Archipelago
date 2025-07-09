@@ -397,10 +397,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
-# Libraries
-libs
-!.gitkeep
-
 # Build folder
 build/*
 

@@ -1,0 +1,3 @@
+[submodule "RhythmDoctor.Archipelago/libs/Pulse"]
+	path = RhythmDoctor.Archipelago/libs/Pulse
+	url = https://github.com/nonperforming/Pulse

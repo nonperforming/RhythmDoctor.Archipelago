@@ -22,7 +22,7 @@ jobs:
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget
-         
+
       - name: Build client
         run: dotnet publish RhythmDoctor.Archipelago --configuration Debug --output build --verbosity normal
 
@@ -38,6 +38,8 @@ jobs:
           path: |
             build/World/data/*
             build/Archipelago.MultiClient.Net.dll
+            build/io.github.nonperforming.pulse.dll
+            build/io.github.nonperforming.pulse.pdb
             build/RhythmDoctor.Archipelago.dll
             build/RhythmDoctor.Archipelago.pdb
             build/YamlDotNet.dll
