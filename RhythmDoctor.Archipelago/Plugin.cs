@@ -33,6 +33,8 @@ public class Plugin : BaseUnityPlugin
 #if DEBUG
     typeof(CreateDebugMenuPatch),
     typeof(LogClearLevelPatch),
+    typeof(LogEntityInteractionsPatch),
+    //typeof(LogLoadLevelAssetPatch),
 #endif
   ];
 
