@@ -70,7 +70,7 @@
       <GameDir>$(GameDir)\Rhythm Doctor_Data\Managed\</GameDir>
       <GameDir Condition="'$(GameDir)' == '\Rhythm Doctor_Data\Managed\'">libs\</GameDir>
     </PropertyGroup>
-    
+
     <Message Importance="high" Text="Using libraries at '$(GameDir)'" />
 
     <ItemGroup>
