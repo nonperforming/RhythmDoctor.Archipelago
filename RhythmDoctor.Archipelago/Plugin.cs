@@ -4,6 +4,7 @@ namespace RhythmDoctor.Archipelago;
 /// Archipelago client mod for Rhythm Doctor
 /// </summary>
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
+[BepInDependency("io.github.nonperforming.pulse")]
 [BepInProcess("Rhythm Doctor.exe")]
 public class Plugin : BaseUnityPlugin
 {
