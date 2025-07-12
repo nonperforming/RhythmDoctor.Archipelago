@@ -29,6 +29,10 @@ public class DebugMenu : MonoBehaviour
     .WithNamingConvention(HyphenatedNamingConvention.Instance)
     .Build();
 
+  /// <remarks>
+  /// Unlike the <see cref="Client"/>'s <see cref="Client.trapManager"/>, traps from this Trap Manager will not be
+  /// automatically deleted.
+  /// </remarks>
   internal TrapManager trapManager = new();
 
   private void Start()
@@ -133,14 +137,15 @@ public class DebugMenu : MonoBehaviour
         }
         break;
       case ActivatedGUI.Patches:
-        GUI.Box(new Rect(10, 10, 330, 420), "Rhythm Doctor Archipelago Patches Debug");
-        if (GUI.Button(new Rect(30, 30, 300, 20), "Clear trap queue"))
+        GUI.Box(new Rect(10, 10, 330, 600), "Rhythm Doctor Archipelago Patches Debug");
+        if (GUI.Button(new Rect(30, 30, 300, 20), "Discard active traps"))
         {
-          trapManager.ClearAllTraps();
+          trapManager.ClearActiveTraps(false);
         }
-        if (GUI.Button(new Rect(30, 60, 300, 20), "Clear all traps immediately"))
+        if (GUI.Button(new Rect(30, 60, 300, 20), "Discard all traps immediately"))
         {
-          trapManager.ClearAllTraps(true);
+          trapManager.ClearActiveTraps(false);
+          trapManager.Traps.Clear();
         }
         if (GUI.Button(new Rect(30, 90, 300, 20), "Add Chilli Speed Trap"))
         {
@@ -158,7 +163,7 @@ public class DebugMenu : MonoBehaviour
           Plugin.Logger.LogInfo("Adding StrongHeartPowerup patch");
           trapManager.AddTrap(new StrongHeartPowerupPatch());
         }
-        if (GUI.Button(new Rect(30, 180, 300, 20), "Apply Fragile Heart Powerup"))
+        if (GUI.Button(new Rect(30, 180, 300, 20), "Add Fragile Heart Powerup"))
         {
           Plugin.Logger.LogInfo("Adding FragileSpeedTrap patch");
           trapManager.AddTrap(new FragileHeartTrapPatch());
@@ -180,7 +185,7 @@ public class DebugMenu : MonoBehaviour
         }
         if (GUI.Button(new Rect(30, 300, 300, 20), "Recreate TrapManager"))
         {
-          trapManager.ClearAllTraps(true);
+          trapManager.ClearActiveTraps(false);
           trapManager = new();
         }
 
@@ -192,6 +197,32 @@ public class DebugMenu : MonoBehaviour
         {
           Plugin.UnapplyGameplayPatches();
         }
+
+        if (GUI.Button(new Rect(30, 420, 300, 20), "Create Client class"))
+        {
+          Plugin.Client = new();
+        }
+
+        string traps = "";
+        foreach (ITrap trap in trapManager.Traps)
+        {
+          traps += $"{trap.Name} ";
+        }
+
+        string trapsPreview = "";
+        foreach ((_, ITrap trap) in trapManager._previewTraps)
+        {
+          trapsPreview += $"{trap.Name} ";
+        }
+
+        string trapsActive = "";
+        foreach ((_, ITrap trap) in trapManager._activeTraps)
+        {
+          trapsActive += $"{trap.Name} ";
+        }
+
+        GUI.Label(new Rect(30, 450, 300, 100), $"Traps: {traps}\nPreview: {trapsPreview}\nActive: {trapsActive}");
+
         break;
       case ActivatedGUI.Levels:
         GUI.Box(new Rect(10, 10, 330, 200), "Rhythm Doctor Archipelago Levels Debug");

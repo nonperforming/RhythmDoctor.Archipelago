@@ -3,41 +3,62 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 // Adapted from https://github.com/Mysthaps/MyseIfRDPatches/blob/master/GhostTapMiss.cs
 class GhostTapTrapPatch : ITrap
 {
-  public string Name => "";
-  public Type[] IncompatibleWith => [typeof(GhostTapTrapPatch)];
+  // ReSharper disable once NullableWarningSuppressionIsUsed
+  private Harmony harmony = null!;
 
-  static bool EndLevel = false;
+  public string Name => "Ghost Tap";
+  public Type[] IncompatibleWithTraps => [typeof(GhostTapTrapPatch)];
 
-  [HarmonyPostfix]
-  [HarmonyPatch(typeof(HUD), nameof(HUD.AdvanceGameover))]
-  public static void DoNotDamageOnExitPatch()
+  public void InQueue()
   {
-    EndLevel = true;
+    harmony = new($"{Plugin.PATCH_ID_TRAP}.{nameof(GhostTapTrapPatch)}");
   }
 
-  [HarmonyPostfix]
-  [HarmonyPatch(typeof(scnGame), nameof(scnGame.UpdateGameplayInput))]
-  public static void DamageGhostInputPatch(RDPlayer player, bool keyPressed, scnGame __instance)
+  public void Active()
   {
-    if (EndLevel)
-      return;
+    harmony.PatchAll(typeof(ActivePatch));
+  }
 
-    if (
-      !keyPressed
-      || !__instance.spacebarOnNothing
-      || __instance.levelIdentifier == nameof(Level.SongOfTheSea)
-      || __instance.levelIdentifier == nameof(Level.SongOfTheSeaH)
-    )
+  public void ActiveEnd()
+  {
+    harmony.UnpatchSelf();
+  }
+
+  private static class ActivePatch
+  {
+    // ReSharper disable once RedundantDefaultMemberInitializer
+    private static bool _endLevel = false;
+
+    [HarmonyPatch(typeof(scnGame), nameof(scnGame.UpdateGameplayInput))]
+    [HarmonyPostfix]
+    static void DamageGhostInputPatch(RDPlayer player, bool keyPressed, scnGame __instance)
     {
-      return;
+      if (_endLevel)
+        return;
+
+      if (
+        !keyPressed
+        || !__instance.spacebarOnNothing
+        || __instance.levelIdentifier == nameof(Level.SongOfTheSea)
+        || __instance.levelIdentifier == nameof(Level.SongOfTheSeaH)
+      )
+      {
+        return;
+      }
+
+      scrConductor.PlayFeedback(
+        GameSoundType.BigMistake,
+        group: RDUtils.GetMixerGroup((player == RDPlayer.P1 ? "PlayerOneMistakes" : "PlayerTwoMistakes"))
+      );
+      __instance.game.OnMistakeOrHeal(0f, 1f, null, false, player);
+      RDBase.Vfx.FlashBorderFeedback(false);
     }
 
-    scrConductor.PlayImmediately(
-      GameSoundType.BigMistake,
-      group: RDUtils.GetMixerGroup((player == RDPlayer.P1 ? "PlayerOneMistakes" : "PlayerTwoMistakes")),
-      pan: (GC.twoPlayerMode ? RDUtils.OverridePanFor2P(player, 0.0f) : 0.0f)
-    );
-    __instance.game.OnMistakeOrHeal(0f, 1f, null, false, player);
-    RDBase.Vfx.FlashBorderFeedback(false);
+    [HarmonyPatch(typeof(HUD), nameof(HUD.AdvanceGameover))]
+    [HarmonyPostfix]
+    static void DoNotDamageOnExitPatch()
+    {
+      _endLevel = true;
+    }
   }
 }

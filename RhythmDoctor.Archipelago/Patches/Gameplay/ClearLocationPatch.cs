@@ -1,5 +1,8 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 
+// This patch should only be applied after the Client is created.
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+
 static class ClearLocationPatch
 {
   /// <summary>
@@ -29,15 +32,25 @@ static class ClearLocationPatch
     // TODO: Boss levels and said "custom levels" will overwrite virtual LevelBase.ShowGameOver
     //       Check for HUD.base.game.currentLevel.customGameover!!! When is this case applicable?
 
+#if DEBUG
+    // Discard Debug Menu traps regardless of result.
+    Plugin.DebugMenu.trapManager.ClearActiveTraps(false);
+#endif
+
     if (bossLevelFailed)
+    {
+      Plugin.Client.trapManager.ClearActiveTraps(false);
       return;
+    }
 
     if (!Enum.TryParse(scnGame.instance.levelIdentifier, out Level internalLevelName))
     {
       Plugin.Logger.LogError($"Couldn't find Level. Level identifier: {scnGame.instance.levelIdentifier}");
+      Plugin.Client.trapManager.ClearActiveTraps(false);
       return;
     }
 
+    Plugin.Logger.LogDebug("Getting locations to clear");
     LevelStage stage = LevelHelper.InternalToFriendlyNameDictionary[internalLevelName];
     Rank rank = scnGame.instance.currentLevel.GetRankFromMistakes();
     long[] ids = Plugin.Client.locations.GetIDsForStage(stage, rank);
@@ -54,19 +67,21 @@ static class ClearLocationPatch
         break;
       }
     }
+
     if (clearedNewLocation)
     {
       Task.Run(() => Plugin.Client.locations.SendLocation(stage, rank));
-      Plugin.Client.trapManager.GetNewTraps();
-#if DEBUG
-      Plugin.DebugMenu.trapManager.GetNewTraps();
-#endif
+      Plugin.Client.trapManager.ClearActiveTraps(false);
+    }
+    else
+    {
+      Plugin.Client.trapManager.ClearActiveTraps(true);
     }
   }
 
   [HarmonyPatch(typeof(scnLevelSelect), nameof(scnLevelSelect.CheckForCutscene))]
   [HarmonyPrefix]
-  static void DoNotPlayLevelUnlockCutscenePrefix(ref bool __runOriginal)
+  static void DoNotPlayLevelUnlockCutscenePatch(ref bool __runOriginal)
   {
     __runOriginal = false;
   }

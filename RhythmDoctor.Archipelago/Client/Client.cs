@@ -47,6 +47,20 @@ internal sealed class Client
     }
   }
 
+#if DEBUG
+  public Client()
+  {
+    Plugin.Logger.LogWarning("Creating client with no login");
+
+    trapManager = new();
+
+    items = new();
+    locations = new();
+    options = new();
+    world = new();
+  }
+#endif
+
   /// <summary>
   /// Create an Archipelago session.
   /// </summary>

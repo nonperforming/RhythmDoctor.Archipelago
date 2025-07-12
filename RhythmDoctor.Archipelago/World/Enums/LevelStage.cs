@@ -329,4 +329,44 @@ internal static class LevelStageExtensions
       .FirstOrDefault();
     return attr?.Value;
   }
+
+  // TODO: Where applicable, it would be nice to be able to generate these automatically on game start.
+  //       However in some cases, such as Fixed Speed levels, where the logic is hardcoded internally, this may not be
+  //       easily possible.
+
+  // TODO: This could get messy with additional combinations of different types of restrictions/attributes,
+  //       consider using a builder pattern instead?
+
+  internal static readonly LevelStage[] IntermissionLevels =
+  [
+    LevelStage.SongOfTheSea,
+    LevelStage.SongOfTheSeaNight,
+    LevelStage.SeventhInningStretch,
+  ];
+
+  // csharpier-ignore
+  internal static readonly LevelStage[] BonusLevels =
+  [
+    LevelStage.BeansHopper,
+    LevelStage.RhythmWeightlifter,
+  ];
+
+  internal static readonly LevelStage[] BossLevels =
+  [
+    LevelStage.BattlewornInsomniac,
+    LevelStage.AllTheTimes,
+    LevelStage.OneShiftMore,
+    LevelStage.SuperBattlewornInsomniac,
+    LevelStage.DreamsDontStop,
+  ];
+
+  internal static readonly LevelStage[] FixedSpeedLevels = [LevelStage.SeventhInningStretch];
+
+  internal static readonly LevelStage[] BonusAndIntermissionLevels = IntermissionLevels.Concat(BonusLevels).ToArray();
+  internal static readonly LevelStage[] BonusIntermissionAndFixedSpeedLevels = BonusAndIntermissionLevels
+    .Concat(FixedSpeedLevels)
+    .ToArray();
+  internal static readonly LevelStage[] BonusIntermissionAndBossLevels = BonusAndIntermissionLevels
+    .Concat(BossLevels)
+    .ToArray();
 }
