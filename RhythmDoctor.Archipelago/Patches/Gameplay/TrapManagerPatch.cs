@@ -1,6 +1,5 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 
-// FIXME: This is outdated!!
 /// <summary>
 /// A <see cref="HarmonyPatch"/> that invokes <see cref="ITrap.Compatible"/>, <see cref="ITrap.Active"/> and
 /// <see cref="ITrap.PreviewLevel"/> in the <see cref="Client"/>'s <see cref="TrapManager"/>'s trap queue for the
@@ -14,7 +13,7 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 /// </remarks>
 /// <seealso cref="ITrap"/>
 /// <seealso cref="TrapManager"/>
-[HarmonyPatch()]
+[HarmonyPatch]
 static class TrapManagerPatch
 {
   [HarmonyPatch(typeof(scnLevelSelect), nameof(scnLevelSelect.SelectCharacter))]

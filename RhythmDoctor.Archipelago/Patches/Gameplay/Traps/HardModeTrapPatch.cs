@@ -6,7 +6,7 @@ class HardModeTrapPatch : ITrap
   private Harmony harmony = null!;
 
   public string Name => "Hard Mode";
-  public Type[] IncompatibleWithTraps => [typeof(EasyModePowerupPatch), typeof(HardModeTrapPatch)];
+  public IEnumerable<Type> IncompatibleWithTraps => [typeof(EasyModePowerupPatch), typeof(HardModeTrapPatch)];
 
   public void InQueue()
   {

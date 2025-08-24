@@ -52,7 +52,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="UnityEngine.Modules" Version="2022.3.33" IncludeAssets="compile" />
-    <PackageReference Include="YamlDotNet" Version="16.*" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
@@ -85,23 +84,10 @@
       </Reference>
     </ItemGroup>
   </Target>
-
+  
+  <!-- Copy required assets over -->
   <ItemGroup>
-    <!-- Data files -->
-    <None Include="..\World\data\items.yml" Link="World\data\items.yml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\World\data\locations.yml" Link="World\data\locations.yml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\World\data\world.yml" Link="World\data\world.yml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-
-    <!-- Assets -->
-    <None Update="World\assets\wardicons\archipelago.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Update="Assets\**\*.*" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
   <ItemGroup>

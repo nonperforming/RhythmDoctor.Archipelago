@@ -61,20 +61,20 @@ function Build-Project
 
 function Clean-OldPluginFiles
 {
-  Remove-Item -Recurse -Path $PluginPath/World -ErrorAction SilentlyContinue
+  Remove-Item -Recurse -Path $PluginPath/Assets -ErrorAction SilentlyContinue
   Remove-Item -Path $PluginPath/Archipelago.MultiClient.Net.dll -ErrorAction SilentlyContinue
   Remove-Item -Path $PluginPath/RhythmDoctor.Archipelago.dll -ErrorAction SilentlyContinue
   Remove-Item -Path $PluginPath/RhythmDoctor.Archipelago.pdb -ErrorAction SilentlyContinue
-  Remove-Item -Path $PluginPath/YamlDotNet.dll -ErrorAction SilentlyContinue
 }
 
 function Copy-Plugin
 {
-  Copy-Item -Recurse -Path $BuildPath/World -Destination $PluginPath
+  Copy-Item -Recurse -Path $BuildPath/Assets -Destination $PluginPath
   Copy-Item -Path $BuildPath/Archipelago.MultiClient.Net.dll -Destination $PluginPath
+	Copy-Item -Path $BuildPath/io.github.nonperforming.pulse.dll -Destination $PluginPath
+  Copy-Item -Path $BuildPath/io.github.nonperforming.pulse.pdb -Destination $PluginPath
   Copy-Item -Path $BuildPath/RhythmDoctor.Archipelago.dll -Destination $PluginPath
   Copy-Item -Path $BuildPath/RhythmDoctor.Archipelago.pdb -Destination $PluginPath
-  Copy-Item -Path $BuildPath/YamlDotNet.dll -Destination $PluginPath
 }
 
 function Clean-BuildFolder
@@ -379,6 +379,7 @@ function Prompt-Menu
 #endregion
 
 #region Main
+$Host.UI.RawUI.WindowTitle = "RhythmDoctor.Archipelago Testing Menu"
 Check-PowerShellVersion
 
 Update-Paths -Initial $true

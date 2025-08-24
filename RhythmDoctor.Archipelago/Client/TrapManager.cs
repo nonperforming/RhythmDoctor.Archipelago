@@ -62,6 +62,16 @@ internal sealed class TrapManager
     trap.InQueue();
   }
 
+  /// <summary>
+  /// Add a trap to the list of queued traps.
+  /// </summary>
+  /// <param name="type">The type of trap to create and add</param>
+  internal void AddTrap(Type type)
+  {
+    Plugin.Logger.LogInfo($"Creating {type.Name} trap from type");
+    AddTrap((ITrap)Activator.CreateInstance(type));
+  }
+
   private void ClearTrapsList(ref (int index, ITrap trap)[] trapList, bool returnToQueue)
   {
     Plugin.Logger.LogInfo($"Clearing traps list (return to queue: {returnToQueue})");
@@ -80,7 +90,7 @@ internal sealed class TrapManager
   }
 
   #region Preview traps
-  private (int index, ITrap trap)[] PopApplicableTraps(LevelStage level)
+  private (int index, ITrap trap)[] PopApplicableTraps(Level level)
   {
     Plugin.Logger.LogDebug($"Getting applicable traps for level {level}");
 
@@ -118,10 +128,7 @@ internal sealed class TrapManager
     return _previewTraps;
   }
 
-  internal (int index, ITrap trap)[] ApplyApplicableTraps(Level level) =>
-    ApplyApplicableTraps(LevelHelper.InternalToFriendlyNameDictionary[level]);
-
-  internal (int index, ITrap trap)[] ApplyApplicableTraps(LevelStage level)
+  internal (int index, ITrap trap)[] ApplyApplicableTraps(Level level)
   {
     Plugin.Logger.LogInfo($"Applying applicable traps for {level}");
 
@@ -189,7 +196,8 @@ internal sealed class TrapManager
   }
 
   /// <summary>
-  /// TODO
+  /// Promotes all preview traps to active traps,
+  /// clearing the preview trap array and invoking <see cref="ITrap.Active"/>
   /// </summary>
   internal void PromotePreviewTrapsToActiveTraps()
   {

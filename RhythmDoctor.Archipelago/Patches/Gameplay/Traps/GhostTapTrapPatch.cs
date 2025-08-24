@@ -7,7 +7,7 @@ class GhostTapTrapPatch : ITrap
   private Harmony harmony = null!;
 
   public string Name => "Ghost Tap";
-  public Type[] IncompatibleWithTraps => [typeof(GhostTapTrapPatch)];
+  public IEnumerable<Type> IncompatibleWithTraps => [typeof(GhostTapTrapPatch)];
 
   public void InQueue()
   {

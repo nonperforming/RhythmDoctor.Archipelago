@@ -1,3 +1,6 @@
+using PulseLib.Localization;
+using SA.GoogleDoc;
+
 namespace RhythmDoctor.Archipelago;
 
 /// <summary>
@@ -52,10 +55,11 @@ public class Plugin : BaseUnityPlugin
     typeof(Act5Patch),
     typeof(SkipTutorialPatch),
     typeof(TrapManagerPatch),
-    //typeof(UnlockItemPatch),
+    typeof(UnlockItemPatch),
+    typeof(UnapplyPatchesPatch),
   ];
 
-  internal static readonly Type CustomLoginScreenPatch = typeof(ArchipelagoLoginPatch);
+  private static readonly Type CustomLoginScreenPatch = typeof(ArchipelagoLoginPatch);
 
   /// <summary>
   /// Apply AlwaysActive patches and create the Logger
@@ -65,8 +69,12 @@ public class Plugin : BaseUnityPlugin
     Logger = base.Logger;
     Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} loaded");
 
+    Logger.LogInfo("Registering custom localization");
+    LocalizationHelpers.RegisterJson(LangCode.English, DataHelper.GetLocalizationJson(LangCode.English));
+
     // TODO: Is there a simpler way to PatchAll()?
     //  Unless we give Harmony the Type, it doesn't seem to apply the patch.
+    Logger.LogInfo("Applying always active patches");
     ApplyPatches(AlwaysActivePatches, PATCH_ID_ALWAYS_ACTIVE);
   }
 

@@ -7,14 +7,11 @@ internal sealed class Client
 {
   internal ArchipelagoSession? session;
   internal DeathLinkService? deathLinkService;
-  internal SlotData? slotData;
+
+  // TODO
+  //internal SlotData? slotData;
 
   internal TrapManager trapManager;
-
-  internal Items items;
-  internal Locations locations;
-  internal Options options;
-  internal World.World world;
 
   /// <summary>
   /// Create an Archipelago client.
@@ -27,11 +24,6 @@ internal sealed class Client
   public Client(string server, string username, string? password = null, bool deathLink = false)
   {
     trapManager = new();
-
-    items = new();
-    locations = new();
-    options = new();
-    world = new();
 
     CreateSession(server);
     try
@@ -53,11 +45,6 @@ internal sealed class Client
     Plugin.Logger.LogWarning("Creating client with no login");
 
     trapManager = new();
-
-    items = new();
-    locations = new();
-    options = new();
-    world = new();
   }
 #endif
 
@@ -74,11 +61,11 @@ internal sealed class Client
   }
 
   /// <summary>
-  ///
+  /// Connect to an Archipelago room.
   /// </summary>
-  /// <param name="name"></param>
-  /// <param name="password"></param>
-  /// <param name="deathLink"></param>
+  /// <param name="name">Slot name to connect under</param>
+  /// <param name="password">Password of the room</param>
+  /// <param name="deathLink">Whether to enable DeathLink</param>
   /// <exception cref="NullReferenceException">Session is null</exception>
   /// <exception cref="Exception">Login failure</exception>
   internal void Connect(string name, string? password = null, bool deathLink = false)
@@ -92,14 +79,14 @@ internal sealed class Client
     {
       deathLinkService = session.CreateDeathLinkService();
       deathLinkService.EnableDeathLink();
-      deathLinkService.OnDeathLinkReceived += DeathLinkRecieved;
+      deathLinkService.OnDeathLinkReceived += DeathLinkReceived;
     }
 
     LoginResult loginResult = session.TryConnectAndLogin(
       "Rhythm Doctor",
       name,
       ItemsHandlingFlags.AllItems,
-      new Version("APWorldInformation.Version"), // FIXME: Create APWorld and load this from shared data on disk
+      new Version("0.6.3"),
       null, // DeathLink is managed by DeathLinkService
       null, // Randomly generated
       password,
@@ -120,14 +107,15 @@ internal sealed class Client
         $"Successfully connected to {loginSuccessful.Slot}/{name} as {session.ConnectionInfo.Uuid}"
       );
 
-      slotData = new()
-      {
-        BossUnlockRequirement = (BossUnlockRequirement)loginSuccessful.SlotData["boss_unlock_requirement"],
-        EndGoal = (EndGoal)loginSuccessful.SlotData["end_goal"],
-      };
+      // FIXME: InvalidCastException: Specified cast is not valid.
+      //slotData = new()
+      //{
+      //  BossUnlockRequirement = (BossUnlockRequirement)loginSuccessful.SlotData["boss_unlock_requirement"],
+      //  EndGoal = (EndGoal)loginSuccessful.SlotData["end_goal"],
+      //};
 
       Plugin.Logger.LogDebug("Binding events");
-      session.MessageLog.OnMessageReceived += MessageRecieved;
+      session.MessageLog.OnMessageReceived += MessageReceived;
       session.Items.ItemReceived += ItemReceived;
 
       // TODO: We need to process items already in our inventory!
@@ -141,29 +129,49 @@ internal sealed class Client
     }
   }
 
-  internal void MessageRecieved(LogMessage message)
+  internal void MessageReceived(LogMessage message)
   {
     Plugin.Logger.LogInfo($"Received message {message}");
   }
 
   internal void ItemReceived(ReceivedItemsHelper helper)
   {
-    // TODO: Handle traps
-    ItemInfo item = helper.PeekItem();
-
-    if (items.IsKeyItem(item))
+    // TODO: Handle items
+    ItemInfo item = helper.DequeueItem();
+    if (item.ItemGame != Bindings.GAME)
     {
-      Plugin.Logger.LogInfo($"Got key {item.ItemName} - {item.ItemId}");
+      Plugin.Logger.LogDebug(
+        $"Ignoring item {item.ItemName} ({item.ItemId} from {item.ItemGame}), as it is not for our world"
+      );
+      return;
     }
-    else if (items.IsLevelItem(item)) { }
 
-    Plugin.Logger.LogDebug($"Successfully received item {item.ItemName} - {item.ItemId}");
-    helper.DequeueItem();
+    if (Bindings.StageItemIdToLevel.TryGetValue(item.ItemId, out Level level))
+    {
+      Plugin.Logger.LogInfo($"Unlocking stage item {item.ItemName} ({item.ItemId}, {level})");
+      // FIXME: 1-CNY and 1-BOO will not unlock even if this is on - need to patch to force available
+      Persistence.SetLevelRank(level, Rank.NotFinished, false, false);
+      return;
+    }
+    else if (Bindings.TrapItemIdToLevel.TryGetValue(item.ItemId, out Type trap))
+    {
+      Plugin.Logger.LogInfo($"Adding trap item {item.ItemName} ({item.ItemId})");
+      trapManager.AddTrap(trap);
+      return;
+    }
+    else if (Bindings.KeyItemIdToWard.ContainsKey(item.ItemId))
+    {
+      // We do this in UnlockItemPatch
+      Plugin.Logger.LogInfo($"Ignoring key item {item.ItemName} ({item.ItemId})");
+      return;
+    }
+    // TODO: implement else case for filler like A Bit of Rhythm
+    Plugin.Logger.LogError($"Got item {item.ItemName} ({item.ItemId} from {item.ItemGame}) but couldn't handle it");
   }
 
-  internal void DeathLinkRecieved(DeathLink deathLink)
+  internal void DeathLinkReceived(DeathLink deathLink)
   {
-    Plugin.Logger.LogInfo($"DeathLink from {deathLink.Source} by {deathLink.Cause} at {deathLink.Timestamp}");
+    Plugin.Logger.LogInfo($"DeathLink from {deathLink.Source} by \"{deathLink.Cause}\" at {deathLink.Timestamp}");
     // TODO: Implement
   }
 }

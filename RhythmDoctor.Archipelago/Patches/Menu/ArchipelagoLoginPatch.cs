@@ -53,7 +53,7 @@ static class ArchipelagoLoginPatch
     // ImportLevels/ImportSign Container/Button/Text
     Transform buttonObject = importOption.rect.Find("Button");
     buttonObject.Find("Icon Image").GetComponent<Image>().sprite = AssetHelper.LoadSprite(
-      AssetHelper.AssetType.WardIcons.NAME,
+      AssetHelper.AssetType.WardIcons.TYPE,
       AssetHelper.AssetType.WardIcons.ARCHIPELAGO
     );
     buttonObject.Find("Text").GetComponent<Text>().text = "Archipelago";

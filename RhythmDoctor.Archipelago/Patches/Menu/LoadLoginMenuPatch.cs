@@ -10,9 +10,9 @@ static class ArchipelagoMenuOptionPatch
   static void RenameMusicOption(scnMenu __instance)
   {
     GameObject labelObject = __instance.transform.Find("mainMenu/options/optionsContainer/music").gameObject;
-    labelObject.name = ARCHIPELAGO_OBJECT_NAME; // Otherwise this option can be hidden on Steam Deck
-    Text text = labelObject.GetComponent<Text>();
-    text.text = "Archipelago";
+    // We need to set the object name to something other than 'music'
+    // otherwise this option can be hidden on Steam Deck
+    labelObject.name = ARCHIPELAGO_OBJECT_NAME;
   }
 
   [HarmonyPatch(nameof(scnMenu.SelectOption))]
@@ -35,7 +35,7 @@ static class ArchipelagoMenuOptionPatch
   [HarmonyPostfix]
   static void HandleArchipelagoOptionLocalize(scnMenu __instance)
   {
-    // TODO: Patch RDString.Get instead and actually localize
+    // TODO: Optimally this would be handled by Pulse localization but that hasn't actually been implemented yet so...
     __instance
       .transform.Find($"mainMenu/options/optionsContainer/{ARCHIPELAGO_OBJECT_NAME}")
       .gameObject.GetComponent<Text>()

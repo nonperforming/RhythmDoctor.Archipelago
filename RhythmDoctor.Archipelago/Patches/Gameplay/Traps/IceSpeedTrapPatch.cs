@@ -6,7 +6,7 @@ class IceSpeedTrapPatch : ITrap
   private Harmony harmony = null!;
 
   public string Name => "Ice Speed";
-  public Type[] IncompatibleWithTraps => [typeof(ChilliSpeedTrapPatch), typeof(IceSpeedTrapPatch)];
+  public IEnumerable<Type> IncompatibleWithTraps => [typeof(ChilliSpeedTrapPatch), typeof(IceSpeedTrapPatch)];
 
   public void InQueue()
   {

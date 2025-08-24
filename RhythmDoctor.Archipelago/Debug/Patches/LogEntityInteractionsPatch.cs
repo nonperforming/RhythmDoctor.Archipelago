@@ -14,7 +14,7 @@ static class LogEntityInteractionsPatch
         Level level = selectableCharacter.levels[__instance.currentDifficulty];
         Plugin.Logger.LogInfo(
           @$"--- scnLevelSelect.PerformEntityAction() [scnLevelSelect.selectedEntity is SelectableCharacter]
-Level: {level} ({LevelHelper.InternalToFriendlyNameDictionary[level]})
+Level: {level}
 State: {Persistence.GetStateFromLevel(level)}
 ---"
         );

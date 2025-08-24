@@ -11,6 +11,7 @@ global using BepInEx.Logging;
 global using HarmonyLib;
 
 global using PulseLib;
+global using PulseLib.Extensions;
 
 global using RhythmDoctor.Archipelago;
 global using RhythmDoctor.Archipelago.Client;
@@ -26,9 +27,7 @@ global using RhythmDoctor.Archipelago.Patches.Gameplay.Powerups;
 global using RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 global using RhythmDoctor.Archipelago.Patches.Menu;
 global using RhythmDoctor.Archipelago.World;
-global using RhythmDoctor.Archipelago.World.Enums;
-global using RhythmDoctor.Archipelago.World.Enums.Options;
-global using RhythmDoctor.Archipelago.World.Structures;
+global using RhythmDoctor.Archipelago.World.Data;
 
 global using System;
 global using System.Collections;
@@ -38,11 +37,7 @@ global using System.Diagnostics.Contracts;
 global using System.IO;
 global using System.Linq;
 global using System.Reflection.Emit;
-global using System.Runtime.Serialization;
 global using System.Threading.Tasks;
 
 global using UnityEngine;
 global using UnityEngine.UI;
-
-global using YamlDotNet.Serialization;
-global using YamlDotNet.Serialization.NamingConventions;

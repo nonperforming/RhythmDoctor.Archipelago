@@ -51,26 +51,26 @@ static class ClearLocationPatch
     }
 
     Plugin.Logger.LogDebug("Getting locations to clear");
-    LevelStage stage = LevelHelper.InternalToFriendlyNameDictionary[internalLevelName];
     Rank rank = scnGame.instance.currentLevel.GetRankFromMistakes();
-    long[] ids = Plugin.Client.locations.GetIDsForStage(stage, rank);
-    Plugin.Logger.LogDebug(
-      $"Stage to clear: {stage.ToString()} with rank {rank.ToString()} ({string.Join(", ", ids)})"
-    );
+    IReadOnlyCollection<long> ids = Bindings.LevelToStage[internalLevelName].GetLocationsToClear(rank);
+    Plugin.Logger.LogDebug($"Stage to clear: {internalLevelName} with rank {rank} ({string.Join(", ", ids)})");
 
     bool clearedNewLocation = false;
     foreach (long id in ids)
     {
-      if (!Plugin.Client.session.Locations.AllLocationsChecked.Contains(id))
+      if (Plugin.Client.session.Locations.AllLocationsChecked.Contains(id))
       {
-        clearedNewLocation = true;
-        break;
+        continue;
       }
+      clearedNewLocation = true;
+      break;
     }
 
     if (clearedNewLocation)
     {
-      Task.Run(() => Plugin.Client.locations.SendLocation(stage, rank));
+      // FIXME: This blocks until completion - should be async!
+      long[] locationsToClear = ids.ToArray();
+      Plugin.Client.session.Locations.CompleteLocationChecks(locationsToClear);
       Plugin.Client.trapManager.ClearActiveTraps(false);
     }
     else

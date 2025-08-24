@@ -6,8 +6,9 @@ class StrongHeartPowerupPatch : ITrap
   private Harmony harmony = null!;
 
   public string Name => "Strong Heart";
-  public Type[] IncompatibleWithTraps => [typeof(FragileHeartTrapPatch)];
-  public LevelStage[] IncompatibleWithLevels => LevelStageExtensions.BonusIntermissionAndBossLevels;
+  public IEnumerable<Type> IncompatibleWithTraps => [typeof(FragileHeartTrapPatch)];
+  public IEnumerable<Level> IncompatibleWithLevels =>
+    LevelExtensions.AllBonusLevels.Concat(LevelExtensions.AllIntermissionLevels).Concat(LevelExtensions.AllBossLevels);
 
   public bool Compatible()
   {

@@ -6,7 +6,7 @@ class FragileHeartTrapPatch : ITrap
   private Harmony harmony = null!;
 
   public string Name => "Fragile Heart";
-  public Type[] IncompatibleWithTraps => [typeof(StrongHeartPowerupPatch)];
+  public IEnumerable<Type> IncompatibleWithTraps => [typeof(StrongHeartPowerupPatch)];
 
   public bool Compatible()
   {

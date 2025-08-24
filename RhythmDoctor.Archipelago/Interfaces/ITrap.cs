@@ -17,13 +17,14 @@ internal interface ITrap
   /// Other trap Types that are incompatible with this trap.
   /// </summary>
   [Pure]
-  internal Type[] IncompatibleWithTraps { get; }
+  internal IEnumerable<Type> IncompatibleWithTraps { get; }
 
   /// <summary>
   /// Levels that are incompatible with this trap.
   /// </summary>
   [Pure]
-  internal LevelStage[] IncompatibleWithLevels => LevelStageExtensions.BonusAndIntermissionLevels;
+  internal IEnumerable<Level> IncompatibleWithLevels =>
+    LevelExtensions.AllBonusLevels.Concat(LevelExtensions.AllIntermissionLevels);
 
   /// <summary>
   /// Put additional compatibility checks not covered by <see cref="IncompatibleWithTraps"/> or
@@ -31,7 +32,7 @@ internal interface ITrap
   /// </summary>
   /// <returns><c>true</c> if compatible, otherwise <c>false</c></returns>
   [Pure]
-  internal bool Compatible(LevelStage level)
+  internal bool Compatible(Level level)
   {
     return true;
   }
@@ -95,7 +96,7 @@ internal static class ITrapExtensions
   /// <remarks>
   /// This trap's <see cref="ITrap.Compatible"/> is called, but the other traps' <see cref="ITrap.Compatible"/> is not.
   /// </remarks>
-  internal static bool IsIncompatibleWith(this ITrap self, ITrap other, LevelStage level) =>
+  internal static bool IsIncompatibleWith(this ITrap self, ITrap other, Level level) =>
     IsIncompatibleWith(self, other.GetType(), level);
 
   /// <summary>
@@ -108,7 +109,7 @@ internal static class ITrapExtensions
   /// <remarks>
   /// This trap's <see cref="ITrap.Compatible"/> is called, but the other traps' <see cref="ITrap.Compatible"/> is not.
   /// </remarks>
-  internal static bool IsIncompatibleWith(this ITrap self, Type other, LevelStage level) =>
+  internal static bool IsIncompatibleWith(this ITrap self, Type other, Level level) =>
     self.IncompatibleWithTraps.Contains(other)
     || self.IncompatibleWithLevels.Contains(level)
     || !self.Compatible(level);
@@ -119,7 +120,7 @@ internal static class ITrapExtensions
   /// <param name="self">This trap.</param>
   /// <param name="level">The level to test against.</param>
   /// <returns><c>false</c> if compatible with the level, otherwise <c>true</c></returns>
-  internal static bool IsIncompatibleWith(this ITrap self, LevelStage level) =>
+  internal static bool IsIncompatibleWith(this ITrap self, Level level) =>
     self.IncompatibleWithLevels.Contains(level) || !self.Compatible(level);
 
   /// <summary>
@@ -132,7 +133,7 @@ internal static class ITrapExtensions
   /// <remarks>
   /// This trap's <see cref="ITrap.Compatible"/> is called, but the other traps' <see cref="ITrap.Compatible"/> is not.
   /// </remarks>
-  internal static bool IsIncompatibleWith(this ITrap self, IEnumerable<ITrap> others, LevelStage level) =>
+  internal static bool IsIncompatibleWith(this ITrap self, IEnumerable<ITrap> others, Level level) =>
     others.Any(otherTrap => self.IsIncompatibleWith(otherTrap, level)) || self.IsIncompatibleWith(level); // If there are no other traps, the first condition will return false.
 
   /// <summary>
@@ -145,9 +146,6 @@ internal static class ITrapExtensions
   /// <remarks>
   /// This trap's <see cref="ITrap.Compatible"/> is called, but the other traps' <see cref="ITrap.Compatible"/> is not.
   /// </remarks>
-  internal static bool IsIncompatibleWith(
-    this ITrap self,
-    IEnumerable<(int index, ITrap trap)> others,
-    LevelStage level
-  ) => self.IsIncompatibleWith(others.Select(tuple => tuple.trap), level);
+  internal static bool IsIncompatibleWith(this ITrap self, IEnumerable<(int index, ITrap trap)> others, Level level) =>
+    self.IsIncompatibleWith(others.Select(tuple => tuple.trap), level);
 }

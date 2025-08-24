@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using RDLevelEditor;
 
 #if DEBUG
 namespace RhythmDoctor.Archipelago.Debug;
@@ -25,10 +26,6 @@ public class DebugMenu : MonoBehaviour
   private string _password = null!;
   private bool _deathLink;
 
-  private readonly ISerializer _dataSerializer = new SerializerBuilder()
-    .WithNamingConvention(HyphenatedNamingConvention.Instance)
-    .Build();
-
   /// <remarks>
   /// Unlike the <see cref="Client"/>'s <see cref="Client.trapManager"/>, traps from this Trap Manager will not be
   /// automatically deleted.
@@ -37,7 +34,17 @@ public class DebugMenu : MonoBehaviour
 
   private void Start()
   {
-    Plugin.Logger.LogInfo("Debug menu started");
+    Notify("Debug menu started");
+  }
+
+  private void Notify(string toShow)
+  {
+    try
+    {
+      HUD.status = toShow;
+    }
+    catch (NullReferenceException) { }
+    Plugin.Logger.LogDebug(toShow);
   }
 
   private ActivatedGUI GUIButton
@@ -70,7 +77,7 @@ public class DebugMenu : MonoBehaviour
 
     activatedGUI = activatedGUI == gui ? ActivatedGUI.None : gui;
 
-    Plugin.Logger.LogDebug($"Toggled activated debug GUI to {activatedGUI.ToString()}");
+    Notify($"Toggled activated debug GUI to {activatedGUI}");
   }
 
   private void OnGUI()
@@ -83,10 +90,15 @@ public class DebugMenu : MonoBehaviour
       case ActivatedGUI.Main:
         GUI.Box(new Rect(10, 10, 330, 180), "Rhythm Doctor Archipelago Main Debug");
 
-        if (GUI.Button(new Rect(30, 30, 300, 20), "Toggle RD Debug"))
+        if (GUI.Button(new Rect(30, 30, 165, 20), "Toggle RD Debug"))
         {
-          Plugin.Logger.LogInfo("Toggling RD Debug to " + !DebugSettings.instance.Debug);
+          Notify("Toggling RD Debug to " + !DebugSettings.instance.Debug);
           DebugSettings.instance.Debug = !DebugSettings.instance.Debug;
+        }
+        if (GUI.Button(new Rect(185, 30, 155, 20), "Toggle autoplay"))
+        {
+          Notify("Toggling auto to " + !DebugSettings.instance.Auto);
+          DebugSettings.instance.Debug = !DebugSettings.instance.Auto;
         }
 
         GUI.Label(new Rect(30, 50, 150, 20), "URL");
@@ -108,33 +120,6 @@ public class DebugMenu : MonoBehaviour
         break;
       case ActivatedGUI.Data:
         GUI.Box(new Rect(10, 10, 330, 150), "Rhythm Doctor Archipelago Data Debug");
-
-        if (GUI.Button(new Rect(30, 30, 300, 20), "Create ItemsData"))
-        {
-          Plugin.Logger.LogInfo("Creating ItemsData");
-          ItemsData itemsData = DataHelper.GetItemsData();
-          Plugin.Logger.LogInfo(_dataSerializer.Serialize(itemsData));
-        }
-        if (GUI.Button(new Rect(30, 60, 300, 20), "Create LocationsData"))
-        {
-          Plugin.Logger.LogInfo("Creating LocationsData");
-          LocationsData locationsData = DataHelper.GetLocationsData();
-          Plugin.Logger.LogInfo(_dataSerializer.Serialize(locationsData));
-        }
-        if (GUI.Button(new Rect(30, 90, 300, 20), "Create OptionsData"))
-        {
-          Plugin.Logger.LogInfo("Creating OptionsData");
-          throw new NotImplementedException();
-          //OptionsData optionsData = DataHelper.GetOptionsData();
-          //Plugin.Logger.LogInfo(_dataSerializer.Serialize(optionsData));
-        }
-        if (GUI.Button(new Rect(30, 120, 300, 20), "Create WorldData"))
-        {
-          Plugin.Logger.LogInfo("Creating WorldData");
-          throw new NotImplementedException();
-          //WorldData worldData = DataHelper.GetWorldData();
-          //Plugin.Logger.LogInfo(_dataSerializer.Serialize(worldData));
-        }
         break;
       case ActivatedGUI.Patches:
         GUI.Box(new Rect(10, 10, 330, 600), "Rhythm Doctor Archipelago Patches Debug");
@@ -149,28 +134,28 @@ public class DebugMenu : MonoBehaviour
         }
         if (GUI.Button(new Rect(30, 90, 300, 20), "Add Chilli Speed Trap"))
         {
-          Plugin.Logger.LogInfo("Adding ChilliSpeedTrap patch");
+          Notify("Adding ChilliSpeedTrap patch");
           trapManager.AddTrap(new ChilliSpeedTrapPatch());
         }
         if (GUI.Button(new Rect(30, 120, 300, 20), "Add Ice Speed Trap"))
         {
-          Plugin.Logger.LogInfo("Adding IceSpeedTrap patch");
+          Notify("Adding IceSpeedTrap patch");
           trapManager.AddTrap(new IceSpeedTrapPatch());
         }
 
         if (GUI.Button(new Rect(30, 150, 300, 20), "Add Strong Heart Powerup"))
         {
-          Plugin.Logger.LogInfo("Adding StrongHeartPowerup patch");
+          Notify("Adding StrongHeartPowerup patch");
           trapManager.AddTrap(new StrongHeartPowerupPatch());
         }
         if (GUI.Button(new Rect(30, 180, 300, 20), "Add Fragile Heart Powerup"))
         {
-          Plugin.Logger.LogInfo("Adding FragileSpeedTrap patch");
+          Notify("Adding FragileSpeedTrap patch");
           trapManager.AddTrap(new FragileHeartTrapPatch());
         }
         if (GUI.Button(new Rect(30, 210, 300, 20), "Add Easy Mode Powerup"))
         {
-          Plugin.Logger.LogInfo("Adding EasyModePowerup patch");
+          Notify("Adding EasyModePowerup patch");
           trapManager.AddTrap(new EasyModePowerupPatch());
         }
         if (GUI.Button(new Rect(30, 240, 300, 20), "Add Hard Mode Trap"))
@@ -180,26 +165,30 @@ public class DebugMenu : MonoBehaviour
         }
         if (GUI.Button(new Rect(30, 270, 300, 20), "Add Ghost Tap Trap"))
         {
-          Plugin.Logger.LogInfo("Adding GhostTapTrap patch");
+          Notify("Adding GhostTapTrap patch");
           trapManager.AddTrap(new GhostTapTrapPatch());
         }
         if (GUI.Button(new Rect(30, 300, 300, 20), "Recreate TrapManager"))
         {
+          Notify("Recreating TrapManager");
           trapManager.ClearActiveTraps(false);
           trapManager = new();
         }
 
         if (GUI.Button(new Rect(30, 360, 300, 20), "Apply post-login patches"))
         {
+          Notify("Applying post-login patches");
           Plugin.ApplyGameplayPatches();
         }
         if (GUI.Button(new Rect(30, 390, 300, 20), "Unapply post-login patches"))
         {
+          Notify("Unapplying post-login patches");
           Plugin.UnapplyGameplayPatches();
         }
 
         if (GUI.Button(new Rect(30, 420, 300, 20), "Create Client class"))
         {
+          Notify("Creating empty Client");
           Plugin.Client = new();
         }
 
@@ -225,10 +214,11 @@ public class DebugMenu : MonoBehaviour
 
         break;
       case ActivatedGUI.Levels:
-        GUI.Box(new Rect(10, 10, 330, 200), "Rhythm Doctor Archipelago Levels Debug");
+        GUI.Box(new Rect(10, 10, 330, 270), "Rhythm Doctor Archipelago Levels Debug");
 
         if (GUI.Button(new Rect(30, 30, 300, 20), "Lock all"))
         {
+          Notify("Locking all levels");
           foreach (Level level in Enum.GetValues(typeof(Level)))
           {
             Persistence.SetLevelRank(level, Rank.NotAvailable, force: true);
@@ -238,6 +228,7 @@ public class DebugMenu : MonoBehaviour
 
         if (GUI.Button(new Rect(30, 60, 300, 20), "Unlock all"))
         {
+          Notify("Unlocking all levels");
           foreach (Level level in Enum.GetValues(typeof(Level)))
           {
             Persistence.SetLevelRank(level, Rank.NotFinished, force: true);
@@ -247,6 +238,7 @@ public class DebugMenu : MonoBehaviour
 
         if (GUI.Button(new Rect(30, 90, 300, 20), "Unlock all entrances"))
         {
+          Notify("Unlocking all entrances");
           scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToSVTWard"));
           scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToTrain"));
           scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToBasement"));
@@ -255,12 +247,14 @@ public class DebugMenu : MonoBehaviour
 
         if (GUI.Button(new Rect(30, 120, 300, 20), "Unlock level 3-1"))
         {
+          Notify("Unlocking 3-1");
           Persistence.SetLevelRank(Level.Garden, Rank.NotFinished);
           scnBase.GoToLevelSelect();
         }
 
         if (GUI.Button(new Rect(30, 150, 300, 20), "Unlock level 3-2N"))
         {
+          Notify("Unlocking 3-2N");
           Persistence.SetLevelRank(Level.Lounge, Rank.NotFinished);
           scnBase.GoToLevelSelect();
         }
@@ -271,10 +265,28 @@ public class DebugMenu : MonoBehaviour
             return;
 
           Level selectedLevel = selectableCharacter.levels[scnLevelSelect.instance.currentDifficulty];
+          Notify($"Setting rank of {selectedLevel} to S+");
           Persistence.SetLevelRank(selectedLevel, Rank.Splus, force: true);
           Persistence.SetLastPlayedLevel(selectedLevel);
           scnBase.GoToLevelSelect();
         }
+
+        if (GUI.Button(new Rect(30, 210, 300, 20), "Perfect all levels"))
+        {
+          Notify("Setting rank of all levels to S+");
+          foreach (Level level in Enum.GetValues(typeof(Level)))
+          {
+            Persistence.SetLevelRank(level, Rank.Splus, force: true);
+          }
+          scnBase.GoToLevelSelect();
+        }
+
+        if (GUI.Button(new Rect(30, 240, 300, 20), "Dump level data"))
+        {
+          Notify("Dumping level data - check console");
+          LogData.Level(RDLevelData.current);
+        }
+
         break;
 
       default:
