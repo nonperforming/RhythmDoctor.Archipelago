@@ -65,15 +65,17 @@ static class ArchipelagoLoginPatch
 
   [HarmonyPatch(typeof(LevelImporter), nameof(LevelImporter.Install))]
   [HarmonyPostfix]
-  static IEnumerator OverrideInstallButton(IEnumerator __result, LevelImporter __instance)
+  static IEnumerator OverrideInstallButton(IEnumerator result, LevelImporter __instance)
   {
     // TODO: Show appropriate errors rather than silently failing
     #region Lock input
+    Plugin.Logger.LogInfo("Locking input");
     __instance.cls.CLSPlaySound("sndImportInstallButtonClick");
     __instance.ToggleInsertUrlContainer(show: false);
     __instance.CurrentContentName = LevelImporter.ContentName.Installing;
     __instance.stoppedInstallCoroutine = false;
     __instance.CanToggleClearButton = false;
+    __instance.levelsToInstall = new List<ImportLevel>(__instance.toInstallIS.levels);
     foreach (ImportLevel item in __instance.levelsToInstall)
     {
       item.canToggleRemoveButton = false;
@@ -82,12 +84,14 @@ static class ArchipelagoLoginPatch
     #endregion
 
     string[] text = __instance
-      .transform.Find("screen/Contents/InsertURL Container/URL InputField")
+      .transform.Find("screen/Contents/InsertURL Container/URL InputField/Text")
       .GetComponent<Text>()
       .text.Split('\n');
+    Plugin.Logger.LogInfo($"Input: {text}");
 
     if (text.Length < 2)
     {
+      Plugin.Logger.LogError("URL or Name not input, bailing out");
       // URL or Name are not present, bail out
       __instance.CurrentContentName = LevelImporter.ContentName.LevelsInstalled;
       __instance.cls.CLSPlaySound("sndImportInstallFinish");
@@ -106,10 +110,12 @@ static class ArchipelagoLoginPatch
     {
       // No password given.
     }
+    Plugin.Logger.LogError($"URL: {url}, Slot Name: {name}");
 
     if (url.IsNullOrWhiteSpace() || name.IsNullOrWhiteSpace())
     {
       // Invalid information, bail out
+      Plugin.Logger.LogError("Invalid information, bailing out");
       __instance.CurrentContentName = LevelImporter.ContentName.LevelsInstalled;
       __instance.cls.CLSPlaySound("sndImportInstallFinish");
       __instance.AddLevelToErrorSection(__instance.levelsToInstall[0], "URL or Name not present");
@@ -117,6 +123,7 @@ static class ArchipelagoLoginPatch
     }
 
     // Attempt to log in with the information given.
+    Plugin.Logger.LogInfo("Attempting to login");
     try
     {
       Plugin.Client = new Client.Client(url, name, password);
@@ -132,9 +139,15 @@ static class ArchipelagoLoginPatch
     }
 
     // Successful login
+    yield return null;
+    Plugin.Logger.LogInfo("Logged in!");
     __instance.cls.CLSPlaySound("sndImportInstallFinish");
+    Persistence.currentSlotIndex = 0; // Slot 1
+    Plugin.ApplyGameplayPatches();
+    UnpatchMenu();
 
-    __instance.CurrentContentName = LevelImporter.ContentName.LevelsInstalled;
+    Plugin.Logger.LogInfo("Heading to Level Select...");
+    scnBase.GoToScene("scnLevelSelect");
   }
 
   [HarmonyPatch(nameof(scnCLS.Exit))]

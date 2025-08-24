@@ -56,6 +56,7 @@ public class Plugin : BaseUnityPlugin
     typeof(SkipTutorialPatch),
     typeof(TrapManagerPatch),
     typeof(UnlockItemPatch),
+    typeof(SavingPatch),
     typeof(UnapplyPatchesPatch),
   ];
 
@@ -124,7 +125,7 @@ public class Plugin : BaseUnityPlugin
     Harmony.UnpatchID(PATCH_ID_POST_LOGIN);
     Harmony.UnpatchID(PATCH_ID_TRAP);
 #if DEBUG
-    Destroy(GameObject.Find($"/{CreateDebugMenuPatch.DEBUG_MENU_OBJECT_NAME}"));
+    DestroyImmediate(GameObject.Find($"/{CreateDebugMenuPatch.DEBUG_MENU_OBJECT_NAME}"));
 #endif
   }
 }
