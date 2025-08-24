@@ -12,6 +12,7 @@ global using HarmonyLib;
 
 global using PulseLib;
 global using PulseLib.Extensions;
+// global using PulseLib.Localization;
 
 global using RhythmDoctor.Archipelago;
 global using RhythmDoctor.Archipelago.Client;
@@ -28,6 +29,8 @@ global using RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 global using RhythmDoctor.Archipelago.Patches.Menu;
 global using RhythmDoctor.Archipelago.World;
 global using RhythmDoctor.Archipelago.World.Data;
+
+//global using SA.GoogleDoc;
 
 global using System;
 global using System.Collections;
