@@ -122,7 +122,7 @@ public class DebugMenu : MonoBehaviour
         GUI.Box(new Rect(10, 10, 330, 150), "Rhythm Doctor Archipelago Data Debug");
         break;
       case ActivatedGUI.Patches:
-        GUI.Box(new Rect(10, 10, 330, 600), "Rhythm Doctor Archipelago Patches Debug");
+        GUI.Box(new Rect(10, 10, 330, 630), "Rhythm Doctor Archipelago Patches Debug");
         if (GUI.Button(new Rect(30, 30, 300, 20), "Discard active traps"))
         {
           trapManager.ClearActiveTraps(false);
@@ -186,7 +186,13 @@ public class DebugMenu : MonoBehaviour
           Plugin.UnapplyGameplayPatches();
         }
 
-        if (GUI.Button(new Rect(30, 420, 300, 20), "Create Client class"))
+        if (GUI.Button(new Rect(30, 420, 300, 20), "Unapply debug patches"))
+        {
+          Notify("Unapplying debug patches");
+          Plugin.UnapplyDebugPatches();
+        }
+
+        if (GUI.Button(new Rect(30, 450, 300, 20), "Create Client class"))
         {
           Notify("Creating empty Client");
           Plugin.Client = new();
@@ -210,11 +216,11 @@ public class DebugMenu : MonoBehaviour
           trapsActive += $"{trap.Name} ";
         }
 
-        GUI.Label(new Rect(30, 450, 300, 100), $"Traps: {traps}\nPreview: {trapsPreview}\nActive: {trapsActive}");
+        GUI.Label(new Rect(30, 480, 300, 100), $"Traps: {traps}\nPreview: {trapsPreview}\nActive: {trapsActive}");
 
         break;
       case ActivatedGUI.Levels:
-        GUI.Box(new Rect(10, 10, 330, 270), "Rhythm Doctor Archipelago Levels Debug");
+        GUI.Box(new Rect(10, 10, 330, 330), "Rhythm Doctor Archipelago Levels Debug");
 
         if (GUI.Button(new Rect(30, 30, 300, 20), "Lock all"))
         {
@@ -285,6 +291,18 @@ public class DebugMenu : MonoBehaviour
         {
           Notify("Dumping level data - check console");
           LogData.Level(RDLevelData.current);
+        }
+
+        if (GUI.Button(new Rect(30, 270, 300, 20), "Unlock 1-CNY"))
+        {
+          Notify("Unlocking 1-CNY");
+          Harmony.CreateAndPatchAll(typeof(UnlockCNYPatch), nameof(Plugin.PATCH_ID_DEBUG));
+        }
+
+        if (GUI.Button(new Rect(30, 300, 300, 20), "Unlock 1-BOO"))
+        {
+          Notify("Unlocking 1-BOO");
+          Harmony.CreateAndPatchAll(typeof(UnlockBOOPatch), nameof(Plugin.PATCH_ID_DEBUG));
         }
 
         break;

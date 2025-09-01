@@ -23,6 +23,12 @@ static class UnlockItemPatch
       }
     }
 
+    // Moving 1-CNY.
+    // If we do not do this, 1-CNY and 1-BOO will overlap each other.
+    Plugin.Logger.LogInfo("Moving 1-CNY");
+    __instance.FindSelectableEntity("1-CNY").gamePosition.x = -564;
+
+    // Unlock the boss if enough levels in its act has been completed
     Plugin.Logger.LogInfo("Checking if boss is available");
     foreach (Act act in Enum.GetValues(typeof(Act)))
     {
@@ -49,45 +55,5 @@ static class UnlockItemPatch
         }
       }
     }
-
-    // TODO: Reimplement with new system
-    // foreach (ItemInfo itemInfo in Plugin.Client.session?.Items.AllItemsReceived!)
-    // {
-    //   if (Plugin.Client.items.IsLevelItem(itemInfo.ItemId))
-    //   {
-    //     LevelStage? levelStage = Plugin.Client.items.GetLevelStageFromItem(itemInfo.ItemId);
-    //
-    //     if (levelStage == null)
-    //     {
-    //       Plugin.Logger.LogError($"Couldn't find LevelStage of item {itemInfo.ItemId}");
-    //       continue;
-    //     }
-    //
-    //     string? levelName = levelStage.Value.GetEnumMember();
-    //     if (levelName == null)
-    //       continue;
-    //
-    //     SelectableEntity selectableEntity = scnLevelSelect.instance.FindSelectableEntity(levelName);
-    //     // SelectableCharacter selectableCharacter = (SelectableCharacter)selectableEntity; // What do we need this for?
-    //
-    //     selectableEntity.gameObject.SetActive(true);
-    //     // selectableCharacter.normalEnabled = true;
-    //     // selectableCharacter.hardEnabled = true;
-    //     selectableEntity.normalEnabled = true;
-    //     selectableEntity.hardEnabled = true;
-    //   }
-    //   else if (Plugin.Client.items.IsKeyItem(itemInfo.ItemId))
-    //   {
-    //     Region? regionToUnlock = Plugin.Client.items.GetKeyItem(itemInfo.ItemId);
-    //
-    //     if (regionToUnlock == null)
-    //     {
-    //       Plugin.Logger.LogError($"Couldn't find Region of item {itemInfo.ItemId}");
-    //       continue;
-    //     }
-    //
-    //     LevelHelper.UnlockEntrance(regionToUnlock.Value);
-    //   }
-    // }
   }
 }

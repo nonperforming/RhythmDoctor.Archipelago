@@ -8,9 +8,7 @@ internal sealed class Client
   internal ArchipelagoSession? session;
   internal DeathLinkService? deathLinkService;
 
-  // TODO
-  //internal SlotData? slotData;
-
+  internal SlotData slotData;
   internal TrapManager trapManager;
 
   /// <summary>
@@ -118,9 +116,7 @@ internal sealed class Client
       session.MessageLog.OnMessageReceived += MessageReceived;
       session.Items.ItemReceived += ItemReceived;
 
-      // TODO: We need to process items already in our inventory!
-      //       The player might have gotten items while offline (i.e: playing async)
-      //       Iterate through session.Items.AllItemsReceived, and process them accordingly.
+      slotData = new SlotData(loginSuccessful.SlotData);
     }
     else
     {
@@ -150,6 +146,16 @@ internal sealed class Client
     {
       Plugin.Logger.LogInfo($"Unlocking stage item {item.ItemName} ({item.ItemId}, {level})");
       // FIXME: 1-CNY and 1-BOO will not unlock even if this is on - need to patch to force available
+      if (level == Level.GongXi) // 1-CNY
+      {
+        Plugin.Logger.LogInfo("Applying 1-CNY patch");
+        Harmony.CreateAndPatchAll(typeof(UnlockCNYPatch), Plugin.PATCH_ID_POST_LOGIN);
+      }
+      else if (level == Level.Halloween) // 1-BOO
+      {
+        Plugin.Logger.LogInfo("Applying 1-BOO patch");
+        Harmony.CreateAndPatchAll(typeof(UnlockBOOPatch), Plugin.PATCH_ID_POST_LOGIN);
+      }
       Persistence.SetLevelRank(level, Rank.NotFinished, false, false);
       return;
     }

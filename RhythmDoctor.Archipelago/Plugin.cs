@@ -4,7 +4,7 @@ namespace RhythmDoctor.Archipelago;
 /// Archipelago client mod for Rhythm Doctor
 /// </summary>
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
-[BepInDependency("io.github.nonperforming.pulse")]
+[BepInDependency(PulseLib.MyPluginInfo.PLUGIN_GUID)]
 [BepInProcess("Rhythm Doctor.exe")]
 public class Plugin : BaseUnityPlugin
 {
@@ -100,6 +100,14 @@ public class Plugin : BaseUnityPlugin
     Logger.LogInfo("Unapplying gameplay patches");
     Harmony.UnpatchID(PATCH_ID_POST_LOGIN);
   }
+
+#if DEBUG
+  internal static void UnapplyDebugPatches()
+  {
+    Logger.LogInfo("Unapplying debug patches");
+    Harmony.UnpatchID(PATCH_ID_DEBUG);
+  }
+#endif
 
   internal static void ApplyArchipelagoMenuPatch()
   {
