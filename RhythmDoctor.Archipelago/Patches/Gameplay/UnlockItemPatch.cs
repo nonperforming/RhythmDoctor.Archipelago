@@ -28,6 +28,32 @@ static class UnlockItemPatch
     Plugin.Logger.LogInfo("Moving 1-CNY");
     __instance.FindSelectableEntity("1-CNY").gamePosition.x = -564;
 
+    // Moving X-1 - Art Exercise to the basement if end goal is X-0 - Helping Hands
+    if (Plugin.Client.slotData.endGoal == SlotData.EndGoal.HelpingHands)
+    {
+      Plugin.Logger.LogInfo("Moving X-1 to the basement");
+      SelectableEntity artExercise = __instance.FindSelectableEntity("X-1");
+      // Moving from group 6 (Art Room) to 3 (Basement)
+      artExercise.group = 3; // Basement group
+      // We need to move this to the left-most level in the Basement.
+      // Currently, this is the vivid/stasis collab X-FTS.
+      // However, this may change in the future when more collabs take place.
+      // In selectableEntities, the unreleased level 'FlyAway' is directly above X-FTS
+      //  and is probably a good place to insert X-1 under,
+      //  seeing as this level is still here as of the Steam release (2021)
+      int index = __instance.selectableEntities.FindIndex((entity) => entity.gameObject.name == "FlyAway") + 1;
+      artExercise.gamePosition = new Vector2(2489, 56);
+      __instance.selectableEntities.Remove(artExercise);
+      __instance.selectableEntities.Insert(index, artExercise);
+    }
+
+    // Unhiding Act 3 levels
+    foreach (SelectableEntity level in __instance.selectableEntities.Where((entity) => entity.id.StartsWith("3-")))
+    {
+      level.normalEnabled = true;
+      level.hardEnabled = true;
+    }
+
     // Unlock the boss if enough levels in its act has been completed
     Plugin.Logger.LogInfo("Checking if boss is available");
     foreach (Act act in Enum.GetValues(typeof(Act)))
