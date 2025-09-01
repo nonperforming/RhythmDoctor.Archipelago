@@ -8,22 +8,19 @@ A mod for **Rhythm Doctor** to integrate with the [Archipelago Multi-World Rando
 
 To set up the Rhythm Doctor Archipelago mod, follow these steps:
 
-1. **Download BepInEx**
-   Download [BepInEx 5.x.x](https://github.com/BepInEx/BepInEx/releases/) (make sure not to download any version newer than 5.x.x).
+1. **Install BepInEx**
+   [Download and install BepInEx 5.](https://docs.bepinex.dev/v5.4.21/articles/user_guide/installation/index.html)
 
-2. **Extract BepInEx**
-   Extract the contents of the downloaded BepInEx package directly into your Rhythm Doctor installation directory.
-
-3. **Run the Game**
+2. **Run the Game**
    Launch Rhythm Doctor once to ensure that BepInEx sets up the required folder structure.
 
-4. **Install the RhythmDoctor.Archipelago plugin**
+3. **Install the RhythmDoctor.Archipelago plugin**
    - Obtain the mod files from a stable release in the `Releases` section or from GitHub Actions (these are debug builds and may be unstable).
    - Place the following files in the `Rhythm Doctor\BepInEx\plugins` folder:
       - `RhythmDoctor.Archipelago.dll`
-      - `World` folder
+      - `io.github.nonperforming.pulse.dll`
+      - `Assets` folder
       - `Archipelago.MultiClient.Net.dll`
-      - `YamlDotNet.dll`
 
 5. Install **dependencies**
    Obtain and install [Pulse](https://github.com/nonperforming/Pulse) from [its releases page](https://github.com/nonperforming/Pulse/releases)
@@ -32,15 +29,15 @@ To set up the Rhythm Doctor Archipelago mod, follow these steps:
 
 ### **Visual Studio** and **Rider**
 
-1. Open the `.sln` file.
+1. Open the `RhythmDoctor.Archipelago.sln`/`RhythmDoctor.Archipelago/RhythmDoctor.Archipelago.csproj` file.
 2. Make your changes.
 3. Build the solution.
-4. Copy the following output files from `bin\Debug\netstandard2.1\` to the game’s `BepInEx\plugins` directory:
+4. Copy the following output files from `bin\<Configuration>\netstandard2.1\` to the game’s `BepInEx\plugins` directory:
     - `RhythmDoctor.Archipelago.dll`
-    - `World` folder
+    - `io.github.nonperforming.pulse.dll`
+    - `Assets` folder
     - `Archipelago.MultiClient.Net.dll`
-    - `YamlDotNet.dll`
-5. Launch the game. A successful installation will show the current mod version in the bottom left of the Main Menu.
+5. Launch the game. A successful installation will show the installed RhythmDoctor.Archipelago plugin version in the bottom left of the Main Menu.
 
 ---
 
