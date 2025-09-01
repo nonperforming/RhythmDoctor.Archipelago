@@ -2,10 +2,12 @@ name: Build
 on:
   push:
     paths-ignore:
-      - "**LICENSE"
-      - "**.editorconfig"
-      - "**.git**"
-      - "!.github/workflows/**"
+      - "**"
+      - "!.github/workflows/main.yml"
+      - "!RhythmDoctor.Archipelago.sln"
+      - "!RhythmDoctor.Archipelago/**"
+      - "RhythmDoctor.Archipelago/.idea"
+      - "RhythmDoctor.Archipelago/.editorconfig"
 
 jobs:
   build:
