@@ -43,7 +43,7 @@ static class ClearLocationPatch
       return;
     }
 
-    if (!Enum.TryParse(scnGame.instance.levelIdentifier, out Level internalLevelName))
+    if (!Enum.TryParse(scnGame.instance.levelIdentifier, out Level level))
     {
       Plugin.Logger.LogError($"Couldn't find Level. Level identifier: {scnGame.instance.levelIdentifier}");
       Plugin.Client.trapManager.ClearActiveTraps(false);
@@ -52,8 +52,15 @@ static class ClearLocationPatch
 
     Plugin.Logger.LogDebug("Getting locations to clear");
     Rank rank = scnGame.instance.currentLevel.GetRankFromMistakes();
-    IReadOnlyCollection<long> ids = Bindings.LevelToStage[internalLevelName].GetLocationsToClear(rank);
-    Plugin.Logger.LogDebug($"Stage to clear: {internalLevelName} with rank {rank} ({string.Join(", ", ids)})");
+    IReadOnlyCollection<long> ids = Bindings.LevelToStage[level].GetLocationsToClear(rank);
+    Plugin.Logger.LogDebug($"Stage to clear: {level} with rank {rank} ({string.Join(", ", ids)})");
+
+    // X-0 - Helping Hands end goal
+    if (Plugin.Client.slotData.endGoal == SlotData.EndGoal.HelpingHands && level == Level.HelpingHands && rank.passed)
+    {
+      Plugin.Logger.LogInfo("Setting goal achieved");
+      Plugin.Client.session.SetGoalAchieved();
+    }
 
     bool clearedNewLocation = false;
     foreach (long id in ids)
