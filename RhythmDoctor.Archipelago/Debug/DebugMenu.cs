@@ -249,6 +249,7 @@ public class DebugMenu : MonoBehaviour
           scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToTrain"));
           scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToBasement"));
           scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToAthleteWard"));
+          scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToArtRoom"));
         }
 
         if (GUI.Button(new Rect(30, 120, 300, 20), "Unlock level 3-1"))

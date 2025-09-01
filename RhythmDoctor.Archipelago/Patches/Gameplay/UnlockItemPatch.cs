@@ -28,9 +28,9 @@ static class UnlockItemPatch
     Plugin.Logger.LogInfo("Moving 1-CNY");
     __instance.FindSelectableEntity("1-CNY").gamePosition.x = -564;
 
-    // Moving X-1 - Art Exercise to the basement if end goal is X-0 - Helping Hands
     if (Plugin.Client.slotData.endGoal == SlotData.EndGoal.HelpingHands)
     {
+      // Moving X-1 - Art Exercise to the basement if end goal is X-0 - Helping Hands
       Plugin.Logger.LogInfo("Moving X-1 to the basement");
       SelectableEntity artExercise = __instance.FindSelectableEntity("X-1");
       // Moving from group 6 (Art Room) to 3 (Basement)
@@ -45,6 +45,14 @@ static class UnlockItemPatch
       artExercise.gamePosition = new Vector2(2489, 56);
       __instance.selectableEntities.Remove(artExercise);
       __instance.selectableEntities.Insert(index, artExercise);
+
+      // Unlock the Art Room if we have all bosses completed.
+      if (Bindings.ActBoss.Values.All(level => Persistence.GetLevelRank(level).passed))
+      {
+        Plugin.Logger.LogInfo("Unlocking Art Room and X-0 - Helping Hands");
+        __instance.UnlockEntrance(__instance.FindSelectableEntity("GoToArtRoom"));
+        Persistence.SetLevelRank(Level.HelpingHands, Rank.NotFinished, false, false);
+      }
     }
 
     // Unhiding Act 3 levels

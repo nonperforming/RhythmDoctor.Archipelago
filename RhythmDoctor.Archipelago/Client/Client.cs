@@ -105,13 +105,6 @@ internal sealed class Client
         $"Successfully connected to {loginSuccessful.Slot}/{name} as {session.ConnectionInfo.Uuid}"
       );
 
-      // FIXME: InvalidCastException: Specified cast is not valid.
-      //slotData = new()
-      //{
-      //  BossUnlockRequirement = (BossUnlockRequirement)loginSuccessful.SlotData["boss_unlock_requirement"],
-      //  EndGoal = (EndGoal)loginSuccessful.SlotData["end_goal"],
-      //};
-
       Plugin.Logger.LogDebug("Binding events");
       session.MessageLog.OnMessageReceived += MessageReceived;
       session.Items.ItemReceived += ItemReceived;
