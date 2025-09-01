@@ -8,7 +8,7 @@ static class SavingPatch
 {
   [HarmonyPatch(nameof(Persistence.SaveSlot))]
   [HarmonyPrefix]
-  static void DisableSavingToFile(int slot, ref bool __runOriginal)
+  static void DisableSavingToFilePatch(int slot, ref bool __runOriginal)
   {
     // "Slot" -1 is settings, as shown by GetSavefilePath
     // string text = ((slot == -1) ? "settings.rdsave" : $"slot{slot}.rdsave");

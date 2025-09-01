@@ -11,6 +11,42 @@ internal sealed class Client
   internal SlotData slotData;
   internal TrapManager trapManager;
 
+  #region Ready for items
+  /// <summary>
+  /// Backing store for <see cref="ReadyForItems"/>.
+  /// </summary>
+  /// <seealso cref="ReadyForItems"/>
+  private bool _readyForItems;
+
+  /// <summary>
+  /// Whether to process items or not.
+  /// Items received when this is false will be put in <see cref="itemQueue"/>
+  /// </summary>
+  /// <seealso cref="itemQueue"/>
+  internal bool ReadyForItems
+  {
+    get => _readyForItems;
+    set
+    {
+      _readyForItems = value;
+      if (value)
+      {
+        Plugin.Logger.LogInfo("Processing all queued items");
+        foreach (ReceivedItemsHelper item in itemQueue)
+        {
+          ProcessItem(item, true);
+        }
+      }
+    }
+  }
+
+  /// <summary>
+  /// Item queue for items received while we were not <see cref="ReadyForItems"/>.
+  /// </summary>
+  /// <seealso cref="ReadyForItems"/>
+  private Queue<ReceivedItemsHelper> itemQueue;
+  #endregion
+
   /// <summary>
   /// Create an Archipelago client.
   /// </summary>
@@ -21,6 +57,7 @@ internal sealed class Client
   /// <exception cref="Exception">Login failure</exception>
   public Client(string server, string username, string? password = null, bool deathLink = false)
   {
+    itemQueue = new();
     trapManager = new();
 
     CreateSession(server);
@@ -42,6 +79,7 @@ internal sealed class Client
   {
     Plugin.Logger.LogWarning("Creating client with no login");
 
+    itemQueue = new();
     trapManager = new();
   }
 #endif
@@ -123,10 +161,22 @@ internal sealed class Client
     Plugin.Logger.LogInfo($"Received message {message}");
   }
 
-  internal void ItemReceived(ReceivedItemsHelper helper)
+  internal void ItemReceived(ReceivedItemsHelper helper) => ProcessItem(helper);
+
+  internal void ProcessItem(ReceivedItemsHelper helper, bool wasQueued = false)
   {
-    // TODO: Handle items
-    ItemInfo item = helper.DequeueItem();
+    ItemInfo item;
+
+    // Ensure the save is prepared before we attempt to load our existing items.
+    if (!ReadyForItems)
+    {
+      item = helper.PeekItem();
+      Plugin.Logger.LogInfo($"Enqueued item {item.ItemName} ({item.ItemId} from {item.ItemGame})");
+      itemQueue.Enqueue(helper);
+      return;
+    }
+
+    item = helper.DequeueItem();
     if (item.ItemGame != Bindings.GAME)
     {
       Plugin.Logger.LogDebug(
@@ -135,10 +185,11 @@ internal sealed class Client
       return;
     }
 
+    // ReSharper disable NullableWarningSuppressionIsUsed
     if (Bindings.StageItemIdToLevel.TryGetValue(item.ItemId, out Level level))
     {
       Plugin.Logger.LogInfo($"Unlocking stage item {item.ItemName} ({item.ItemId}, {level})");
-      // FIXME: 1-CNY and 1-BOO will not unlock even if this is on - need to patch to force available
+
       if (level == Level.GongXi) // 1-CNY
       {
         Plugin.Logger.LogInfo("Applying 1-CNY patch");
@@ -149,7 +200,81 @@ internal sealed class Client
         Plugin.Logger.LogInfo("Applying 1-BOO patch");
         Harmony.CreateAndPatchAll(typeof(UnlockBOOPatch), Plugin.PATCH_ID_POST_LOGIN);
       }
-      Persistence.SetLevelRank(level, Rank.NotFinished, false, false);
+
+      if (wasQueued)
+      {
+        Plugin.Logger.LogInfo($"Attempting to get rank from locations cleared for {level}");
+
+        // Attempt to get rank from locations sent
+        RegularStage levelStage = (RegularStage)Bindings.LevelToStage[level];
+        if (session!.Locations.AllLocationsChecked.Contains(levelStage.SRankLocation))
+        {
+          Plugin.Logger.LogInfo("Found S rank location");
+          Persistence.SetLevelRank(level, Rank.S, false, false);
+        }
+        else if (
+          levelStage.ARankLocation.HasValue
+          && session!.Locations.AllLocationsChecked.Contains(levelStage.ARankLocation.Value)
+        )
+        {
+          Plugin.Logger.LogInfo("Found A rank location");
+          Persistence.SetLevelRank(level, Rank.A, false, false);
+        }
+        else if (
+          levelStage.BRankLocation.HasValue
+          && session!.Locations.AllLocationsChecked.Contains(levelStage.BRankLocation.Value)
+        )
+        {
+          Plugin.Logger.LogInfo("Found B rank location");
+          Persistence.SetLevelRank(level, Rank.B, false, false);
+        }
+        else
+        {
+          // We haven't cleared the level yet.
+          Plugin.Logger.LogInfo("Couldn't find any location");
+          Persistence.SetLevelRank(level, Rank.NotFinished, false, false);
+          return;
+        }
+
+        // As we've cleared the level, we need to check if we have unlocked a boss song,
+        //  and handle its rank if we have unlocked one.
+        Plugin.Logger.LogInfo("Checking if boss song unlocked");
+        Act act = Bindings.LevelToAct[level];
+        Level bossLevel = Bindings.ActBoss[act];
+        if (UnlockItemPatch.HasUnlockedBossSong(act))
+        {
+          Plugin.Logger.LogInfo($"Attempting to get boss rank from locations cleared for {bossLevel}");
+          BossStage bossStage = (BossStage)Bindings.LevelToStage[bossLevel];
+          if (session!.Locations.AllLocationsChecked.Contains(bossStage.PerfectLocation))
+          {
+            Plugin.Logger.LogInfo("Found Perfect location");
+            Persistence.SetLevelRank(bossLevel, Rank.BossPerfect, false, false);
+          }
+          else if (
+            bossStage.CompletePlusLocation.HasValue
+            && session!.Locations.AllLocationsChecked.Contains(bossStage.CompletePlusLocation.Value)
+          )
+          {
+            Plugin.Logger.LogInfo("Found Complete+ location");
+            Persistence.SetLevelRank(bossLevel, Rank.BossNoCheckpoints, false, false);
+          }
+          else if (session!.Locations.AllLocationsChecked.Contains(bossStage.ClearLocation))
+          {
+            Plugin.Logger.LogInfo("Found Clear location");
+            Persistence.SetLevelRank(bossLevel, Rank.BossClear, false, false);
+          }
+          else
+          {
+            // We haven't cleared the boss level yet.
+            Plugin.Logger.LogInfo("Couldn't find any location");
+            Persistence.SetLevelRank(bossLevel, Rank.NotFinished, false, false);
+          }
+        }
+      }
+      else
+      {
+        Persistence.SetLevelRank(level, Rank.NotFinished, false, false);
+      }
       return;
     }
     else if (Bindings.TrapItemIdToLevel.TryGetValue(item.ItemId, out Type trap))
@@ -164,6 +289,8 @@ internal sealed class Client
       Plugin.Logger.LogInfo($"Ignoring key item {item.ItemName} ({item.ItemId})");
       return;
     }
+    // ReSharper restore NullableWarningSuppressionIsUsed
+
     // TODO: implement else case for filler like A Bit of Rhythm
     Plugin.Logger.LogError($"Got item {item.ItemName} ({item.ItemId} from {item.ItemGame}) but couldn't handle it");
   }

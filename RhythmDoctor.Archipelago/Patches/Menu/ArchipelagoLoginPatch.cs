@@ -110,7 +110,7 @@ static class ArchipelagoLoginPatch
     {
       // No password given.
     }
-    Plugin.Logger.LogError($"URL: {url}, Slot Name: {name}");
+    Plugin.Logger.LogInfo($"URL: {url}, Slot Name: {name}");
 
     if (url.IsNullOrWhiteSpace() || name.IsNullOrWhiteSpace())
     {
@@ -144,6 +144,12 @@ static class ArchipelagoLoginPatch
     __instance.cls.CLSPlaySound("sndImportInstallFinish");
     Persistence.currentSlotIndex = 0; // Slot 1
     Plugin.ApplyGameplayPatches();
+    // Scary!!!!!!!!!!!
+    // Hopefully if we got here without any exceptions SavingPatch should be applied,
+    //  so we shouldn't lose our first slot in the case of a crash.
+    // When we are quitting, the original data should be reloaded by UnapplyPatchesPatch.
+    Persistence.slotPrefs[0].Clear();
+    Plugin.Client.ReadyForItems = true;
     UnpatchMenu();
 
     Plugin.Logger.LogInfo("Heading to Level Select...");

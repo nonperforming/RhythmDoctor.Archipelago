@@ -63,31 +63,39 @@ static class UnlockItemPatch
     }
 
     // Unlock the boss if enough levels in its act has been completed
-    Plugin.Logger.LogInfo("Checking if boss is available");
     foreach (Act act in Enum.GetValues(typeof(Act)))
     {
-      if (act == Act.None)
+      if (HasUnlockedBossSong(act))
       {
-        continue;
+        Persistence.SetLevelRank(Bindings.ActBoss[act], Rank.NotFinished, false, false);
       }
+    }
+  }
 
-      Plugin.Logger.LogDebug($"Checking act {act}");
-      int clearedInAct = 0;
-      foreach (Level level in Bindings.LevelsInAct[act])
+  internal static bool HasUnlockedBossSong(Act act)
+  {
+    if (act == Act.None)
+    {
+      return false;
+    }
+
+    Plugin.Logger.LogDebug($"Checking act {act}");
+    int clearedInAct = 0;
+    foreach (Level level in Bindings.LevelsInAct[act])
+    {
+      Plugin.Logger.LogDebug($"Checking level {level}");
+      Rank rank = Persistence.GetLevelRank(level);
+      if (rank.passed)
       {
-        Plugin.Logger.LogDebug($"Checking level {level}");
-        Rank rank = Persistence.GetLevelRank(level);
-        if (rank.passed)
+        clearedInAct++;
+        if (clearedInAct >= Bindings.ClearedLevelsToUnlockBoss[act])
         {
-          clearedInAct++;
-          if (clearedInAct >= Bindings.ClearedLevelsToUnlockBoss[act])
-          {
-            Plugin.Logger.LogInfo($"Unlocking {act} boss");
-            Persistence.SetLevelRank(Bindings.ActBoss[act], Rank.NotFinished, false, false);
-            break;
-          }
+          Plugin.Logger.LogInfo($"Unlocking {act} boss");
+          return true;
         }
       }
     }
+
+    return false;
   }
 }

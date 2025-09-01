@@ -10,16 +10,28 @@ static class UnapplyPatchesPatch
   [HarmonyPrefix]
   internal static void TearDownClientPluginPatch()
   {
+    Plugin.Logger.LogInfo("Tearing down client plugin");
+    Plugin.UnapplyGameplayPatches();
+
+    // Reload data - we wipe Slot 1 in ArchipelagoLoginPatch, and we do **NOT** want to lose it.
+    Persistence.Load();
+    // In the case we somehow skip scnBase.GoToMainMenu (maybe some other plugin) we need to reload slot 1's data,
+    //  as otherwise the Main Menu option will still show our Archipelago slot.
+    try
+    {
+      scnMenu.instance.slots[0].LoadSlotData();
+    }
+    catch (NullReferenceException)
+    {
+      // We aren't in the Main Menu yet. Don't do anything.
+    }
+
     // TODO: Correct way to tear down Archipelago client?
     if (Plugin.Client.session != null)
       // For some reason session does not want to accept '?'
       // NOTE: Disconnect in a non-async manner is under NET35
       //       This should probably be made async.
       Task.Run(Plugin.Client.session.Socket.DisconnectAsync).Wait();
-    //Plugin.Client.session = null;
-    //Plugin.Client.deathLinkService = null;
-    //Plugin.Client.trapManager.ClearAllTraps(true);
-    Plugin.Client = null!; // TODO: Setting the Client to null should automatically clean up itself and children?
-    Plugin.UnapplyGameplayPatches();
+    Plugin.Client = null!;
   }
 }
