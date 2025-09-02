@@ -45,11 +45,19 @@ public class Plugin : BaseUnityPlugin
   /// <summary>
   /// Patches that are applied after logging into Archipelago, and unapplied after logging out.
   /// </summary>
+  /// <remarks>
+  /// The <see cref="UnlockBOOPatch"/> and <see cref="UnlockCNYPatch"/> patches will be applied by <see cref="Client"/>
+  /// once we have gotten their respective items. They share the <see cref="PATCH_ID_POST_LOGIN"/> patch ID, and should
+  /// also be unapplied when logging out.
+  /// </remarks>
+  /// <seealso cref="UnlockBOOPatch"/>
+  /// <seealso cref="UnlockCNYPatch"/>
   private static readonly Type[] PostLoginPatches =
   [
+    typeof(Act5Patch),
     typeof(ClearLocationPatch),
     typeof(JanitorPatch),
-    typeof(Act5Patch),
+    typeof(SkipCutscenePatch),
     typeof(SkipTutorialPatch),
     typeof(TrapManagerPatch),
     typeof(UnlockItemPatch),

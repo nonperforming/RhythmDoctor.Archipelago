@@ -85,11 +85,4 @@ static class ClearLocationPatch
       Plugin.Client.trapManager.ClearActiveTraps(true);
     }
   }
-
-  [HarmonyPatch(typeof(scnLevelSelect), nameof(scnLevelSelect.CheckForCutscene))]
-  [HarmonyPrefix]
-  static void DoNotPlayLevelUnlockCutscenePatch(ref bool __runOriginal)
-  {
-    __runOriginal = false;
-  }
 }
