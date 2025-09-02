@@ -72,6 +72,13 @@ static class UnlockItemPatch
     }
   }
 
+  [HarmonyPatch(nameof(DoNotUnlockNightShiftLevelPatch))]
+  [HarmonyPrefix]
+  static void DoNotUnlockNightShiftLevelPatch(ref bool __runOriginal)
+  {
+    __runOriginal = false;
+  }
+
   internal static bool HasUnlockedBossSong(Act act)
   {
     if (act == Act.None)
