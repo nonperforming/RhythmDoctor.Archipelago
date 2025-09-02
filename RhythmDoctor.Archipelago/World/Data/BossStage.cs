@@ -32,25 +32,45 @@ internal class BossStage : BaseStage
 
     // Higher ranks match first so we can `goto` lower ranks
     // TODO: probably use array for this
+
+    // From HUD.ShowAndSaveRank(bool, bool)
+    // ...
+    // case LevelType.Boss:
+    // {
+    //   bool passedLevelWithoutCheckpoints = base.game.GetPassedLevelWithoutCheckpoints();
+    //   string text2 = (isAnySRank ? "Perfect" : (passedLevelWithoutCheckpoints ? "CompletePlus" : "Complete"));
+    //   customText.text = RDString.Get("rankscreen.act" + base.game.currentLevel.bossActNum + text2);
+    //   customText.color = color;
+    //   customText.gameObject.SetActive(value: true);
+    //   if (base.game.currentLevel is Level_Lesmis { dogMode: not false })
+    //   {
+    //     customText.text = RDString.Get("rankscreen.dogtor");
+    //   }
+    //   Narration.Say(customText.text, NarrationCategory.Notification, false, NarrationActionName.ToContinue);
+    //   break;
+    // }
+    // ...
+
     List<long> ids = new();
-    switch (rank)
+
+    // S ranks are always equivalent to Perfect.
+    if (rank.perfected)
     {
-      case Rank.Splus:
-      case Rank.BossPerfect:
-        ids.Add(PerfectLocation);
-        goto case Rank.BossNoCheckpoints;
-      case Rank.BossNoCheckpoints:
-        if (CompletePlusLocation.HasValue)
-        {
-          ids.Add(CompletePlusLocation.Value);
-        }
-        goto case Rank.BossClear;
-      case Rank.BossClear:
-        ids.Add(ClearLocation);
-        break;
-      default:
-        throw new ArgumentOutOfRangeException($"Given rank ({rank.internalValue}) out of range");
+      ids.Add(PerfectLocation);
     }
+
+    // No, rank.noCheckpoints does not work.
+    if (CompletePlusLocation.HasValue && rank.noCheckpoints)
+    {
+      // Check if we've cleared without checkpoints.
+      if (scnGame.instance.GetPassedLevelWithoutCheckpoints())
+      {
+        ids.Add(CompletePlusLocation.Value);
+      }
+    }
+
+    // You must clear a boss location to save its rank.
+    ids.Add(ClearLocation);
 
     return ids.AsReadOnly();
   }
