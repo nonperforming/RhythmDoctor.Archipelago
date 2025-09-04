@@ -99,7 +99,7 @@ static class UnlockItemPatch
     }
   }
 
-  [HarmonyPatch(nameof(DoNotUnlockNightShiftLevelPatch))]
+  [HarmonyPatch(nameof(scnLevelSelect.UnlockNightShiftLevel))]
   [HarmonyPrefix]
   static void DoNotUnlockNightShiftLevelPatch(ref bool __runOriginal)
   {
