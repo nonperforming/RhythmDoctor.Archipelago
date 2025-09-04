@@ -76,6 +76,10 @@ static class UnlockItemPatch
     BOO.gameObject.SetActive(true);
     // Unhiding MD-1 - for some reason MD-1 has an additional check for 3-X
     __instance.GetSelectableEntity("MD-1").normalEnabled = true;
+    // Unhiding 1-XN
+    __instance.GetSelectableEntity("1-X").hardEnabled = true;
+    // Unhiding 2-X
+    __instance.GetSelectableEntity("2-X").normalEnabled = true;
     // Unhiding 5-1N before we pass 5-1 (normally when we are out of dream)
     SelectableEntity FiveOne = __instance.GetSelectableEntity("5-1");
     FiveOne.normalEnabled = true;
@@ -104,6 +108,29 @@ static class UnlockItemPatch
   static void DoNotUnlockNightShiftLevelPatch(ref bool __runOriginal)
   {
     __runOriginal = false;
+  }
+
+  /// <summary>
+  /// Do not unlock levels while loading level data (i.e. collabs).
+  /// </summary>
+  /// <param name="instructions">Original method IL instructions</param>
+  /// <returns>Modified IL instructions</returns>
+  [HarmonyPatch(nameof(scnLevelSelect.LoadLevelData))]
+  [HarmonyTranspiler]
+  static IEnumerable<CodeInstruction> DoNotUnlockLevelsPatch(IEnumerable<CodeInstruction> instructions)
+  {
+    CodeMatcher matcher = new(instructions);
+    int startIndex = matcher.MatchForward(false, new CodeMatch(OpCodes.Ldstr, "1-X")).Advance(2).Pos;
+    int endIndex = matcher
+      .MatchForward(
+        false,
+        new CodeMatch(OpCodes.Ldloc_S),
+        new CodeMatch(OpCodes.Ldloc_S),
+        new CodeMatch(OpCodes.Ldstr, "normalEnabled")
+      )
+      .Advance(-2)
+      .Pos;
+    return matcher.RemoveInstructionsInRange(startIndex, endIndex).InstructionEnumeration();
   }
 
   internal static bool HasUnlockedBossSong(Act act)

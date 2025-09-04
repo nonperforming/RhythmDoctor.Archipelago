@@ -149,6 +149,12 @@ static class ArchipelagoLoginPatch
     //  so we shouldn't lose our first slot in the case of a crash.
     // When we are quitting, the original data should be reloaded by UnapplyPatchesPatch.
     Persistence.slotPrefs[0].Clear();
+    // Some levels come unlocked by default, such as X-1.
+    // Lock all levels to force the user to unlock them with an item.
+    foreach (Level level in Enum.GetValues(typeof(Level)))
+    {
+      Persistence.SetLevelRank(level, Rank.NotAvailable, force: true);
+    }
     Plugin.Client.ReadyForItems = true;
     UnpatchMenu();
 
