@@ -220,7 +220,7 @@ public class DebugMenu : MonoBehaviour
 
         break;
       case ActivatedGUI.Levels:
-        GUI.Box(new Rect(10, 10, 330, 330), "Rhythm Doctor Archipelago Levels Debug");
+        GUI.Box(new Rect(10, 10, 330, 290), "Rhythm Doctor Archipelago Levels Debug");
 
         if (GUI.Button(new Rect(30, 30, 300, 20), "Lock all"))
         {
@@ -248,6 +248,8 @@ public class DebugMenu : MonoBehaviour
           scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToSVTWard"));
           scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToTrain"));
           scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToBasement"));
+          scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToMuseDashRoom"));
+          scnLevelSelect.instance.ActivateEntranceRin();
           scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToAthleteWard"));
           scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToArtRoom"));
         }
@@ -292,18 +294,6 @@ public class DebugMenu : MonoBehaviour
         {
           Notify("Dumping level data - check console");
           LogData.Level(RDLevelData.current);
-        }
-
-        if (GUI.Button(new Rect(30, 270, 300, 20), "Unlock 1-CNY"))
-        {
-          Notify("Unlocking 1-CNY");
-          Harmony.CreateAndPatchAll(typeof(UnlockCNYPatch), nameof(Plugin.PATCH_ID_DEBUG));
-        }
-
-        if (GUI.Button(new Rect(30, 300, 300, 20), "Unlock 1-BOO"))
-        {
-          Notify("Unlocking 1-BOO");
-          Harmony.CreateAndPatchAll(typeof(UnlockBOOPatch), nameof(Plugin.PATCH_ID_DEBUG));
         }
 
         break;

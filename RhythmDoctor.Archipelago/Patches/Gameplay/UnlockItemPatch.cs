@@ -42,7 +42,7 @@ static class UnlockItemPatch
       //  and is probably a good place to insert X-1 under,
       //  seeing as this level is still here as of the Steam release (2021)
       int index = __instance.selectableEntities.FindIndex((entity) => entity.gameObject.name == "FlyAway") + 1;
-      artExercise.gamePosition = new Vector2(2489, 56);
+      artExercise.gamePosition = new Vector2(2535, 56); // a little bit left to the fireplace/boiler in Ian's office
       __instance.selectableEntities.Remove(artExercise);
       __instance.selectableEntities.Insert(index, artExercise);
 
@@ -55,12 +55,39 @@ static class UnlockItemPatch
       }
     }
 
-    // Unhiding Act 3 levels
+    // Hiding Paige at the vending machine
+    // Even though we are skipping cutscenes for some reason Paige can show up at the vending machine
+    GameObject.Find("/Scene/Corridor/VendingMachinePaige").gameObject.SetActive(false);
+
+    // Unhiding levels
+    // Show all Act 3 levels before we unlock 3-1
     foreach (SelectableEntity level in __instance.selectableEntities.Where((entity) => entity.id.StartsWith("3-")))
     {
       level.normalEnabled = true;
-      level.hardEnabled = true;
+      if (level.id != "3-X")
+        level.hardEnabled = true;
     }
+    // Unhiding timed levels 1-CNY and 1-BOO
+    SelectableEntity CNY = __instance.GetSelectableEntity("1-CNY");
+    CNY.normalEnabled = true;
+    CNY.gameObject.SetActive(true);
+    SelectableEntity BOO = __instance.GetSelectableEntity("1-BOO");
+    BOO.normalEnabled = true;
+    BOO.gameObject.SetActive(true);
+    // Unhiding MD-1 - for some reason MD-1 has an additional check for 3-X
+    __instance.GetSelectableEntity("MD-1").normalEnabled = true;
+    // Unhiding 5-1N before we pass 5-1 (normally when we are out of dream)
+    SelectableEntity FiveOne = __instance.GetSelectableEntity("5-1");
+    FiveOne.normalEnabled = true;
+    FiveOne.hardEnabled = true;
+    // Unhiding X-0 before we pass the last released boss song
+    SelectableEntity X0 = __instance.GetSelectableEntity("X-0");
+    X0.normalEnabled = true;
+    X0.gameObject.SetActive(true);
+    // Unhiding X-1 before we pass the last released boss song
+    SelectableEntity X1 = __instance.GetSelectableEntity("X-1");
+    X1.normalEnabled = true;
+    X1.gameObject.SetActive(true);
 
     // Unlock the boss if enough levels in its act has been completed
     foreach (Act act in Enum.GetValues(typeof(Act)))

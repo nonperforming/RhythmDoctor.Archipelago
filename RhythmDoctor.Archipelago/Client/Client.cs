@@ -190,17 +190,6 @@ internal sealed class Client
     {
       Plugin.Logger.LogInfo($"Unlocking stage item {item.ItemName} ({item.ItemId}, {level})");
 
-      if (level == Level.GongXi) // 1-CNY
-      {
-        Plugin.Logger.LogInfo("Applying 1-CNY patch");
-        Harmony.CreateAndPatchAll(typeof(UnlockCNYPatch), Plugin.PATCH_ID_POST_LOGIN);
-      }
-      else if (level == Level.Halloween) // 1-BOO
-      {
-        Plugin.Logger.LogInfo("Applying 1-BOO patch");
-        Harmony.CreateAndPatchAll(typeof(UnlockBOOPatch), Plugin.PATCH_ID_POST_LOGIN);
-      }
-
       if (wasQueued)
       {
         Plugin.Logger.LogInfo($"Attempting to get rank from locations cleared for {level}");

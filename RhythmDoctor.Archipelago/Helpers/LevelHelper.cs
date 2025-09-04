@@ -38,5 +38,14 @@ internal static class LevelHelper
 
     Plugin.Logger.LogDebug($"Unlocking {name} entrance");
     scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity(name));
+
+    if (regionToUnlock == Region.Basement)
+    {
+      // Unlock Muse Dash levels.
+      // Rin will normally not be visible until we complete One Shift More and complete the post-Act 3 cutscene.
+      Plugin.Logger.LogDebug("Unlocking Muse Dash levels");
+      scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToMuseDashRoom"));
+      scnLevelSelect.instance.ActivateEntranceRin();
+    }
   }
 }
