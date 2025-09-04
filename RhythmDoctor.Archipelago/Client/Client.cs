@@ -229,9 +229,9 @@ internal sealed class Client
         //  and handle its rank if we have unlocked one.
         Plugin.Logger.LogInfo("Checking if boss song unlocked");
         Act act = Bindings.LevelToAct[level];
-        Level bossLevel = Bindings.ActBoss[act];
         if (UnlockItemPatch.HasUnlockedBossSong(act))
         {
+          Level bossLevel = Bindings.ActBoss[act];
           Plugin.Logger.LogInfo($"Attempting to get boss rank from locations cleared for {bossLevel}");
           BossStage bossStage = (BossStage)Bindings.LevelToStage[bossLevel];
           if (session!.Locations.AllLocationsChecked.Contains(bossStage.PerfectLocation))
