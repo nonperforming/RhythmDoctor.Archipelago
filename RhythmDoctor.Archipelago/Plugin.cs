@@ -123,8 +123,20 @@ public class Plugin : BaseUnityPlugin
     Harmony.UnpatchID(PATCH_ID_ARCHIPELAGO_MENU);
   }
 
+  #region Cleaning up
+  private bool quitting = false;
+
+  private void OnApplicationQuit()
+  {
+    Logger.LogDebug("Quitting...");
+    quitting = true;
+  }
+
   private void OnDestroy()
   {
+    if (quitting)
+      return;
+
     Logger.LogWarning("Tearing down plugin. This is unsupported!");
     UnapplyPatchesPatch.TearDownClientPluginPatch();
     Harmony.UnpatchID(PATCH_ID_ALWAYS_ACTIVE);
@@ -135,4 +147,5 @@ public class Plugin : BaseUnityPlugin
     DestroyImmediate(GameObject.Find($"/{CreateDebugMenuPatch.DEBUG_MENU_OBJECT_NAME}"));
 #endif
   }
+  #endregion
 }
