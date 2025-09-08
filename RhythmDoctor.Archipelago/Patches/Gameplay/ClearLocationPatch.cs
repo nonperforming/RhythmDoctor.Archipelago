@@ -52,8 +52,27 @@ static class ClearLocationPatch
 
     Plugin.Logger.LogDebug("Getting locations to clear");
     Rank rank = scnGame.instance.currentLevel.GetRankFromMistakes();
-    IReadOnlyCollection<long> ids = Bindings.LevelToStage[level].GetLocationsToClear(rank);
-    Plugin.Logger.LogDebug($"Stage to clear: {level} with rank {rank} ({string.Join(", ", ids)})");
+
+    IReadOnlyCollection<long> ids;
+    if (scnGame.instance.currentLevel.dogMode && level == Level.Lesmis)
+    {
+      Plugin.Logger.LogInfo("Detected Rhythm Dogtor");
+      // Playing 3-DOG - Rhythm Dogtor
+      BossStage rhythmDogtor = (Bindings.LevelToStage[level] as BossStage)!;
+
+      List<long> idsToClear = [rhythmDogtor.ExtraLocations["dog_clear"]];
+      if (rank.perfected)
+      {
+        idsToClear.Add(rhythmDogtor.ExtraLocations["dog_perfect"]);
+      }
+
+      ids = idsToClear.AsReadOnly();
+    }
+    else
+    {
+      ids = Bindings.LevelToStage[level].GetLocationsToClear(rank);
+      Plugin.Logger.LogDebug($"Stage to clear: {level} with rank {rank} ({string.Join(", ", ids)})");
+    }
 
     // X-0 - Helping Hands end goal
     if (Plugin.Client.slotData.endGoal == SlotData.EndGoal.HelpingHands && level == Level.HelpingHands && rank.passed)

@@ -39,6 +39,18 @@ static class TrapManagerPatch
   static void ApplyApplicableTrapsPatch(string levelToGo, scnLevelSelect __instance)
   {
     Plugin.Logger.LogInfo("Promoting preview traps to active traps");
+
+    // Rhythm Dogtor and Rhythm Weightlifter dog mode can bypass selection,
+    // so we may need apply preview patches here.
+    if (Plugin.Client.trapManager._previewTraps.Length == 0 && levelToGo is "Lesmis" or "RhythmWeightlifter")
+    {
+      Plugin.Logger.LogInfo("Going to Rhythm Dogtor/Rhythm Weightlifter (dog) - applying preview traps now");
+      // The cheat code for Rhythm Dogtor allows you to end it
+      // hovering over any level, we need to check the levelToGo.
+      Level level = RDUtils.ParseEnum(levelToGo, Level.None);
+      Plugin.Client.trapManager.ApplyApplicableTraps(level);
+    }
+
     Plugin.Client.trapManager.PromotePreviewTrapsToActiveTraps();
 
 #if DEBUG
