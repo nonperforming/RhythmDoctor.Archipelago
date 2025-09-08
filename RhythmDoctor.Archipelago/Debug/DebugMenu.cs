@@ -220,7 +220,7 @@ public class DebugMenu : MonoBehaviour
 
         break;
       case ActivatedGUI.Levels:
-        GUI.Box(new Rect(10, 10, 330, 290), "Rhythm Doctor Archipelago Levels Debug");
+        GUI.Box(new Rect(10, 10, 330, 300), "Rhythm Doctor Archipelago Levels Debug");
 
         if (GUI.Button(new Rect(30, 30, 300, 20), "Lock all"))
         {
@@ -294,6 +294,18 @@ public class DebugMenu : MonoBehaviour
         {
           Notify("Dumping level data - check console");
           LogData.Level(RDLevelData.current);
+        }
+
+        if (GUI.Button(new Rect(30, 270, 300, 20), "Lock selected level"))
+        {
+          if (scnLevelSelect.instance.selectedEntity is not SelectableCharacter selectableCharacter)
+            return;
+
+          Level selectedLevel = selectableCharacter.levels[scnLevelSelect.instance.currentDifficulty];
+          Notify($"Setting rank of {selectedLevel} to NotAvailable");
+          Persistence.SetLevelRank(selectedLevel, Rank.NotAvailable, force: true);
+          Persistence.SetLastPlayedLevel(selectedLevel);
+          scnBase.GoToLevelSelect();
         }
 
         break;

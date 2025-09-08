@@ -120,17 +120,32 @@ static class UnlockItemPatch
   static IEnumerable<CodeInstruction> DoNotUnlockLevelsPatch(IEnumerable<CodeInstruction> instructions)
   {
     CodeMatcher matcher = new(instructions);
+
     int startIndex = matcher.MatchForward(false, new CodeMatch(OpCodes.Ldstr, "1-X")).Advance(2).Pos;
     int endIndex = matcher
-      .MatchForward(
-        false,
-        new CodeMatch(OpCodes.Ldloc_S),
-        new CodeMatch(OpCodes.Ldloc_S),
-        new CodeMatch(OpCodes.Ldstr, "normalEnabled")
-      )
-      .Advance(-2)
+      .MatchForward(false, new CodeMatch(OpCodes.Newobj, AccessTools.Constructor(typeof(List<Level>))))
+      .Advance(-1)
       .Pos;
-    return matcher.RemoveInstructionsInRange(startIndex, endIndex).InstructionEnumeration();
+
+    matcher.RemoveInstructionsInRange(startIndex, endIndex);
+    return matcher.InstructionEnumeration();
+  }
+
+  [HarmonyPatch(nameof(scnLevelSelect.Awake))]
+  [HarmonyTranspiler]
+  static IEnumerable<CodeInstruction> DoNotUnlockArtRoomLevels(IEnumerable<CodeInstruction> instructions)
+  {
+    // csharpier-ignore
+    return new CodeMatcher(instructions)
+      // For Helping Hands
+      .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(RDUtils), nameof(RDUtils.Locked))))
+      .Advance(-1).SetOpcodeAndAdvance(OpCodes.Nop) // otherwise stack will be messed up
+      .SetOpcodeAndAdvance(OpCodes.Ldc_I4_0) // force false
+      // For Art Exercise
+      .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(RDUtils), nameof(RDUtils.Locked))))
+      .Advance(-1).SetOpcodeAndAdvance(OpCodes.Nop) // otherwise stack will be messed up
+      .SetOpcodeAndAdvance(OpCodes.Ldc_I4_0) // force false
+      .InstructionEnumeration();
   }
 
   internal static bool HasUnlockedBossSong(Act act)
