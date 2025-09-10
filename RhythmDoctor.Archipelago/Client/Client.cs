@@ -186,7 +186,7 @@ internal sealed class Client
     }
 
     // ReSharper disable NullableWarningSuppressionIsUsed
-    if (Bindings.StageItemIdToLevel.TryGetValue(item.ItemId, out Level level))
+    if (Bindings.ItemIdToLevel.TryGetValue(item.ItemId, out Level level))
     {
       Plugin.Logger.LogInfo($"Unlocking stage item {item.ItemName} ({item.ItemId}, {level})");
 
@@ -272,10 +272,10 @@ internal sealed class Client
       trapManager.AddTrap(trap);
       return;
     }
-    else if (Bindings.KeyItemIdToWard.ContainsKey(item.ItemId))
+    else if (Bindings.KeyItemIdToWard.ContainsKey(item.ItemId) || Bindings.SLEEVE_PAINT_ITEM_ID == item.ItemId)
     {
       // We do this in UnlockItemPatch
-      Plugin.Logger.LogInfo($"Ignoring key item {item.ItemName} ({item.ItemId})");
+      Plugin.Logger.LogInfo($"Ignoring item {item.ItemName} ({item.ItemId})");
       return;
     }
     // ReSharper restore NullableWarningSuppressionIsUsed

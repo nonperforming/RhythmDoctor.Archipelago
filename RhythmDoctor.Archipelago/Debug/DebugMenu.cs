@@ -122,7 +122,7 @@ public class DebugMenu : MonoBehaviour
         GUI.Box(new Rect(10, 10, 330, 150), "Rhythm Doctor Archipelago Data Debug");
         break;
       case ActivatedGUI.Patches:
-        GUI.Box(new Rect(10, 10, 330, 630), "Rhythm Doctor Archipelago Patches Debug");
+        GUI.Box(new Rect(10, 10, 330, 660), "Rhythm Doctor Archipelago Patches Debug");
         if (GUI.Button(new Rect(30, 30, 300, 20), "Discard active traps"))
         {
           trapManager.ClearActiveTraps(false);
@@ -156,43 +156,48 @@ public class DebugMenu : MonoBehaviour
         if (GUI.Button(new Rect(30, 210, 300, 20), "Add Easy Mode Powerup"))
         {
           Notify("Adding EasyModePowerup patch");
-          trapManager.AddTrap(new EasyModePowerupPatch());
+          trapManager.AddTrap(new EasyDifficultyPowerupPatch());
         }
         if (GUI.Button(new Rect(30, 240, 300, 20), "Add Hard Mode Trap"))
         {
           Plugin.Logger.LogInfo("Adding HardModeTrap patch");
-          trapManager.AddTrap(new HardModeTrapPatch());
+          trapManager.AddTrap(new HardDifficultyTrapPatch());
         }
         if (GUI.Button(new Rect(30, 270, 300, 20), "Add Ghost Tap Trap"))
         {
           Notify("Adding GhostTapTrap patch");
           trapManager.AddTrap(new GhostTapTrapPatch());
         }
-        if (GUI.Button(new Rect(30, 300, 300, 20), "Recreate TrapManager"))
+        if (GUI.Button(new Rect(30, 300, 300, 20), "Add Scramble Characters Trap"))
+        {
+          Notify("Adding ScrambleCharactersTrap patch");
+          trapManager.AddTrap(new ScrambleCharactersTrapPatch());
+        }
+        if (GUI.Button(new Rect(30, 330, 300, 20), "Recreate TrapManager"))
         {
           Notify("Recreating TrapManager");
           trapManager.ClearActiveTraps(false);
           trapManager = new();
         }
 
-        if (GUI.Button(new Rect(30, 360, 300, 20), "Apply post-login patches"))
+        if (GUI.Button(new Rect(30, 390, 300, 20), "Apply post-login patches"))
         {
           Notify("Applying post-login patches");
           Plugin.ApplyGameplayPatches();
         }
-        if (GUI.Button(new Rect(30, 390, 300, 20), "Unapply post-login patches"))
+        if (GUI.Button(new Rect(30, 420, 300, 20), "Unapply post-login patches"))
         {
           Notify("Unapplying post-login patches");
           Plugin.UnapplyGameplayPatches();
         }
 
-        if (GUI.Button(new Rect(30, 420, 300, 20), "Unapply debug patches"))
+        if (GUI.Button(new Rect(30, 450, 300, 20), "Unapply debug patches"))
         {
           Notify("Unapplying debug patches");
           Plugin.UnapplyDebugPatches();
         }
 
-        if (GUI.Button(new Rect(30, 450, 300, 20), "Create Client class"))
+        if (GUI.Button(new Rect(30, 480, 300, 20), "Create Client class"))
         {
           Notify("Creating empty Client");
           Plugin.Client = new();
@@ -216,7 +221,7 @@ public class DebugMenu : MonoBehaviour
           trapsActive += $"{trap.Name} ";
         }
 
-        GUI.Label(new Rect(30, 480, 300, 100), $"Traps: {traps}\nPreview: {trapsPreview}\nActive: {trapsActive}");
+        GUI.Label(new Rect(30, 510, 330, 100), $"Traps: {traps}\nPreview: {trapsPreview}\nActive: {trapsActive}");
 
         break;
       case ActivatedGUI.Levels:

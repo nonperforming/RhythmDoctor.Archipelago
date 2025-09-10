@@ -1,16 +1,17 @@
-namespace RhythmDoctor.Archipelago.Patches.Gameplay.Powerups;
+namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 
-class EasyModePowerupPatch : ITrap
+class HardDifficultyTrapPatch : ITrap
 {
   // ReSharper disable once NullableWarningSuppressionIsUsed
   private Harmony harmony = null!;
 
-  public string Name => "Easy Mode";
-  public IEnumerable<Type> IncompatibleWithTraps => [typeof(EasyModePowerupPatch), typeof(HardModeTrapPatch)];
+  public string Name => "Hard Mode";
+  public IEnumerable<Type> IncompatibleWithTraps =>
+    [typeof(EasyDifficultyPowerupPatch), typeof(HardDifficultyTrapPatch)];
 
   public void InQueue()
   {
-    harmony = new($"{Plugin.PATCH_ID_TRAP}.{nameof(EasyModePowerupPatch)}");
+    harmony = new($"{Plugin.PATCH_ID_TRAP}.{nameof(EasyDifficultyPowerupPatch)}");
   }
 
   public void Active()
@@ -30,13 +31,15 @@ class EasyModePowerupPatch : ITrap
   [HarmonyPatch(typeof(Persistence))]
   private static class ActivePatch
   {
+    // TODO: Lock the difficulty seen in the settings menu
+    //       like how fullscreen and resolution options are locked in window-dance levels
     [HarmonyPatch(nameof(Persistence.GetDefibrillatorP1))]
     [HarmonyPatch(nameof(Persistence.GetDefibrillatorP2))]
     [HarmonyPrefix]
-    static void ForceEasyDifficultyPatch(ref DefibMode __result, ref bool __runOriginal)
+    static void ForceHardDifficultyPatch(ref DefibMode __result, ref bool __runOriginal)
     {
       __runOriginal = false;
-      __result = DefibMode.Easy;
+      __result = DefibMode.Hard;
     }
   }
 }

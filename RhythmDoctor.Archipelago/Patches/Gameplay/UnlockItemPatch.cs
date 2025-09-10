@@ -10,8 +10,10 @@ static class UnlockItemPatch
     // This is a PostLogin patch, session is guaranteed to exist (assuming going through normal flow)
     Plugin.Logger.LogInfo("Checking for extra unlocks");
 
-    // Unlocking regions
+    // Unlocking regions and Sleeve Paint
     Plugin.Logger.LogInfo("Checking for regions to unlock");
+
+    bool sleevePaint = false;
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
     foreach (ItemInfo item in Plugin.Client.session.Items.AllItemsReceived)
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
@@ -21,6 +23,20 @@ static class UnlockItemPatch
         Plugin.Logger.LogInfo($"Unlocking entrance {region}");
         LevelHelper.UnlockEntrance(region);
       }
+
+      if (!sleevePaint && item.ItemId == Bindings.SLEEVE_PAINT_ITEM_ID)
+      {
+        sleevePaint = true;
+      }
+    }
+
+    // Sleeve Paint is unlocked by default.
+    if (!sleevePaint)
+    {
+      Plugin.Logger.LogInfo("Locking Sleeve Paint");
+      SelectableEntity sleevePaintEntity = __instance.FindSelectableEntity("SleevePaintComputer");
+      sleevePaintEntity.normalEnabled = sleevePaintEntity.hardEnabled = false;
+      GameObject.Find("/Scene/Corridor/SleevePaintComputer").gameObject.SetActive(false);
     }
 
     // Moving 1-CNY.

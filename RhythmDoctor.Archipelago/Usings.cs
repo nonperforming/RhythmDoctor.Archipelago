@@ -14,6 +14,8 @@ global using PulseLib;
 global using PulseLib.Extensions;
 // global using PulseLib.Localization;
 
+global using RDLevelEditor;
+
 global using RhythmDoctor.Archipelago;
 global using RhythmDoctor.Archipelago.Client;
 #if DEBUG
@@ -44,3 +46,6 @@ global using System.Threading.Tasks;
 
 global using UnityEngine;
 global using UnityEngine.UI;
+
+
+global using Random = System.Random;

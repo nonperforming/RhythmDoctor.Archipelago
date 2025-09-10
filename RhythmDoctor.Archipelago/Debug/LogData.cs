@@ -4,7 +4,6 @@ using System.Text;
 
 namespace RhythmDoctor.Archipelago.Debug;
 
-[HarmonyPatch(typeof(RDLevelData))]
 internal static class LogData
 {
   internal static void Level(RDLevelData data)
