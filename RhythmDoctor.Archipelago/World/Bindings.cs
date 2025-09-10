@@ -135,7 +135,7 @@ internal static class Bindings
       { 60, typeof(FragileHeartTrapPatch) },
       { 61, typeof(HardDifficultyTrapPatch) },
       { 62, typeof(ScrambleCharactersTrapPatch) },
-      //{ 63, typeof(Scramble Beatsound Trap) },
+      { 63, typeof(ScrambleBeatsoundsTrapPatch) },
       //{ 64, typeof(Scramble Hitsound Trap) },
       { 65, typeof(ChilliSpeedTrapPatch) },
       { 66, typeof(GhostTapTrapPatch) },

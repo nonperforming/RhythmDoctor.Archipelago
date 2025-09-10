@@ -173,34 +173,46 @@ public class DebugMenu : MonoBehaviour
           Notify("Adding ScrambleCharactersTrap patch");
           trapManager.AddTrap(new ScrambleCharactersTrapPatch());
         }
-        if (GUI.Button(new Rect(30, 330, 300, 20), "Recreate TrapManager"))
+        if (GUI.Button(new Rect(30, 330, 300, 20), "Add Scramble Beatsounds Trap"))
+        {
+          Notify("Adding ScrambleBeatsoundsTrap patch");
+          trapManager.AddTrap(new ScrambleBeatsoundsTrapPatch());
+        }
+        if (GUI.Button(new Rect(30, 360, 300, 20), "Recreate TrapManager"))
         {
           Notify("Recreating TrapManager");
           trapManager.ClearActiveTraps(false);
           trapManager = new();
         }
 
-        if (GUI.Button(new Rect(30, 390, 300, 20), "Apply post-login patches"))
+        if (GUI.Button(new Rect(30, 420, 300, 20), "Apply post-login patches"))
         {
           Notify("Applying post-login patches");
           Plugin.ApplyGameplayPatches();
         }
-        if (GUI.Button(new Rect(30, 420, 300, 20), "Unapply post-login patches"))
+        if (GUI.Button(new Rect(30, 450, 300, 20), "Unapply post-login patches"))
         {
           Notify("Unapplying post-login patches");
           Plugin.UnapplyGameplayPatches();
         }
 
-        if (GUI.Button(new Rect(30, 450, 300, 20), "Unapply debug patches"))
+        if (GUI.Button(new Rect(30, 480, 300, 20), "Unapply debug patches"))
         {
           Notify("Unapplying debug patches");
           Plugin.UnapplyDebugPatches();
         }
 
-        if (GUI.Button(new Rect(30, 480, 300, 20), "Create Client class"))
+        if (GUI.Button(new Rect(30, 510, 300, 20), "Create Client class"))
         {
           Notify("Creating empty Client");
           Plugin.Client = new();
+        }
+
+        if (GUI.Button(new Rect(30, 540, 300, 20), "Push all traps to Active"))
+        {
+          Notify("Pushing all traps to Active");
+          trapManager.ApplyApplicableTraps(Level.None);
+          trapManager.PromotePreviewTrapsToActiveTraps();
         }
 
         string traps = "";
@@ -221,7 +233,7 @@ public class DebugMenu : MonoBehaviour
           trapsActive += $"{trap.Name} ";
         }
 
-        GUI.Label(new Rect(30, 510, 330, 100), $"Traps: {traps}\nPreview: {trapsPreview}\nActive: {trapsActive}");
+        GUI.Label(new Rect(30, 600, 300, 100), $"Traps: {traps}\nPreview: {trapsPreview}\nActive: {trapsActive}");
 
         break;
       case ActivatedGUI.Levels:

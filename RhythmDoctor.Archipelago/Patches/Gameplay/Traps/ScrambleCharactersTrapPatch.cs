@@ -78,7 +78,7 @@ internal class ScrambleCharactersTrapPatch : ITrap
     [HarmonyPostfix]
     static void ModifyCharacterDataPatch(RDLevelData __result)
     {
-      Plugin.Logger.LogDebug("Modifying MakeRow and ChangeCharacter level events");
+      Plugin.Logger.LogDebug("Scramble Characters: Modifying MakeRow and ChangeCharacter level events");
 
       foreach (LevelEvent_MakeRow row in __result.rows)
       {
