@@ -13,7 +13,7 @@ internal class ScrambleBeatsoundsTrapPatch : ITrap
 
   public void InQueue()
   {
-    harmony = new($"{Plugin.PATCH_ID_TRAP}.{nameof(ScrambleCharactersTrapPatch)}");
+    harmony = new($"{Plugin.PATCH_ID_TRAP}.{nameof(ScrambleBeatsoundsTrapPatch)}");
   }
 
   public void Active()
