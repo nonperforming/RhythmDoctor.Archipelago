@@ -1,12 +1,14 @@
 namespace RhythmDoctor.Archipelago.Helpers;
 
-internal static class LevelHelper
+// ReSharper disable once InconsistentNaming
+internal static class scnLevelSelectExtensions
 {
   /// <summary>
   /// Unlock a ward's entrance.
   /// </summary>
+  /// <param name="this">scnLevelSelect instance</param>
   /// <param name="regionToUnlock">The ward to unlock</param>
-  internal static void UnlockEntrance(Region regionToUnlock)
+  internal static void UnlockEntrance(this scnLevelSelect @this, Region regionToUnlock)
   {
     string name;
     switch (regionToUnlock)
@@ -37,15 +39,15 @@ internal static class LevelHelper
     }
 
     Plugin.Logger.LogDebug($"Unlocking {name} entrance");
-    scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity(name));
+    @this.UnlockEntrance(@this.FindSelectableEntity(name));
 
     if (regionToUnlock == Region.Basement)
     {
       // Unlock Muse Dash levels.
       // Rin will normally not be visible until we complete One Shift More and complete the post-Act 3 cutscene.
       Plugin.Logger.LogDebug("Unlocking Muse Dash levels");
-      scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToMuseDashRoom"));
-      scnLevelSelect.instance.ActivateEntranceRin();
+      @this.UnlockEntrance(@this.FindSelectableEntity("GoToMuseDashRoom"));
+      @this.ActivateEntranceRin();
     }
   }
 }

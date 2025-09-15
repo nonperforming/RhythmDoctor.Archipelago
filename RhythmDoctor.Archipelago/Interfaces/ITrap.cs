@@ -80,7 +80,6 @@ internal interface ITrap
   internal void ActiveEnd();
 }
 
-// ReSharper disable once InconsistentNaming
 /// <summary>
 /// Extension methods for <see cref="ITrap"/> to simplify compatibility checks.
 /// </summary>

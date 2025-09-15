@@ -38,7 +38,7 @@ public class Plugin : BaseUnityPlugin
     typeof(CreateDebugMenuPatch),
     typeof(LogClearLevelPatch),
     typeof(LogEntityInteractionsPatch),
-    //typeof(LogLoadLevelAssetPatch),
+    // typeof(LogLoadLevelAssetPatch),
 #endif
   ];
 
@@ -80,9 +80,9 @@ public class Plugin : BaseUnityPlugin
 
   private static void ApplyPatches(Type[] patches, string id)
   {
+    Logger.LogInfo($"Applying patches as {id}");
     Harmony harmony = new(id);
 
-    Logger.LogInfo($"Applying {id} patches");
     foreach (Type patch in patches)
     {
       Logger.LogDebug($"Applying {patch.Name}");
@@ -113,8 +113,7 @@ public class Plugin : BaseUnityPlugin
   internal static void ApplyArchipelagoMenuPatch()
   {
     Logger.LogInfo("Applying Archipelago menu patch");
-    Harmony harmony = new(PATCH_ID_ARCHIPELAGO_MENU);
-    harmony.PatchAll(CustomLoginScreenPatch);
+    Harmony.CreateAndPatchAll(CustomLoginScreenPatch, PATCH_ID_ARCHIPELAGO_MENU);
   }
 
   internal static void UnapplyArchipelagoMenuPatch()
@@ -124,17 +123,17 @@ public class Plugin : BaseUnityPlugin
   }
 
   #region Cleaning up
-  private bool quitting = false;
+  private bool _quitting = false;
 
   private void OnApplicationQuit()
   {
     Logger.LogDebug("Quitting...");
-    quitting = true;
+    _quitting = true;
   }
 
   private void OnDestroy()
   {
-    if (quitting)
+    if (_quitting)
       return;
 
     Logger.LogWarning("Tearing down plugin. This is unsupported!");

@@ -1,26 +1,26 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 
-class IceSpeedTrapPatch : ITrap
+internal class IceSpeedTrapPatch : ITrap
 {
   // ReSharper disable once NullableWarningSuppressionIsUsed
-  private Harmony harmony = null!;
+  private Harmony _harmony = null!;
 
   public string Name => "Ice Speed";
   public IEnumerable<Type> IncompatibleWithTraps => [typeof(ChilliSpeedTrapPatch), typeof(IceSpeedTrapPatch)];
 
   public void InQueue()
   {
-    harmony = new($"{Plugin.PATCH_ID_TRAP}.{nameof(IceSpeedTrapPatch)}");
+    _harmony = new Harmony($"{Plugin.PATCH_ID_TRAP}.{nameof(IceSpeedTrapPatch)}");
   }
 
   public void PreviewLevel()
   {
-    harmony.PatchAll(typeof(Patch));
+    _harmony.PatchAll(typeof(Patch));
   }
 
   public void PreviewLevelEnd()
   {
-    harmony.UnpatchSelf();
+    _harmony.UnpatchSelf();
   }
 
   // Intentionally left blank
@@ -28,7 +28,7 @@ class IceSpeedTrapPatch : ITrap
 
   public void ActiveEnd()
   {
-    harmony.UnpatchSelf();
+    _harmony.UnpatchSelf();
   }
 
   [HarmonyPatch(typeof(HeartMonitor))]
@@ -36,7 +36,7 @@ class IceSpeedTrapPatch : ITrap
   {
     [HarmonyPatch(nameof(HeartMonitor.Update))]
     [HarmonyPrefix]
-    static void ForceLevelSpeed(HeartMonitor __instance)
+    private static void ForceLevelSpeed(HeartMonitor __instance)
     {
       __instance.isSpeedOptionShown = false;
       __instance.currentLevelSpeedIndex = 0;
@@ -48,7 +48,7 @@ class IceSpeedTrapPatch : ITrap
 
     [HarmonyPatch(nameof(HeartMonitor.ChangeLevelSpeed))]
     [HarmonyPrefix]
-    static void DisableChangingLevelSpeedPatch(ref bool __runOriginal)
+    private static void DisableChangingLevelSpeedPatch(ref bool __runOriginal)
     {
       Plugin.Logger.LogWarning("Level speed attempted to be changed, ignoring");
       __runOriginal = false;

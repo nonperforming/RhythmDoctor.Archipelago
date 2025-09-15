@@ -3,7 +3,7 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 internal class ScrambleCharactersTrapPatch : ITrap
 {
   // ReSharper disable once NullableWarningSuppressionIsUsed
-  private Harmony harmony = null!;
+  private Harmony _harmony = null!;
 
   private static Dictionary<Character, Character> scrambled = new();
 
@@ -14,7 +14,7 @@ internal class ScrambleCharactersTrapPatch : ITrap
 
   public void InQueue()
   {
-    harmony = new($"{Plugin.PATCH_ID_TRAP}.{nameof(ScrambleCharactersTrapPatch)}");
+    _harmony = new Harmony($"{Plugin.PATCH_ID_TRAP}.{nameof(ScrambleCharactersTrapPatch)}");
   }
 
   public void Active()
@@ -39,7 +39,7 @@ internal class ScrambleCharactersTrapPatch : ITrap
     IReadOnlyList<Character> allowedCharacters = characters
       .Where(character => !disallowedCharacters.Contains(character))
       .ToList();
-    IList<Character> pool = ((Character[])(allowedCharacters.ToArray().Clone())).ToList();
+    IList<Character> pool = ((Character[])allowedCharacters.ToArray().Clone()).ToList();
     Random random = new();
     random.Shuffle(randomizedOrder);
 
@@ -63,12 +63,12 @@ internal class ScrambleCharactersTrapPatch : ITrap
     {
       Plugin.Logger.LogDebug($"  {originalCharacter} -> {randomizedCharacter}");
     }
-    harmony.PatchAll(typeof(Patch));
+    _harmony.PatchAll(typeof(Patch));
   }
 
   public void ActiveEnd()
   {
-    harmony.UnpatchSelf();
+    _harmony.UnpatchSelf();
   }
 
   [HarmonyPatch(typeof(RDLevelData))]
@@ -76,7 +76,7 @@ internal class ScrambleCharactersTrapPatch : ITrap
   {
     [HarmonyPatch(nameof(RDLevelData.Decode))]
     [HarmonyPostfix]
-    static void ModifyCharacterDataPatch(RDLevelData __result)
+    private static void ModifyCharacterDataPatch(RDLevelData __result)
     {
       Plugin.Logger.LogDebug("Scramble Characters: Modifying MakeRow and ChangeCharacter level events");
 
@@ -91,7 +91,9 @@ internal class ScrambleCharactersTrapPatch : ITrap
         if (levelEvent is LevelEvent_CallCustomMethod callCustomMethod)
         {
           if (!callCustomMethod.methodName.StartsWith("ChangeCharacter"))
+          {
             continue;
+          }
 
           Plugin.Logger.LogDebug($"ChangeCharacter custom method: {callCustomMethod.methodName}");
 

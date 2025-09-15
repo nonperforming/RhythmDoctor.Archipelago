@@ -3,7 +3,7 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 // This patch should only be applied after the Client is created.
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 
-static class ClearLocationPatch
+internal static class ClearLocationPatch
 {
   /// <summary>
   /// Loading a level.
@@ -16,10 +16,9 @@ static class ClearLocationPatch
   //   // TODO: implement
   //   //long[] ids = Plugin.Client.locations.GetIDsForStage(stage, Rank.Splus);
   // }
-
   [HarmonyPatch(typeof(HUD), nameof(HUD.ShowAndSaveRank))]
   [HarmonyPrefix]
-  static void CustomClearLocationPatch(bool bossLevelFailed, bool onlySavePersistence)
+  private static void CustomClearLocationPatch(bool bossLevelFailed, bool onlySavePersistence)
   {
     // Is onlySavePersistence is currently only used in custom levels?
     // "there's a function for custom levels to skip the rank text [rank screen] at the end"
@@ -34,19 +33,19 @@ static class ClearLocationPatch
 
 #if DEBUG
     // Discard Debug Menu traps regardless of result.
-    Plugin.DebugMenu.trapManager.ClearActiveTraps(false);
+    Plugin.DebugMenu.TrapManager.ClearActiveTraps(false);
 #endif
 
     if (bossLevelFailed)
     {
-      Plugin.Client.trapManager.ClearActiveTraps(false);
+      Plugin.Client.TrapManager.ClearActiveTraps(false);
       return;
     }
 
     if (!Enum.TryParse(scnGame.instance.levelIdentifier, out Level level))
     {
       Plugin.Logger.LogError($"Couldn't find Level. Level identifier: {scnGame.instance.levelIdentifier}");
-      Plugin.Client.trapManager.ClearActiveTraps(false);
+      Plugin.Client.TrapManager.ClearActiveTraps(false);
       return;
     }
 
@@ -58,6 +57,7 @@ static class ClearLocationPatch
     {
       Plugin.Logger.LogInfo("Detected Rhythm Dogtor");
       // Playing 3-DOG - Rhythm Dogtor
+      // ReSharper disable once NullableWarningSuppressionIsUsed
       BossStage rhythmDogtor = (Bindings.LevelToStage[level] as BossStage)!;
 
       List<long> idsToClear = [rhythmDogtor.ExtraLocations["dog_clear"]];
@@ -75,16 +75,16 @@ static class ClearLocationPatch
     }
 
     // X-0 - Helping Hands end goal
-    if (Plugin.Client.slotData.endGoal == SlotData.EndGoal.HelpingHands && level == Level.HelpingHands && rank.passed)
+    if (Plugin.Client.Slot.endGoal == SlotData.EndGoal.HelpingHands && level == Level.HelpingHands && rank.passed)
     {
       Plugin.Logger.LogInfo("Setting goal achieved");
-      Plugin.Client.session.SetGoalAchieved();
+      Plugin.Client.Session.SetGoalAchieved();
     }
 
     bool clearedNewLocation = false;
     foreach (long id in ids)
     {
-      if (Plugin.Client.session.Locations.AllLocationsChecked.Contains(id))
+      if (Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id))
       {
         continue;
       }
@@ -96,12 +96,12 @@ static class ClearLocationPatch
     {
       // FIXME: This blocks until completion - should be async!
       long[] locationsToClear = ids.ToArray();
-      Plugin.Client.session.Locations.CompleteLocationChecks(locationsToClear);
-      Plugin.Client.trapManager.ClearActiveTraps(false);
+      Plugin.Client.Session.Locations.CompleteLocationChecks(locationsToClear);
+      Plugin.Client.TrapManager.ClearActiveTraps(false);
     }
     else
     {
-      Plugin.Client.trapManager.ClearActiveTraps(true);
+      Plugin.Client.TrapManager.ClearActiveTraps(true);
     }
   }
 }

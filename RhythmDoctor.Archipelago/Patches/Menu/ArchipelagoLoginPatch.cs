@@ -1,11 +1,11 @@
 namespace RhythmDoctor.Archipelago.Patches.Menu;
 
 [HarmonyPatch(typeof(scnCLS))]
-static class ArchipelagoLoginPatch
+internal static class ArchipelagoLoginPatch
 {
   [HarmonyPatch(nameof(scnCLS.Start))]
   [HarmonyPostfix]
-  static void ConstructArchipelagoMenu(scnCLS __instance)
+  private static void ConstructArchipelagoMenu(scnCLS __instance)
   {
     // TODO: Need to change applicable text on LevelDetail
 
@@ -65,13 +65,14 @@ static class ArchipelagoLoginPatch
 
   [HarmonyPatch(typeof(LevelImporter), nameof(LevelImporter.Install))]
   [HarmonyPostfix]
-  static IEnumerator OverrideInstallButton(IEnumerator result, LevelImporter __instance)
+  private static IEnumerator OverrideInstallButton(IEnumerator result, LevelImporter __instance)
   {
     // TODO: Show appropriate errors rather than silently failing
+
     #region Lock input
     Plugin.Logger.LogInfo("Locking input");
     __instance.cls.CLSPlaySound("sndImportInstallButtonClick");
-    __instance.ToggleInsertUrlContainer(show: false);
+    __instance.ToggleInsertUrlContainer(false);
     __instance.CurrentContentName = LevelImporter.ContentName.Installing;
     __instance.stoppedInstallCoroutine = false;
     __instance.CanToggleClearButton = false;
@@ -153,7 +154,7 @@ static class ArchipelagoLoginPatch
     // Lock all levels to force the user to unlock them with an item.
     foreach (Level level in Enum.GetValues(typeof(Level)))
     {
-      Persistence.SetLevelRank(level, Rank.NotAvailable, force: true);
+      Persistence.SetLevelRank(level, Rank.NotAvailable, true);
     }
     Plugin.Client.ReadyForItems = true;
     UnpatchMenu();
@@ -164,14 +165,14 @@ static class ArchipelagoLoginPatch
 
   [HarmonyPatch(nameof(scnCLS.Exit))]
   [HarmonyPostfix]
-  static void UnpatchMenu()
+  private static void UnpatchMenu()
   {
     Plugin.UnapplyArchipelagoMenuPatch();
   }
 
   [HarmonyPatch(nameof(scnCLS.SelectWardOption))]
   [HarmonyPostfix]
-  static void CustomSelectOption(ref bool __runOriginal, scnCLS __instance)
+  private static void CustomSelectOption(ref bool __runOriginal, scnCLS __instance)
   {
     __runOriginal = false;
     switch (__instance.CurrentWardOption.name)
@@ -190,7 +191,7 @@ static class ArchipelagoLoginPatch
 
   [HarmonyPatch(typeof(LevelImporter), nameof(LevelImporter.Showing), MethodType.Setter)]
   [HarmonyPostfix]
-  static void ArchipelagoImportScreen()
+  private static void ArchipelagoImportScreen()
   {
     GameObject levelImporterObject = scnCLS.instance.levelImporter.gameObject;
     GameObject screenObject = levelImporterObject.transform.Find("screen").gameObject;
@@ -220,7 +221,7 @@ static class ArchipelagoLoginPatch
 
   [HarmonyPatch(typeof(LevelImporter), nameof(LevelImporter.ValidateUrl))]
   [HarmonyPrefix]
-  static void StubValidateUrl(ref bool __runOriginal, LevelImporter __instance)
+  private static void StubValidateUrl(ref bool __runOriginal, LevelImporter __instance)
   {
     // Seems to be called on the "install" button being clicked.
     // Redirect it to our login patch.

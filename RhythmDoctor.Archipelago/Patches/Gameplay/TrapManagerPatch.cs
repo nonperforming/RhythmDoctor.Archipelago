@@ -14,21 +14,21 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 /// <seealso cref="ITrap"/>
 /// <seealso cref="TrapManager"/>
 [HarmonyPatch]
-static class TrapManagerPatch
+internal static class TrapManagerPatch
 {
   [HarmonyPatch(typeof(scnLevelSelect), nameof(scnLevelSelect.SelectCharacter))]
   [HarmonyPrefix]
-  static void ApplyApplicableTrapPreviewPatch(scnLevelSelect __instance)
+  private static void ApplyApplicableTrapPreviewPatch(scnLevelSelect __instance)
   {
     if (__instance.selectedEntity is not SelectableCharacter selectableCharacter)
       return;
 
     Level level = selectableCharacter.levels[__instance.currentDifficulty];
-    Plugin.Client.trapManager.ApplyApplicableTraps(level);
+    Plugin.Client.TrapManager.ApplyApplicableTraps(level);
 
 #if DEBUG
     Plugin.Logger.LogInfo($"DEBUG TRAPS: Applying applicable trap previews for level {level}");
-    Plugin.DebugMenu.trapManager.ApplyApplicableTraps(level);
+    Plugin.DebugMenu.TrapManager.ApplyApplicableTraps(level);
 #endif
   }
 
@@ -36,26 +36,26 @@ static class TrapManagerPatch
 
   [HarmonyPatch(typeof(scnLevelSelect), nameof(scnLevelSelect.GoToLevelSequence))]
   [HarmonyPostfix]
-  static void ApplyApplicableTrapsPatch(string levelToGo, scnLevelSelect __instance)
+  private static void ApplyApplicableTrapsPatch(string levelToGo, scnLevelSelect __instance)
   {
     Plugin.Logger.LogInfo("Promoting preview traps to active traps");
 
     // Rhythm Dogtor and Rhythm Weightlifter dog mode can bypass selection,
     // so we may need apply preview patches here.
-    if (Plugin.Client.trapManager._previewTraps.Length == 0 && levelToGo is "Lesmis" or "RhythmWeightlifter")
+    if (Plugin.Client.TrapManager._previewTraps.Length == 0 && levelToGo is "Lesmis" or "RhythmWeightlifter")
     {
       Plugin.Logger.LogInfo("Going to Rhythm Dogtor/Rhythm Weightlifter (dog) - applying preview traps now");
       // The cheat code for Rhythm Dogtor allows you to end it
       // hovering over any level, we need to check the levelToGo.
       Level level = RDUtils.ParseEnum(levelToGo, Level.None);
-      Plugin.Client.trapManager.ApplyApplicableTraps(level);
+      Plugin.Client.TrapManager.ApplyApplicableTraps(level);
     }
 
-    Plugin.Client.trapManager.PromotePreviewTrapsToActiveTraps();
+    Plugin.Client.TrapManager.PromotePreviewTrapsToActiveTraps();
 
 #if DEBUG
     Plugin.Logger.LogInfo("DEBUG: Promoting preview traps to active traps");
-    Plugin.DebugMenu.trapManager.PromotePreviewTrapsToActiveTraps();
+    Plugin.DebugMenu.TrapManager.PromotePreviewTrapsToActiveTraps();
 #endif
   }
 
@@ -63,13 +63,13 @@ static class TrapManagerPatch
 
   [HarmonyPatch(typeof(scnGame), nameof(scnGame.Quit))]
   [HarmonyPostfix]
-  static void RestoreActiveTrapsOnAbandonPatch()
+  private static void RestoreActiveTrapsOnAbandonPatch()
   {
     Plugin.Logger.LogInfo("Clearing active traps (returning to queue)");
-    Plugin.Client.trapManager.ClearActiveTraps(true);
+    Plugin.Client.TrapManager.ClearActiveTraps(true);
 #if DEBUG
     Plugin.Logger.LogInfo("DEBUG: Clearing active traps (do not return to queue)");
-    Plugin.DebugMenu.trapManager.ClearActiveTraps(false);
+    Plugin.DebugMenu.TrapManager.ClearActiveTraps(false);
 #endif
   }
 }

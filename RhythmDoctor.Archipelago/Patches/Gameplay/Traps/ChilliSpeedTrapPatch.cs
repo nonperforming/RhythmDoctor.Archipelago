@@ -1,26 +1,26 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 
-class ChilliSpeedTrapPatch : ITrap
+internal class ChilliSpeedTrapPatch : ITrap
 {
   // ReSharper disable once NullableWarningSuppressionIsUsed
-  private Harmony harmony = null!;
+  private Harmony _harmony = null!;
 
   public string Name => "Chilli Speed";
   public IEnumerable<Type> IncompatibleWithTraps => [typeof(ChilliSpeedTrapPatch), typeof(IceSpeedTrapPatch)];
 
   public void InQueue()
   {
-    harmony = new($"{Plugin.PATCH_ID_TRAP}.{nameof(ChilliSpeedTrapPatch)}");
+    _harmony = new Harmony($"{Plugin.PATCH_ID_TRAP}.{nameof(ChilliSpeedTrapPatch)}");
   }
 
   public void PreviewLevel()
   {
-    harmony.PatchAll(typeof(Patch));
+    _harmony.PatchAll(typeof(Patch));
   }
 
   public void PreviewLevelEnd()
   {
-    harmony.UnpatchSelf();
+    _harmony.UnpatchSelf();
   }
 
   // Intentionally left blank
@@ -28,7 +28,7 @@ class ChilliSpeedTrapPatch : ITrap
 
   public void ActiveEnd()
   {
-    harmony.UnpatchSelf();
+    _harmony.UnpatchSelf();
   }
 
   [HarmonyPatch(typeof(HeartMonitor))]

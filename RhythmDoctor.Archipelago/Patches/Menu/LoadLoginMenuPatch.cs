@@ -1,13 +1,13 @@
 namespace RhythmDoctor.Archipelago.Patches.Menu;
 
 [HarmonyPatch(typeof(scnMenu))]
-static class ArchipelagoMenuOptionPatch
+internal static class ArchipelagoMenuOptionPatch
 {
   private const string ARCHIPELAGO_OBJECT_NAME = "archipelago";
 
   [HarmonyPatch(nameof(scnMenu.Awake))]
   [HarmonyPrefix]
-  static void RenameMusicOption(scnMenu __instance)
+  private static void RenameMusicOption(scnMenu __instance)
   {
     GameObject labelObject = __instance.transform.Find("mainMenu/options/optionsContainer/music").gameObject;
     // We need to set the object name to something other than 'music'
@@ -17,7 +17,7 @@ static class ArchipelagoMenuOptionPatch
 
   [HarmonyPatch(nameof(scnMenu.SelectOption))]
   [HarmonyPrefix]
-  static void HandleArchipelagoOptionSelected(ref bool __runOriginal, scnMenu __instance)
+  private static void HandleArchipelagoOptionSelected(ref bool __runOriginal, scnMenu __instance)
   {
     bool archipelagoOptionSelected =
       __instance.optionsText[__instance.currentOption].gameObject.name == ARCHIPELAGO_OBJECT_NAME;
@@ -33,7 +33,7 @@ static class ArchipelagoMenuOptionPatch
 
   [HarmonyPatch(nameof(scnMenu.Localize))]
   [HarmonyPostfix]
-  static void HandleArchipelagoOptionLocalize(scnMenu __instance)
+  private static void HandleArchipelagoOptionLocalize(scnMenu __instance)
   {
     // TODO: Optimally this would be handled by Pulse localization but that hasn't actually been implemented yet so...
     __instance

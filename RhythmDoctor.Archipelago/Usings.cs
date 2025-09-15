@@ -1,3 +1,4 @@
+
 global using Archipelago.MultiClient.Net;
 global using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 global using Archipelago.MultiClient.Net.Enums;
@@ -7,15 +8,13 @@ global using Archipelago.MultiClient.Net.Models;
 
 global using BepInEx;
 global using BepInEx.Logging;
-
 global using HarmonyLib;
 
 global using PulseLib;
 global using PulseLib.Extensions;
-// global using PulseLib.Localization;
+global using PulseLib.Localization;
 
 global using RDLevelEditor;
-
 global using RhythmDoctor.Archipelago;
 global using RhythmDoctor.Archipelago.Client;
 #if DEBUG
@@ -31,8 +30,6 @@ global using RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 global using RhythmDoctor.Archipelago.Patches.Menu;
 global using RhythmDoctor.Archipelago.World;
 global using RhythmDoctor.Archipelago.World.Data;
-
-//global using SA.GoogleDoc;
 
 global using System;
 global using System.Collections;

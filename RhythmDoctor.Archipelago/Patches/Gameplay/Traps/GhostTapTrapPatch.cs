@@ -1,27 +1,27 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 
 // Adapted from https://github.com/Mysthaps/MyseIfRDPatches/blob/master/GhostTapMiss.cs
-class GhostTapTrapPatch : ITrap
+internal class GhostTapTrapPatch : ITrap
 {
   // ReSharper disable once NullableWarningSuppressionIsUsed
-  private Harmony harmony = null!;
+  private Harmony _harmony = null!;
 
   public string Name => "Ghost Tap";
   public IEnumerable<Type> IncompatibleWithTraps => [typeof(GhostTapTrapPatch)];
 
   public void InQueue()
   {
-    harmony = new($"{Plugin.PATCH_ID_TRAP}.{nameof(GhostTapTrapPatch)}");
+    _harmony = new Harmony($"{Plugin.PATCH_ID_TRAP}.{nameof(GhostTapTrapPatch)}");
   }
 
   public void Active()
   {
-    harmony.PatchAll(typeof(ActivePatch));
+    _harmony.PatchAll(typeof(ActivePatch));
   }
 
   public void ActiveEnd()
   {
-    harmony.UnpatchSelf();
+    _harmony.UnpatchSelf();
   }
 
   private static class ActivePatch
@@ -31,10 +31,12 @@ class GhostTapTrapPatch : ITrap
 
     [HarmonyPatch(typeof(scnGame), nameof(scnGame.UpdateGameplayInput))]
     [HarmonyPostfix]
-    static void DamageGhostInputPatch(RDPlayer player, bool keyPressed, scnGame __instance)
+    private static void DamageGhostInputPatch(RDPlayer player, bool keyPressed, scnGame __instance)
     {
       if (_endLevel)
+      {
         return;
+      }
 
       if (
         !keyPressed
@@ -48,7 +50,7 @@ class GhostTapTrapPatch : ITrap
 
       scrConductor.PlayFeedback(
         GameSoundType.BigMistake,
-        group: RDUtils.GetMixerGroup((player == RDPlayer.P1 ? "PlayerOneMistakes" : "PlayerTwoMistakes"))
+        group: RDUtils.GetMixerGroup(player == RDPlayer.P1 ? "PlayerOneMistakes" : "PlayerTwoMistakes")
       );
       __instance.game.OnMistakeOrHeal(0f, 1f, null, false, player);
       RDBase.Vfx.FlashBorderFeedback(false);
@@ -56,7 +58,7 @@ class GhostTapTrapPatch : ITrap
 
     [HarmonyPatch(typeof(HUD), nameof(HUD.AdvanceGameover))]
     [HarmonyPostfix]
-    static void DoNotDamageOnExitPatch()
+    private static void DoNotDamageOnExitPatch()
     {
       _endLevel = true;
     }

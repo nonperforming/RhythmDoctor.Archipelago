@@ -1,11 +1,11 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 
 [HarmonyPatch(typeof(scnLevelSelect))]
-static class UnlockItemPatch
+internal static class UnlockItemPatch
 {
   [HarmonyPatch(nameof(scnLevelSelect.LoadLevelData))]
   [HarmonyPostfix]
-  static void UnlockEntitiesWithItemsPatch(scnLevelSelect __instance)
+  private static void UnlockEntitiesWithItemsPatch(scnLevelSelect __instance)
   {
     // This is a PostLogin patch, session is guaranteed to exist (assuming going through normal flow)
     Plugin.Logger.LogInfo("Checking for extra unlocks");
@@ -15,13 +15,13 @@ static class UnlockItemPatch
 
     bool sleevePaint = false;
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-    foreach (ItemInfo item in Plugin.Client.session.Items.AllItemsReceived)
+    foreach (ItemInfo item in Plugin.Client.Session.Items.AllItemsReceived)
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
     {
       if (Bindings.KeyItemIdToWard.TryGetValue(item.ItemId, out Region region))
       {
         Plugin.Logger.LogInfo($"Unlocking entrance {region}");
-        LevelHelper.UnlockEntrance(region);
+        scnLevelSelect.instance.UnlockEntrance(region);
       }
 
       if (!sleevePaint && item.ItemId == Bindings.SLEEVE_PAINT_ITEM_ID)
@@ -44,7 +44,7 @@ static class UnlockItemPatch
     Plugin.Logger.LogInfo("Moving 1-CNY");
     __instance.FindSelectableEntity("1-CNY").gamePosition.x = -564;
 
-    if (Plugin.Client.slotData.endGoal == SlotData.EndGoal.HelpingHands)
+    if (Plugin.Client.Slot.endGoal == SlotData.EndGoal.HelpingHands)
     {
       // Moving X-1 - Art Exercise to the basement if end goal is X-0 - Helping Hands
       Plugin.Logger.LogInfo("Moving X-1 to the basement");
@@ -117,51 +117,6 @@ static class UnlockItemPatch
         Persistence.SetLevelRank(Bindings.ActBoss[act], Rank.NotFinished, false, false);
       }
     }
-  }
-
-  [HarmonyPatch(nameof(scnLevelSelect.UnlockNightShiftLevel))]
-  [HarmonyPrefix]
-  static void DoNotUnlockNightShiftLevelPatch(ref bool __runOriginal)
-  {
-    __runOriginal = false;
-  }
-
-  /// <summary>
-  /// Do not unlock levels while loading level data (i.e. collabs).
-  /// </summary>
-  /// <param name="instructions">Original method IL instructions</param>
-  /// <returns>Modified IL instructions</returns>
-  [HarmonyPatch(nameof(scnLevelSelect.LoadLevelData))]
-  [HarmonyTranspiler]
-  static IEnumerable<CodeInstruction> DoNotUnlockLevelsPatch(IEnumerable<CodeInstruction> instructions)
-  {
-    CodeMatcher matcher = new(instructions);
-
-    int startIndex = matcher.MatchForward(false, new CodeMatch(OpCodes.Ldstr, "1-X")).Advance(2).Pos;
-    int endIndex = matcher
-      .MatchForward(false, new CodeMatch(OpCodes.Newobj, AccessTools.Constructor(typeof(List<Level>))))
-      .Advance(-1)
-      .Pos;
-
-    matcher.RemoveInstructionsInRange(startIndex, endIndex);
-    return matcher.InstructionEnumeration();
-  }
-
-  [HarmonyPatch(nameof(scnLevelSelect.Awake))]
-  [HarmonyTranspiler]
-  static IEnumerable<CodeInstruction> DoNotUnlockArtRoomLevels(IEnumerable<CodeInstruction> instructions)
-  {
-    // csharpier-ignore
-    return new CodeMatcher(instructions)
-      // For Helping Hands
-      .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(RDUtils), nameof(RDUtils.Locked))))
-      .Advance(-1).SetOpcodeAndAdvance(OpCodes.Nop) // otherwise stack will be messed up
-      .SetOpcodeAndAdvance(OpCodes.Ldc_I4_0) // force false
-      // For Art Exercise
-      .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(RDUtils), nameof(RDUtils.Locked))))
-      .Advance(-1).SetOpcodeAndAdvance(OpCodes.Nop) // otherwise stack will be messed up
-      .SetOpcodeAndAdvance(OpCodes.Ldc_I4_0) // force false
-      .InstructionEnumeration();
   }
 
   internal static bool HasUnlockedBossSong(Act act)

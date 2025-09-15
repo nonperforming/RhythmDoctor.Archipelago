@@ -1,7 +1,7 @@
 namespace RhythmDoctor.Archipelago.Helpers;
 
 // Fisher-Yates shuffle from https://stackoverflow.com/a/110570
-static class RandomExtensions
+internal static class RandomExtensions
 {
   public static void Shuffle<T>(this Random rng, T[] array)
   {

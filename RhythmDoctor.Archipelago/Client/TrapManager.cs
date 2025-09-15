@@ -19,6 +19,7 @@ internal sealed class TrapManager
   /// </remarks>
   /// <seealso cref="_activeTraps"/>
 #if DEBUG
+  // ReSharper disable once InconsistentNaming
   internal (int index, ITrap trap)[] _previewTraps = [];
 #else
   private (int index, ITrap trap)[] _previewTraps = [];
@@ -41,6 +42,7 @@ internal sealed class TrapManager
   /// </example>
   /// <seealso cref="_previewTraps"/>
 #if DEBUG
+  // ReSharper disable once InconsistentNaming
   internal (int index, ITrap trap)[] _activeTraps = [];
 #else
   private (int index, ITrap trap)[] _activeTraps = [];
@@ -49,7 +51,7 @@ internal sealed class TrapManager
   /// <summary>
   /// Ordered list of traps based on when we received the trap item.
   /// </summary>
-  internal List<ITrap> Traps = new();
+  internal readonly List<ITrap> Traps = new();
 
   /// <summary>
   /// Add a trap to the list of queued traps.
@@ -111,10 +113,10 @@ internal sealed class TrapManager
 
     // Remove traps when we are done iterating through all the other traps
     // otherwise we will skip the later traps if we are activating them.
-    //if (okTraps.Count == 0)
-    //{
+    // if (okTraps.Count == 0)
+    // {
     //  return [];
-    //}
+    // }
 
     // because Count is 1-indexed
     for (int i = okTraps.Count - 1; i >= 0; i--)
@@ -144,7 +146,7 @@ internal sealed class TrapManager
     if (_activeTraps.Length != 0)
     {
       Plugin.Logger.LogWarning(
-        $"Active traps for {level} will be returned to queue."
+        $"Active traps for {level} will be returned to queue. "
           + "Applying new preview traps with currently active traps should not be possible."
       );
       ClearTrapsList(ref _activeTraps, true);

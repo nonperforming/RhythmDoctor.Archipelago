@@ -5,11 +5,11 @@ namespace RhythmDoctor.Archipelago.Client;
 /// </summary>
 internal sealed class Client
 {
-  internal ArchipelagoSession? session;
-  internal DeathLinkService? deathLinkService;
+  internal ArchipelagoSession? Session;
+  internal DeathLinkService? DeathLink;
 
-  internal SlotData slotData;
-  internal TrapManager trapManager;
+  internal SlotData Slot;
+  internal TrapManager TrapManager;
 
   #region Ready for items
   /// <summary>
@@ -57,8 +57,8 @@ internal sealed class Client
   /// <exception cref="Exception">Login failure</exception>
   public Client(string server, string username, string? password = null, bool deathLink = false)
   {
-    itemQueue = new();
-    trapManager = new();
+    itemQueue = new Queue<ReceivedItemsHelper>();
+    TrapManager = new TrapManager();
 
     CreateSession(server);
     try
@@ -79,8 +79,8 @@ internal sealed class Client
   {
     Plugin.Logger.LogWarning("Creating client with no login");
 
-    itemQueue = new();
-    trapManager = new();
+    itemQueue = new Queue<ReceivedItemsHelper>();
+    TrapManager = new TrapManager();
   }
 #endif
 
@@ -89,11 +89,11 @@ internal sealed class Client
   /// </summary>
   /// <param name="server">Server to connect to</param>
   /// <returns>Created session</returns>
-  internal ArchipelagoSession CreateSession(string server)
+  private ArchipelagoSession CreateSession(string server)
   {
     Plugin.Logger.LogInfo($"Creating Archipelago session to {server}");
-    session = ArchipelagoSessionFactory.CreateSession(server);
-    return session;
+    Session = ArchipelagoSessionFactory.CreateSession(server);
+    return Session;
   }
 
   /// <summary>
@@ -104,21 +104,21 @@ internal sealed class Client
   /// <param name="deathLink">Whether to enable DeathLink</param>
   /// <exception cref="NullReferenceException">Session is null</exception>
   /// <exception cref="Exception">Login failure</exception>
-  internal void Connect(string name, string? password = null, bool deathLink = false)
+  private void Connect(string name, string? password = null, bool deathLink = false)
   {
-    if (session == null)
+    if (Session == null)
     {
       throw new NullReferenceException("Session is null");
     }
 
     if (deathLink)
     {
-      deathLinkService = session.CreateDeathLinkService();
-      deathLinkService.EnableDeathLink();
-      deathLinkService.OnDeathLinkReceived += DeathLinkReceived;
+      DeathLink = Session.CreateDeathLinkService();
+      DeathLink.EnableDeathLink();
+      DeathLink.OnDeathLinkReceived += DeathLinkReceived;
     }
 
-    LoginResult loginResult = session.TryConnectAndLogin(
+    LoginResult loginResult = Session.TryConnectAndLogin(
       "Rhythm Doctor",
       name,
       ItemsHandlingFlags.AllItems,
@@ -131,8 +131,13 @@ internal sealed class Client
 
     if (loginResult is LoginFailure loginFailure)
     {
-      Plugin.Logger.LogError(loginFailure.Errors);
-      Plugin.Logger.LogError(loginFailure.ErrorCodes);
+      for (int i = 0; i < loginFailure.Errors.Length; i++)
+      {
+        string error = loginFailure.Errors[i];
+        ConnectionRefusedError errorCode = loginFailure.ErrorCodes[i];
+
+        Plugin.Logger.LogError($"Error {errorCode}: {error}");
+      }
 
       // FIXME: Shouldn't use a generic exception for this
       throw new Exception($"Failed to connect to server under {name}: {password} (Death Link: {deathLink})");
@@ -140,14 +145,14 @@ internal sealed class Client
     else if (loginResult is LoginSuccessful loginSuccessful)
     {
       Plugin.Logger.LogInfo(
-        $"Successfully connected to {loginSuccessful.Slot}/{name} as {session.ConnectionInfo.Uuid}"
+        $"Successfully connected to {loginSuccessful.Slot}/{name} as {Session.ConnectionInfo.Uuid}"
       );
 
       Plugin.Logger.LogDebug("Binding events");
-      session.MessageLog.OnMessageReceived += MessageReceived;
-      session.Items.ItemReceived += ItemReceived;
+      Session.MessageLog.OnMessageReceived += MessageReceived;
+      Session.Items.ItemReceived += ItemReceived;
 
-      slotData = new SlotData(loginSuccessful.SlotData);
+      Slot = new SlotData(loginSuccessful.SlotData);
     }
     else
     {
@@ -156,14 +161,14 @@ internal sealed class Client
     }
   }
 
-  internal void MessageReceived(LogMessage message)
+  private void MessageReceived(LogMessage message)
   {
     Plugin.Logger.LogInfo($"Received message {message}");
   }
 
-  internal void ItemReceived(ReceivedItemsHelper helper) => ProcessItem(helper);
+  private void ItemReceived(ReceivedItemsHelper helper) => ProcessItem(helper);
 
-  internal void ProcessItem(ReceivedItemsHelper helper, bool wasQueued = false)
+  private void ProcessItem(ReceivedItemsHelper helper, bool wasQueued = false)
   {
     ItemInfo item;
 
@@ -196,14 +201,14 @@ internal sealed class Client
 
         // Attempt to get rank from locations sent
         RegularStage levelStage = (RegularStage)Bindings.LevelToStage[level];
-        if (session!.Locations.AllLocationsChecked.Contains(levelStage.SRankLocation))
+        if (Session!.Locations.AllLocationsChecked.Contains(levelStage.SRankLocation))
         {
           Plugin.Logger.LogInfo("Found S rank location");
           Persistence.SetLevelRank(level, Rank.S, false, false);
         }
         else if (
           levelStage.ARankLocation.HasValue
-          && session!.Locations.AllLocationsChecked.Contains(levelStage.ARankLocation.Value)
+          && Session!.Locations.AllLocationsChecked.Contains(levelStage.ARankLocation.Value)
         )
         {
           Plugin.Logger.LogInfo("Found A rank location");
@@ -211,7 +216,7 @@ internal sealed class Client
         }
         else if (
           levelStage.BRankLocation.HasValue
-          && session!.Locations.AllLocationsChecked.Contains(levelStage.BRankLocation.Value)
+          && Session!.Locations.AllLocationsChecked.Contains(levelStage.BRankLocation.Value)
         )
         {
           Plugin.Logger.LogInfo("Found B rank location");
@@ -234,20 +239,20 @@ internal sealed class Client
           Level bossLevel = Bindings.ActBoss[act];
           Plugin.Logger.LogInfo($"Attempting to get boss rank from locations cleared for {bossLevel}");
           BossStage bossStage = (BossStage)Bindings.LevelToStage[bossLevel];
-          if (session!.Locations.AllLocationsChecked.Contains(bossStage.PerfectLocation))
+          if (Session!.Locations.AllLocationsChecked.Contains(bossStage.PerfectLocation))
           {
             Plugin.Logger.LogInfo("Found Perfect location");
             Persistence.SetLevelRank(bossLevel, Rank.BossPerfect, false, false);
           }
           else if (
             bossStage.CompletePlusLocation.HasValue
-            && session!.Locations.AllLocationsChecked.Contains(bossStage.CompletePlusLocation.Value)
+            && Session!.Locations.AllLocationsChecked.Contains(bossStage.CompletePlusLocation.Value)
           )
           {
             Plugin.Logger.LogInfo("Found Complete+ location");
             Persistence.SetLevelRank(bossLevel, Rank.BossNoCheckpoints, false, false);
           }
-          else if (session!.Locations.AllLocationsChecked.Contains(bossStage.ClearLocation))
+          else if (Session!.Locations.AllLocationsChecked.Contains(bossStage.ClearLocation))
           {
             Plugin.Logger.LogInfo("Found Clear location");
             Persistence.SetLevelRank(bossLevel, Rank.BossClear, false, false);
@@ -269,7 +274,7 @@ internal sealed class Client
     else if (Bindings.TrapItemIdToLevel.TryGetValue(item.ItemId, out Type trap))
     {
       Plugin.Logger.LogInfo($"Adding trap item {item.ItemName} ({item.ItemId})");
-      trapManager.AddTrap(trap);
+      TrapManager.AddTrap(trap);
       return;
     }
     else if (Bindings.KeyItemIdToWard.ContainsKey(item.ItemId) || Bindings.SLEEVE_PAINT_ITEM_ID == item.ItemId)
@@ -284,7 +289,7 @@ internal sealed class Client
     Plugin.Logger.LogError($"Got item {item.ItemName} ({item.ItemId} from {item.ItemGame}) but couldn't handle it");
   }
 
-  internal void DeathLinkReceived(DeathLink deathLink)
+  private void DeathLinkReceived(DeathLink deathLink)
   {
     Plugin.Logger.LogInfo($"DeathLink from {deathLink.Source} by \"{deathLink.Cause}\" at {deathLink.Timestamp}");
     // TODO: Implement

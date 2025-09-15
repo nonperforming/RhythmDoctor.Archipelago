@@ -2,11 +2,11 @@
 namespace RhythmDoctor.Archipelago.Debug.Patches;
 
 [HarmonyPatch(typeof(scnLevelSelect))]
-static class LogEntityInteractionsPatch
+internal static class LogEntityInteractionsPatch
 {
   [HarmonyPatch(nameof(scnLevelSelect.PerformEntityAction))]
   [HarmonyPrefix]
-  static void LogSelectableObjectInteractionsPatch(scnLevelSelect __instance)
+  private static void LogSelectableObjectInteractionsPatch(scnLevelSelect __instance)
   {
     switch (__instance.selectedEntity)
     {

@@ -4,7 +4,7 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 /// Patch to not play cutscenes.
 /// </summary>
 [HarmonyPatch(typeof(Persistence))]
-static class SkipCutscenePatch
+internal static class SkipCutscenePatch
 {
   /// <summary>
   /// Skip playing the passed level cutscene, post Act 2, post Act 3, post Act 4, and pre Act 5 cutscenes.
@@ -22,7 +22,7 @@ static class SkipCutscenePatch
   [HarmonyPatch(nameof(Persistence.GetPlayedPostAct4Cutscene))]
   [HarmonyPatch(nameof(Persistence.GetPlayedPreAct5Cutscene))]
   [HarmonyPrefix]
-  static void PersistenceDoNotPlayCutscenePatch(ref bool __result, ref bool __runOriginal)
+  private static void PersistenceDoNotPlayCutscenePatch(ref bool __result, ref bool __runOriginal)
   {
     __result = true;
     __runOriginal = false;
@@ -38,7 +38,7 @@ static class SkipCutscenePatch
   [HarmonyPatch(typeof(scnLevelSelect), nameof(scnLevelSelect.PlayAct5Intro))]
   [HarmonyPatch(typeof(scnLevelSelect), nameof(scnLevelSelect.CheckForCutscene))]
   [HarmonyPrefix]
-  static void LevelSelectDoNotPlayCutscenePatch(ref bool __runOriginal)
+  private static void LevelSelectDoNotPlayCutscenePatch(ref bool __runOriginal)
   {
     __runOriginal = false;
   }

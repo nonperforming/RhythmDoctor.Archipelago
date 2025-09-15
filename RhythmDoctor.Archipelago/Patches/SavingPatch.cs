@@ -4,11 +4,11 @@ namespace RhythmDoctor.Archipelago.Patches;
 /// Disable all saving progress to disk, and load Sleeve Paint images from our special AP file.
 /// </summary>
 [HarmonyPatch(typeof(Persistence))]
-static class SavingPatch
+internal static class SavingPatch
 {
   [HarmonyPatch(nameof(Persistence.SaveSlot))]
   [HarmonyPrefix]
-  static void DisableSavingToFilePatch(int slot, ref bool __runOriginal)
+  private static void DisableSavingToFilePatch(int slot, ref bool __runOriginal)
   {
     // "Slot" -1 is settings, as shown by GetSavefilePath
     // string text = ((slot == -1) ? "settings.rdsave" : $"slot{slot}.rdsave");
@@ -17,7 +17,7 @@ static class SavingPatch
 
   [HarmonyPatch(typeof(ArmSkin), nameof(ArmSkin.GetDrawingPath))]
   [HarmonyPrefix]
-  static void RedirectSleevePaintFilePatch(RDPlayer player, ref string __result, ref bool __runOriginal)
+  private static void RedirectSleevePaintFilePatch(RDPlayer player, ref string __result, ref bool __runOriginal)
   {
     __runOriginal = false;
     // .ToString() shouldn't modify an enum???

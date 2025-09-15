@@ -2,11 +2,11 @@
 namespace RhythmDoctor.Archipelago.Debug.Patches;
 
 [HarmonyPatch(typeof(HUD))]
-static class LogClearLevelPatch
+internal static class LogClearLevelPatch
 {
   [HarmonyPatch(nameof(HUD.ShowAndSaveRank))]
   [HarmonyPrefix]
-  static void LogShowAndSaveRankPatch(bool bossLevelFailed, bool onlySavePersistence)
+  private static void LogShowAndSaveRankPatch(bool bossLevelFailed, bool onlySavePersistence)
   {
     Plugin.Logger.LogInfo(
       @$"--- HUD.ShowAndSaveRank(bool bossLevelFailed = {bossLevelFailed}, bool onlySavePersistence = {onlySavePersistence})
@@ -19,7 +19,7 @@ Level ID: {scnGame.instance.levelIdentifier}
 
   [HarmonyPatch(typeof(HUD), nameof(HUD.AdvanceGameover))]
   [HarmonyPrefix]
-  static void LogAdvanceGameoverPatch(HUD __instance, bool isPlayer)
+  private static void LogAdvanceGameoverPatch(HUD __instance, bool isPlayer)
   {
     Plugin.Logger.LogInfo(
       $@"--- HUD.AdvanceGameover(bool isPlayer = {isPlayer})

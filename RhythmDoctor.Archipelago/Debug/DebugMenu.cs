@@ -14,7 +14,7 @@ public class DebugMenu : MonoBehaviour
     Levels,
   }
 
-  private ActivatedGUI activatedGUI;
+  private ActivatedGUI _activatedGUI;
 
   private string _url = "archipelago.gg";
 
@@ -26,10 +26,10 @@ public class DebugMenu : MonoBehaviour
   private bool _deathLink;
 
   /// <remarks>
-  /// Unlike the <see cref="Client"/>'s <see cref="Client.trapManager"/>, traps from this Trap Manager will not be
+  /// Unlike the <see cref="Client"/>'s <see cref="Client.TrapManager"/>, traps from this Trap Manager will not be
   /// automatically deleted.
   /// </remarks>
-  internal TrapManager trapManager = new();
+  internal TrapManager TrapManager = new();
 
   private void Start()
   {
@@ -74,14 +74,14 @@ public class DebugMenu : MonoBehaviour
     if (gui == ActivatedGUI.None)
       return;
 
-    activatedGUI = activatedGUI == gui ? ActivatedGUI.None : gui;
+    _activatedGUI = _activatedGUI == gui ? ActivatedGUI.None : gui;
 
-    Notify($"Toggled activated debug GUI to {activatedGUI}");
+    Notify($"Toggled activated debug GUI to {_activatedGUI}");
   }
 
   private void OnGUI()
   {
-    switch (activatedGUI)
+    switch (_activatedGUI)
     {
       case ActivatedGUI.None:
         break;
@@ -124,69 +124,69 @@ public class DebugMenu : MonoBehaviour
         GUI.Box(new Rect(10, 10, 330, 890), "Rhythm Doctor Archipelago Patches Debug");
         if (GUI.Button(new Rect(30, 30, 300, 20), "Discard active traps"))
         {
-          trapManager.ClearActiveTraps(false);
+          TrapManager.ClearActiveTraps(false);
         }
         if (GUI.Button(new Rect(30, 60, 300, 20), "Discard all traps immediately"))
         {
-          trapManager.ClearActiveTraps(false);
-          trapManager.Traps.Clear();
+          TrapManager.ClearActiveTraps(false);
+          TrapManager.Traps.Clear();
         }
         if (GUI.Button(new Rect(30, 90, 300, 20), "Add Chilli Speed Trap"))
         {
           Notify("Adding ChilliSpeedTrap patch");
-          trapManager.AddTrap(new ChilliSpeedTrapPatch());
+          TrapManager.AddTrap(new ChilliSpeedTrapPatch());
         }
         if (GUI.Button(new Rect(30, 120, 300, 20), "Add Ice Speed Trap"))
         {
           Notify("Adding IceSpeedTrap patch");
-          trapManager.AddTrap(new IceSpeedTrapPatch());
+          TrapManager.AddTrap(new IceSpeedTrapPatch());
         }
 
         if (GUI.Button(new Rect(30, 150, 300, 20), "Add Strong Heart Powerup"))
         {
           Notify("Adding StrongHeartPowerup patch");
-          trapManager.AddTrap(new StrongHeartPowerupPatch());
+          TrapManager.AddTrap(new StrongHeartPowerupPatch());
         }
         if (GUI.Button(new Rect(30, 180, 300, 20), "Add Fragile Heart Powerup"))
         {
           Notify("Adding FragileSpeedTrap patch");
-          trapManager.AddTrap(new FragileHeartTrapPatch());
+          TrapManager.AddTrap(new FragileHeartTrapPatch());
         }
         if (GUI.Button(new Rect(30, 210, 300, 20), "Add Easy Mode Powerup"))
         {
           Notify("Adding EasyModePowerup patch");
-          trapManager.AddTrap(new EasyDifficultyPowerupPatch());
+          TrapManager.AddTrap(new EasyDifficultyPowerupPatch());
         }
         if (GUI.Button(new Rect(30, 240, 300, 20), "Add Hard Mode Trap"))
         {
           Plugin.Logger.LogInfo("Adding HardModeTrap patch");
-          trapManager.AddTrap(new HardDifficultyTrapPatch());
+          TrapManager.AddTrap(new HardDifficultyTrapPatch());
         }
         if (GUI.Button(new Rect(30, 270, 300, 20), "Add Ghost Tap Trap"))
         {
           Notify("Adding GhostTapTrap patch");
-          trapManager.AddTrap(new GhostTapTrapPatch());
+          TrapManager.AddTrap(new GhostTapTrapPatch());
         }
         if (GUI.Button(new Rect(30, 300, 300, 20), "Add Scramble Characters Trap"))
         {
           Notify("Adding ScrambleCharactersTrap patch");
-          trapManager.AddTrap(new ScrambleCharactersTrapPatch());
+          TrapManager.AddTrap(new ScrambleCharactersTrapPatch());
         }
         if (GUI.Button(new Rect(30, 330, 300, 20), "Add Scramble Beatsounds Trap"))
         {
           Notify("Adding ScrambleBeatsoundsTrap patch");
-          trapManager.AddTrap(new ScrambleBeatsoundsTrapPatch());
+          TrapManager.AddTrap(new ScrambleBeatsoundsTrapPatch());
         }
         if (GUI.Button(new Rect(30, 360, 300, 20), "Add Scramble Hitsounds Trap"))
         {
           Notify("Adding ScrambleHitsoundsTrap patch");
-          trapManager.AddTrap(new ScrambleHitsoundsTrapPatch());
+          TrapManager.AddTrap(new ScrambleHitsoundsTrapPatch());
         }
         if (GUI.Button(new Rect(30, 390, 300, 20), "Recreate TrapManager"))
         {
           Notify("Recreating TrapManager");
-          trapManager.ClearActiveTraps(false);
-          trapManager = new();
+          TrapManager.ClearActiveTraps(false);
+          TrapManager = new TrapManager();
         }
 
         if (GUI.Button(new Rect(30, 450, 300, 20), "Apply post-login patches"))
@@ -209,30 +209,30 @@ public class DebugMenu : MonoBehaviour
         if (GUI.Button(new Rect(30, 540, 300, 20), "Create Client class"))
         {
           Notify("Creating empty Client");
-          Plugin.Client = new();
+          Plugin.Client = new Client.Client();
         }
 
         if (GUI.Button(new Rect(30, 570, 300, 20), "Push all traps to Active"))
         {
           Notify("Pushing all traps to Active");
-          trapManager.ApplyApplicableTraps(Level.None);
-          trapManager.PromotePreviewTrapsToActiveTraps();
+          TrapManager.ApplyApplicableTraps(Level.None);
+          TrapManager.PromotePreviewTrapsToActiveTraps();
         }
 
         string traps = "";
-        foreach (ITrap trap in trapManager.Traps)
+        foreach (ITrap trap in TrapManager.Traps)
         {
           traps += $"{trap.Name} ";
         }
 
         string trapsPreview = "";
-        foreach ((_, ITrap trap) in trapManager._previewTraps)
+        foreach ((_, ITrap trap) in TrapManager._previewTraps)
         {
           trapsPreview += $"{trap.Name} ";
         }
 
         string trapsActive = "";
-        foreach ((_, ITrap trap) in trapManager._activeTraps)
+        foreach ((_, ITrap trap) in TrapManager._activeTraps)
         {
           trapsActive += $"{trap.Name} ";
         }
@@ -248,7 +248,7 @@ public class DebugMenu : MonoBehaviour
           Notify("Locking all levels");
           foreach (Level level in Enum.GetValues(typeof(Level)))
           {
-            Persistence.SetLevelRank(level, Rank.NotAvailable, force: true);
+            Persistence.SetLevelRank(level, Rank.NotAvailable, true);
           }
           scnBase.GoToScene("scnLevelSelect");
         }
@@ -258,7 +258,14 @@ public class DebugMenu : MonoBehaviour
           Notify("Unlocking all levels");
           foreach (Level level in Enum.GetValues(typeof(Level)))
           {
-            Persistence.SetLevelRank(level, Rank.NotFinished, force: true);
+            try
+            {
+              Persistence.SetLevelRank(level, Rank.NotFinished, true);
+            }
+            catch (NotImplementedException)
+            {
+              Persistence.SetLevelRank(level, Rank.NotFinished, true);
+            }
           }
           scnBase.GoToLevelSelect();
         }
@@ -266,13 +273,15 @@ public class DebugMenu : MonoBehaviour
         if (GUI.Button(new Rect(30, 90, 300, 20), "Unlock all entrances"))
         {
           Notify("Unlocking all entrances");
+
           scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToSVTWard"));
           scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToTrain"));
           scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToBasement"));
           scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToMuseDashRoom"));
-          scnLevelSelect.instance.ActivateEntranceRin();
           scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToAthleteWard"));
           scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToArtRoom"));
+
+          scnLevelSelect.instance.ActivateEntranceRin();
         }
 
         if (GUI.Button(new Rect(30, 120, 300, 20), "Unlock level 3-1"))
@@ -292,11 +301,13 @@ public class DebugMenu : MonoBehaviour
         if (GUI.Button(new Rect(30, 180, 300, 20), "S+ selected level"))
         {
           if (scnLevelSelect.instance.selectedEntity is not SelectableCharacter selectableCharacter)
+          {
             return;
+          }
 
           Level selectedLevel = selectableCharacter.levels[scnLevelSelect.instance.currentDifficulty];
           Notify($"Setting rank of {selectedLevel} to S+");
-          Persistence.SetLevelRank(selectedLevel, Rank.Splus, force: true);
+          Persistence.SetLevelRank(selectedLevel, Rank.Splus, true);
           Persistence.SetLastPlayedLevel(selectedLevel);
           scnBase.GoToLevelSelect();
         }
@@ -306,7 +317,7 @@ public class DebugMenu : MonoBehaviour
           Notify("Setting rank of all levels to S+");
           foreach (Level level in Enum.GetValues(typeof(Level)))
           {
-            Persistence.SetLevelRank(level, Rank.Splus, force: true);
+            Persistence.SetLevelRank(level, Rank.Splus, true);
           }
           scnBase.GoToLevelSelect();
         }
@@ -320,11 +331,14 @@ public class DebugMenu : MonoBehaviour
         if (GUI.Button(new Rect(30, 270, 300, 20), "Lock selected level"))
         {
           if (scnLevelSelect.instance.selectedEntity is not SelectableCharacter selectableCharacter)
+          {
             return;
+          }
 
           Level selectedLevel = selectableCharacter.levels[scnLevelSelect.instance.currentDifficulty];
           Notify($"Setting rank of {selectedLevel} to NotAvailable");
-          Persistence.SetLevelRank(selectedLevel, Rank.NotAvailable, force: true);
+          Persistence.SetLevelRank(selectedLevel, Rank.NotAvailable, true);
+
           Persistence.SetLastPlayedLevel(selectedLevel);
           scnBase.GoToLevelSelect();
         }

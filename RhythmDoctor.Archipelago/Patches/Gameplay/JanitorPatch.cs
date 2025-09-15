@@ -4,7 +4,7 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 /// Patches related to the Janitor
 /// </summary>
 [HarmonyPatch(typeof(scnLevelSelect))]
-static class JanitorPatch
+internal static class JanitorPatch
 {
   /// <summary>
   /// Open the Archipelago Ward when interacting with the Janitor.
@@ -13,7 +13,7 @@ static class JanitorPatch
   /// <param name="__runOriginal">Whether to run the original method or not. This will be set to false if interacting with the Janitor.</param>
   [HarmonyPatch(nameof(scnLevelSelect.PerformEntityAction))]
   [HarmonyPrefix]
-  static void InteractJanitorPatch(scnLevelSelect __instance, ref bool __runOriginal)
+  private static void InteractJanitorPatch(scnLevelSelect __instance, ref bool __runOriginal)
   {
     SelectableObject? currentSelectableObject = __instance.selectedEntity as SelectableObject;
 
@@ -30,14 +30,14 @@ static class JanitorPatch
 
     // We have selected a Janitor object.
     // Load the custom level ward, add our custom options, and delete the old options
-    //__runOriginal = false;
+    // __runOriginal = false;
     // TODO: Implement janitor menu patch. (additional comment to show on TODO plugins)
     Plugin.Logger.LogError("TODO: Implement janitor menu patch");
   }
 
   [HarmonyPatch(nameof(scnLevelSelect.ShowRanksText))]
   [HarmonyPrefix]
-  static void TextJanitorPatch(int index, scnLevelSelect __instance, ref bool __runOriginal)
+  private static void TextJanitorPatch(int index, scnLevelSelect __instance, ref bool __runOriginal)
   {
     if (__instance.selectableEntities[index] is not SelectableObject selectableObject)
     {
@@ -57,7 +57,7 @@ static class JanitorPatch
     __runOriginal = false;
 
     __instance.ChangeTextOutline(RDConstants.data.levelSelect_notPassedLevelTextOutline);
-    __instance.SetDifficultyArrowsVisible(visible: false);
+    __instance.SetDifficultyArrowsVisible(false);
     __instance.description.text = "Archipelago";
   }
 
@@ -68,7 +68,7 @@ static class JanitorPatch
   /// <param name="__runOriginal">Whether to run the original method or not. This will always be set to <c>false</c>.</param>
   [HarmonyPatch(nameof(scnLevelSelect.PlaceJanitor))]
   [HarmonyPrefix]
-  static void PlaceJanitorPatch(ref bool __runOriginal)
+  private static void PlaceJanitorPatch(ref bool __runOriginal)
   {
     Plugin.Logger.LogDebug("Bypassing PlaceJanitor");
     __runOriginal = false;
@@ -83,7 +83,7 @@ static class JanitorPatch
   /// <param name="__runOriginal">Whether to run the original method or not. This will always be set to <c>false</c>.</param>
   [HarmonyPatch(nameof(scnLevelSelect.HideJanitor))]
   [HarmonyPrefix]
-  static void HideJanitorPatch(ref bool __runOriginal)
+  private static void HideJanitorPatch(ref bool __runOriginal)
   {
     Plugin.Logger.LogWarning("Bypassing HideJanitor. This should never be called assuming PlaceJanitor was bypassed!");
     __runOriginal = false;

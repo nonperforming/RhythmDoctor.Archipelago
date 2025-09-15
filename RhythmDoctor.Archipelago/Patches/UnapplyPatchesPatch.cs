@@ -1,7 +1,7 @@
 namespace RhythmDoctor.Archipelago.Patches;
 
 [HarmonyPatch(typeof(scnBase))]
-static class UnapplyPatchesPatch
+internal static class UnapplyPatchesPatch
 {
   // Access modifier is internal instead of private as the finalizer for Plugin can call it
   // (i.e. when running under ScriptEngine).
@@ -27,11 +27,13 @@ static class UnapplyPatchesPatch
     }
 
     // TODO: Correct way to tear down Archipelago client?
-    if (Plugin.Client.session != null)
+    if (Plugin.Client.Session != null)
+    {
       // For some reason session does not want to accept '?'
       // NOTE: Disconnect in a non-async manner is under NET35
       //       This should probably be made async.
-      Task.Run(Plugin.Client.session.Socket.DisconnectAsync).Wait();
+      Task.Run(Plugin.Client.Session.Socket.DisconnectAsync).Wait();
+    }
     Plugin.Client = null!;
   }
 }

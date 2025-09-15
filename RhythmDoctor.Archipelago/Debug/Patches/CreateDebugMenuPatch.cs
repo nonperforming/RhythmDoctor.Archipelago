@@ -2,7 +2,7 @@
 namespace RhythmDoctor.Archipelago.Debug.Patches;
 
 [HarmonyPatch(typeof(RDStartup))]
-class CreateDebugMenuPatch
+internal class CreateDebugMenuPatch
 {
   internal const string DEBUG_MENU_OBJECT_NAME = "RhythmDoctor.Archipelago Debug";
 
@@ -11,13 +11,13 @@ class CreateDebugMenuPatch
   // (Start method does not run?)
   [HarmonyPatch(nameof(RDStartup.Setup))]
   [HarmonyPostfix]
-  static void CreateDebugMenuAfterSetupPatch()
+  private static void CreateDebugMenuAfterSetupPatch()
   {
     if (GameObject.Find($"/{DEBUG_MENU_OBJECT_NAME}") != null)
     {
       // Can get noisy, even seemingly innocent actions such as selecting entities in the Level Select calls
       // RDStartup.Setup multiple times.
-      //Plugin.Logger.LogDebug("Debug menu object found, ignoring request to create new menu");
+      // Plugin.Logger.LogDebug("Debug menu object found, ignoring request to create new menu");
       return;
     }
 

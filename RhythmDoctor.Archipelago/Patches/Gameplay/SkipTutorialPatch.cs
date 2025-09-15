@@ -4,7 +4,7 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 /// Prevents tutorials from being loaded
 /// </summary>
 [HarmonyPatch(typeof(scnGame))]
-static class SkipTutorialPatch
+internal static class SkipTutorialPatch
 {
   // From https://github.com/Mysthaps/MyseIfRDPatches/blob/master/Main.cs#L223
   /// <summary>
@@ -14,14 +14,14 @@ static class SkipTutorialPatch
   /// <returns>Modified IL instructions</returns>
   [HarmonyPatch(nameof(scnGame.Start))]
   [HarmonyTranspiler]
-  static IEnumerable<CodeInstruction> FixLesmisPatch(IEnumerable<CodeInstruction> instructions)
+  private static IEnumerable<CodeInstruction> FixLesmisPatch(IEnumerable<CodeInstruction> instructions)
   {
     return new CodeMatcher(instructions)
       .MatchForward(false, new CodeMatch(OpCodes.Ldstr, "Level_"))
       .Advance(3)
       .InsertAndAdvance(
         new CodeInstruction(OpCodes.Ldstr, ", Assembly-CSharp"),
-        new CodeInstruction(OpCodes.Call, AccessTools.Method("System.String:Concat", [typeof(String), typeof(String)]))
+        new CodeInstruction(OpCodes.Call, AccessTools.Method("System.String:Concat", [typeof(string), typeof(string)]))
       )
       .InstructionEnumeration();
   }
@@ -31,7 +31,7 @@ static class SkipTutorialPatch
   /// </summary>
   [HarmonyPatch(nameof(scnGame.Start))]
   [HarmonyPrefix]
-  static void DoNotLoadTutorialPatch()
+  private static void DoNotLoadTutorialPatch()
   {
     Plugin.Logger.LogDebug(
       $"Level {scnGame.internalIdentifier}: Forcing attemptToLoadTutorial from {scnGame.attemptToLoadTutorial} to false"
@@ -41,7 +41,7 @@ static class SkipTutorialPatch
 
   [HarmonyPatch(typeof(Persistence), nameof(Persistence.GetFirstTimePlaying))]
   [HarmonyPrefix]
-  static void DoNotLoadIntroPatch(ref bool __result, ref bool __runOriginal)
+  private static void DoNotLoadIntroPatch(ref bool __result, ref bool __runOriginal)
   {
     Plugin.Logger.LogDebug("Forcing first_time to false");
     __runOriginal = false;

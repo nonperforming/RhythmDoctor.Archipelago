@@ -23,7 +23,7 @@ internal struct SlotData
     string msg = "Creating SlotData from";
     foreach ((string key, object value) in slotData)
     {
-      msg += $" key: {key}, value: {value} (type {value.GetType().Name})";
+      msg += $"  key: {key}, value: {value} (type {value.GetType().Name})";
     }
     Plugin.Logger.LogDebug(msg);
 
@@ -33,7 +33,7 @@ internal struct SlotData
     Plugin.Logger.LogDebug($"Created SlotData - {endGoal}, {bossUnlockRequirement},  {deathLink}");
   }
 
-  internal EndGoal endGoal;
-  internal BossUnlockRequirement bossUnlockRequirement;
-  internal bool deathLink;
+  internal readonly EndGoal endGoal;
+  internal readonly BossUnlockRequirement bossUnlockRequirement;
+  internal readonly bool deathLink;
 }

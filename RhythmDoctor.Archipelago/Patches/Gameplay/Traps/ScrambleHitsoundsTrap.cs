@@ -5,7 +5,7 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 internal class ScrambleHitsoundsTrapPatch : ITrap
 {
   // ReSharper disable once NullableWarningSuppressionIsUsed
-  private Harmony harmony = null!;
+  private Harmony _harmony = null!;
 
   private static Dictionary<string, string> scrambled = new();
 
@@ -40,7 +40,7 @@ internal class ScrambleHitsoundsTrapPatch : ITrap
       hitsounds = soundAttributes.SelectMany(soundAttribute => soundAttribute.options).Distinct().ToList();
     }
 
-    harmony = new($"{Plugin.PATCH_ID_TRAP}.{nameof(ScrambleHitsoundsTrapPatch)}");
+    _harmony = new Harmony($"{Plugin.PATCH_ID_TRAP}.{nameof(ScrambleHitsoundsTrapPatch)}");
   }
 
   public void Active()
@@ -60,12 +60,12 @@ internal class ScrambleHitsoundsTrapPatch : ITrap
     {
       Plugin.Logger.LogDebug($"  {originalHitsound} -> {randomizedHitsound}");
     }
-    harmony.PatchAll(typeof(Patch));
+    _harmony.PatchAll(typeof(Patch));
   }
 
   public void ActiveEnd()
   {
-    harmony.UnpatchSelf();
+    _harmony.UnpatchSelf();
   }
 
   [HarmonyPatch(typeof(RDLevelData))]
@@ -73,7 +73,7 @@ internal class ScrambleHitsoundsTrapPatch : ITrap
   {
     [HarmonyPatch(nameof(RDLevelData.Decode))]
     [HarmonyPostfix]
-    static void ModifyCharacterDataPatch(RDLevelData __result)
+    private static void ModifyCharacterDataPatch(RDLevelData __result)
     {
       Plugin.Logger.LogDebug("Scramble Hitsounds: Modifying SetClapSounds level events");
 
