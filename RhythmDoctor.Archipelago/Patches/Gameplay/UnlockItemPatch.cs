@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 
 [HarmonyPatch(typeof(scnLevelSelect))]
@@ -117,6 +119,31 @@ internal static class UnlockItemPatch
         Persistence.SetLevelRank(Bindings.ActBoss[act], Rank.NotFinished, false, false);
       }
     }
+  }
+
+  [HarmonyPatch(nameof(scnLevelSelect.LoadLevelData))]
+  [HarmonyTranspiler]
+  private static IEnumerable<CodeInstruction> DoNotUnlockEntrancesPatch(IEnumerable<CodeInstruction> instructions)
+  {
+    CodeMatcher matcher = new(instructions);
+
+    foreach (CodeInstruction instruction in matcher.Instructions())
+    {
+      if (
+        instruction.opcode == OpCodes.Call
+        && (MethodInfo)instruction.operand
+          == AccessTools.Method(
+            typeof(scnLevelSelect),
+            nameof(scnLevelSelect.UnlockEntrance),
+            [typeof(SelectableEntity)]
+          )
+      )
+      {
+        instruction.opcode = OpCodes.Nop;
+      }
+    }
+
+    return matcher.InstructionEnumeration();
   }
 
   internal static bool HasUnlockedBossSong(Act act)
