@@ -155,6 +155,11 @@ internal static class Bindings
       { 54, Region.Basement },
       { 55, Region.ArtRoom },
     };
+
+  /// <summary>
+  /// Rhythm Weightlifter stage to its corresponding location ID.
+  /// </summary>
+  internal static readonly long[] RhythmWeightlifterStageToLocationID = [97, 98, 99, 100, 101, 102, 103, 104, 105, 106];
   #endregion
 
   internal static readonly IReadOnlyCollection<Level> Levels = LevelToStage.Keys;
