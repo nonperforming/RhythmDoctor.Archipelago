@@ -48,28 +48,27 @@ internal static class Bindings
       { Level.Freezeshot, new RegularStage(Act.Act5, 90, 91, 92) },
       { Level.FreezeshotH, new RegularStage(Act.Act5, 93, 94, 95) },
       { Level.AthleteTherapy, new RegularStage(Act.Act5, null, null, 96) },
-      { Level.RhythmWeightlifter, new RegularStage(Act.Act5, 97, 98, 99) },
-      { Level.VividStasis, new RegularStage(Act.None, 100, 101, 102) },
-      { Level.SparkLine, new RegularStage(Act.None, 103, 104, 105) },
-      { Level.Unbeatable, new RegularStage(Act.None, 106, 107, 108) },
-      { Level.MeetAndTweet, new RegularStage(Act.None, 109, 110, 111) },
-      { Level.BlackestLuxuryCar, new RegularStage(Act.None, 112, 113, 114) },
-      { Level.TapeStopNight, new RegularStage(Act.None, 115, 116, 117) },
-      { Level.The90sDecision, new RegularStage(Act.None, 118, 119, 120) },
-      { Level.HelpingHands, new RegularStage(Act.None, 121, 122, 123) },
-      { Level.ArtExercise, new RegularStage(Act.None, 124, 125, 126) },
-      { Level.OrientalInsomniac, new BossStage(Act.Act1, 127, null, 128) },
-      { Level.Boss2, new BossStage(Act.Act2, 129, null, 130) },
-      { Level.InsomniacHard, new BossStage(Act.Act4, 135, null, 136) },
-      { Level.AthleteFinale, new BossStage(Act.Act5, 137, 138, 139) },
+      { Level.VividStasis, new RegularStage(Act.None, 107, 108, 109) },
+      { Level.SparkLine, new RegularStage(Act.None, 110, 111, 112) },
+      { Level.Unbeatable, new RegularStage(Act.None, 113, 114, 115) },
+      { Level.MeetAndTweet, new RegularStage(Act.None, 116, 117, 118) },
+      { Level.BlackestLuxuryCar, new RegularStage(Act.None, 119, 120, 121) },
+      { Level.TapeStopNight, new RegularStage(Act.None, 122, 123, 124) },
+      { Level.The90sDecision, new RegularStage(Act.None, 125, 126, 127) },
+      { Level.HelpingHands, new RegularStage(Act.None, 128, 129, 130) },
+      { Level.ArtExercise, new RegularStage(Act.None, 131, 132, 133) },
+      { Level.OrientalInsomniac, new BossStage(Act.Act1, 134, null, 135) },
+      { Level.Boss2, new BossStage(Act.Act2, 136, null, 137) },
+      { Level.InsomniacHard, new BossStage(Act.Act4, 142, null, 143) },
+      { Level.AthleteFinale, new BossStage(Act.Act5, 144, 145, 146) },
       {
         Level.Lesmis,
         new BossStage(
           Act.Act3,
-          131,
+          138,
           null,
-          132,
-          new Dictionary<string, long> { { "dog_clear", 133 }, { "dog_perfect", 134 } }
+          139,
+          new Dictionary<string, long> { { "dog_clear", 140 }, { "dog_perfect", 141 } }
         )
       },
     };
@@ -157,6 +156,8 @@ internal static class Bindings
       { 55, Region.ArtRoom },
     };
   #endregion
+
+  internal static readonly IReadOnlyCollection<Level> Levels = LevelToStage.Keys;
 
   internal static readonly Dictionary<Level, Act> LevelToAct = LevelToStage.ToDictionary(
     pair => pair.Key,
