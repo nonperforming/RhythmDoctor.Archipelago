@@ -17,6 +17,13 @@ internal static class Act5Patch
       .InstructionEnumeration();
   }
 
+  [HarmonyPatch(nameof(scnLevelSelect.Start))]
+  [HarmonyPostfix]
+  private static void DematerializeNicolePatch(scnLevelSelect __instance)
+  {
+    __instance.nicoleAct5Blockage.visible = false;
+  }
+
   [HarmonyPatch(nameof(scnLevelSelect.PrepareAthleteWardTransition))]
   [HarmonyPrefix]
   private static void DoNotShowDreamBubbles(ref bool __runOriginal)
