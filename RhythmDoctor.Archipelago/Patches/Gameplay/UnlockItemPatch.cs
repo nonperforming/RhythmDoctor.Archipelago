@@ -85,6 +85,14 @@ internal static class UnlockItemPatch
       if (level.id != "3-X")
         level.hardEnabled = true;
     }
+
+    // Show all Act 5 levels before we clear 5-1
+    foreach (SelectableEntity level in __instance.selectableEntities.Where((entity) => entity.id.StartsWith("5-")))
+    {
+      level.normalEnabled = true;
+      if (level.id is "5-1" or "5-2")
+        level.hardEnabled = true;
+    }
     // Unhiding timed levels 1-CNY and 1-BOO
     SelectableEntity CNY = __instance.GetSelectableEntity("1-CNY");
     CNY.normalEnabled = true;
