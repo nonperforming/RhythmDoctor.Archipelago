@@ -32,10 +32,11 @@ internal sealed class Client
       if (value)
       {
         Plugin.Logger.LogInfo("Processing all queued items");
-        foreach (ReceivedItemsHelper item in itemQueue)
+        foreach (ReceivedItemsHelper item in itemQueue!)
         {
           ProcessItem(item, true);
         }
+        itemQueue = null;
       }
     }
   }
@@ -43,8 +44,7 @@ internal sealed class Client
   /// <summary>
   /// Item queue for items received while we were not <see cref="ReadyForItems"/>.
   /// </summary>
-  /// <seealso cref="ReadyForItems"/>
-  private Queue<ReceivedItemsHelper> itemQueue;
+  private Queue<ReceivedItemsHelper>? itemQueue;
   #endregion
 
   /// <summary>
@@ -111,8 +111,13 @@ internal sealed class Client
       throw new NullReferenceException("Session is null");
     }
 
+    Plugin.Logger.LogDebug("Binding events");
+    Session.MessageLog.OnMessageReceived += MessageReceived;
+    Session.Items.ItemReceived += ItemReceived;
+
     if (deathLink)
     {
+      Plugin.Logger.LogInfo("Creating DeathLink");
       DeathLink = Session.CreateDeathLinkService();
       DeathLink.EnableDeathLink();
       DeathLink.OnDeathLinkReceived += DeathLinkReceived;
@@ -148,10 +153,6 @@ internal sealed class Client
         $"Successfully connected to {loginSuccessful.Slot}/{name} as {Session.ConnectionInfo.Uuid}"
       );
 
-      Plugin.Logger.LogDebug("Binding events");
-      Session.MessageLog.OnMessageReceived += MessageReceived;
-      Session.Items.ItemReceived += ItemReceived;
-
       Slot = new SlotData(loginSuccessful.SlotData);
     }
     else
@@ -177,7 +178,7 @@ internal sealed class Client
     {
       item = helper.PeekItem();
       Plugin.Logger.LogInfo($"Enqueued item {item.ItemName} ({item.ItemId} from {item.ItemGame})");
-      itemQueue.Enqueue(helper);
+      itemQueue!.Enqueue(helper);
       return;
     }
 
