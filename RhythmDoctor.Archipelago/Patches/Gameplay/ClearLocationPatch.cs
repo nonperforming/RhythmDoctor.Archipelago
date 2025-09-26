@@ -6,17 +6,19 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 [HarmonyPatch]
 internal static class ClearLocationPatch
 {
+  // [HarmonyPatch(typeof(LevelBase), nameof(LevelBase.LoadLevelAsset))]
+  // [HarmonyPrefix]
+  // private static void ScoutLocationChecks()
+  // {
+  //   // TODO: Implement.
+  //   // Get the locations we will clear so we can show the user
+  //   // the locations they clear when they pass the level (replace the rank text)
+  // }
+
   /// <summary>
   /// Loading a level.
   /// </summary>
-  // [HarmonyPatch(typeof(LevelBase), nameof(LevelBase.LoadLevelAsset))]
-  // [HarmonyPrefix]
-  // static void ScoutLocationChecks()
-  // {
-  //   throw new NotImplementedException();
-  //   // TODO: implement
-  //   //long[] ids = Plugin.Client.locations.GetIDsForStage(stage, Rank.Splus);
-  // }
+  /// <exception cref="ArgumentOutOfRangeException">Thrown if end goal is not valid.</exception>
   [HarmonyPatch(typeof(HUD), nameof(HUD.ShowAndSaveRank))]
   [HarmonyPrefix]
   private static void CustomClearLocationPatch(bool bossLevelFailed, bool onlySavePersistence)
@@ -76,9 +78,52 @@ internal static class ClearLocationPatch
     }
 
     // X-0 - Helping Hands end goal
+    bool clearedAll = false;
     if (Plugin.Client.Slot.endGoal == SlotData.EndGoal.HelpingHands && level == Level.HelpingHands && rank.passed)
     {
-      Plugin.Logger.LogInfo("Setting goal achieved");
+      Plugin.Logger.LogInfo("Setting goal achieved - Helping Hands");
+      Plugin.Client.Session.SetGoalAchieved();
+    }
+    else if (
+      (
+        Plugin.Client.Slot.endGoal == SlotData.EndGoal.ARankAll
+        || Plugin.Client.Slot.endGoal == SlotData.EndGoal.BRankAll
+        || Plugin.Client.Slot.endGoal == SlotData.EndGoal.PerfectAll
+      )
+      && Plugin.Client.Slot.endGoal != SlotData.EndGoal.HelpingHands
+    )
+    {
+      clearedAll = true;
+      Rank minimumRank;
+      switch (Plugin.Client.Slot.endGoal)
+      {
+        case SlotData.EndGoal.PerfectAll:
+          minimumRank = Rank.S;
+          break;
+        case SlotData.EndGoal.ARankAll:
+          minimumRank = Rank.A;
+          break;
+        case SlotData.EndGoal.BRankAll:
+          minimumRank = Rank.B;
+          break;
+        default:
+          throw new ArgumentOutOfRangeException($"End Goal ({Plugin.Client.Slot.endGoal}) not valid value.");
+      }
+      foreach (Level otherLevel in Enum.GetValues(typeof(Level)))
+      {
+        Rank otherRank = Persistence.GetLevelRank(otherLevel);
+        // If we aren't above the minimum rank, bail.
+        if (minimumRank <= otherRank.ToNormal())
+        {
+          clearedAll = false;
+          break;
+        }
+      }
+    }
+
+    if (clearedAll)
+    {
+      Plugin.Logger.LogInfo("Setting goal achieved - Cleared all");
       Plugin.Client.Session.SetGoalAchieved();
     }
 
