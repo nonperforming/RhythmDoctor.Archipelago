@@ -208,12 +208,11 @@ internal sealed class Client
           // As the stages can only be played sequentially, and we don't have any specific Rank locations,
           //  we can take a shortcut and just set the last level unlocked to the number of
           //  Weightlifter locations we have cleared.
-          int stagesCleared =
-            Session!.Locations.AllLocationsChecked.Count(locationId =>
-              Bindings.RhythmWeightlifterStageToLocationID.Contains(locationId)
-            ) - 1; // Count is 1-indexed
+          int stagesCleared = Session!.Locations.AllLocationsChecked.Count(locationId =>
+            Bindings.RhythmWeightlifterStageToLocationID.Contains(locationId)
+          );
 
-          if (stagesCleared == -1)
+          if (stagesCleared == 0)
           {
             // We haven't cleared any stages yet.
           }
