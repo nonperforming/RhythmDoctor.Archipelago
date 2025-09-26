@@ -50,6 +50,7 @@ public class Plugin : BaseUnityPlugin
     typeof(Act5Patch),
     typeof(ClearLocationPatch),
     typeof(JanitorPatch),
+    typeof(RhythmWeightlifterPatch),
     typeof(SkipCutscenePatch),
     typeof(SkipTutorialPatch),
     typeof(TrapManagerPatch),
