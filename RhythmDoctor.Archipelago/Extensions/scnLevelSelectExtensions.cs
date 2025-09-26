@@ -1,4 +1,4 @@
-namespace RhythmDoctor.Archipelago.Helpers;
+namespace RhythmDoctor.Archipelago.Extensions;
 
 // ReSharper disable once InconsistentNaming
 internal static class scnLevelSelectExtensions

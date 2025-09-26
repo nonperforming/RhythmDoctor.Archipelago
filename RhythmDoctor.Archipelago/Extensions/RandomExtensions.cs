@@ -1,4 +1,4 @@
-namespace RhythmDoctor.Archipelago.Helpers;
+namespace RhythmDoctor.Archipelago.Extensions;
 
 // Fisher-Yates shuffle from https://stackoverflow.com/a/110570
 internal static class RandomExtensions
