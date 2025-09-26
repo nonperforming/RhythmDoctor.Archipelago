@@ -3,6 +3,7 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 // This patch should only be applied after the Client is created.
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 
+[HarmonyPatch]
 internal static class ClearLocationPatch
 {
   /// <summary>
@@ -103,5 +104,20 @@ internal static class ClearLocationPatch
     {
       Plugin.Client.TrapManager.ClearActiveTraps(true);
     }
+  }
+
+  [HarmonyPatch(typeof(RhythmWeightlifter.Level), nameof(RhythmWeightlifter.Level.GetRank))]
+  [HarmonyPostfix]
+  private static void RhythmWeightlifterClearLocationPatch(string __result)
+  {
+    if (__result == "-")
+    {
+      // We haven't actually cleared the level yet.
+      return;
+    }
+    // TODO: Show what item we have sent out somehow.
+    Plugin.Client.Session.Locations.CompleteLocationChecks(
+      Bindings.RhythmWeightlifterStageToLocationID[RhythmWeightlifter.scnRhythmWeightlifter.gameInstance.LevelIndex]
+    );
   }
 }
