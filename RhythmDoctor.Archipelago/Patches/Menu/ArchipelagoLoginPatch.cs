@@ -88,7 +88,7 @@ internal static class ArchipelagoLoginPatch
       .transform.Find("screen/Contents/InsertURL Container/URL InputField/Text")
       .GetComponent<Text>()
       .text.Split('\n');
-    Plugin.Logger.LogInfo($"Input: {text}");
+    Plugin.Logger.LogInfo($"Input: {text.Join()}");
 
     if (text.Length < 2)
     {
