@@ -315,6 +315,7 @@ internal sealed class Client
       else
       {
         Plugin.Logger.LogInfo("Got region key, but not in level select so ignoring");
+        return;
       }
     }
     else if (Bindings.SLEEVE_PAINT_ITEM_ID == item.ItemId)
