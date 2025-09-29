@@ -302,7 +302,22 @@ internal sealed class Client
       TrapManager.AddTrap(trap);
       return;
     }
-    else if (Bindings.KeyItemIdToWard.ContainsKey(item.ItemId) || Bindings.SLEEVE_PAINT_ITEM_ID == item.ItemId)
+    else if (Bindings.KeyItemIdToWard.ContainsKey(item.ItemId))
+    {
+      // We also do this in UnlockItemPatch,
+      // but regions are able to be unlocked cleanly while in level select.
+      if (scnBase.instance is scnLevelSelect)
+      {
+        Region region = Bindings.KeyItemIdToWard[item.ItemId];
+        Plugin.Logger.LogInfo($"Unlocking entrance {region}");
+        scnLevelSelect.instance.UnlockEntrance(region);
+      }
+      else
+      {
+        Plugin.Logger.LogInfo("Got region key, but not in level select so ignoring");
+      }
+    }
+    else if (Bindings.SLEEVE_PAINT_ITEM_ID == item.ItemId)
     {
       // We do this in UnlockItemPatch
       Plugin.Logger.LogInfo($"Ignoring item {item.ItemName} ({item.ItemId})");
