@@ -1,4 +1,3 @@
-
 global using Archipelago.MultiClient.Net;
 global using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 global using Archipelago.MultiClient.Net.Enums;
@@ -45,5 +44,5 @@ global using System.Threading.Tasks;
 global using UnityEngine;
 global using UnityEngine.UI;
 
-
+global using Color = UnityEngine.Color;
 global using Random = System.Random;
