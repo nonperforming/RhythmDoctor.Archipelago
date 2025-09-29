@@ -16,9 +16,8 @@ internal static class UnlockItemPatch
     Plugin.Logger.LogInfo("Checking for regions to unlock");
 
     bool sleevePaint = false;
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-    foreach (ItemInfo item in Plugin.Client.Session.Items.AllItemsReceived)
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
+    // ReSharper disable once NullableWarningSuppressionIsUsed
+    foreach (ItemInfo item in Plugin.Client.Session!.Items.AllItemsReceived)
     {
       if (Bindings.KeyItemIdToWard.TryGetValue(item.ItemId, out Region region))
       {
@@ -26,7 +25,7 @@ internal static class UnlockItemPatch
         scnLevelSelect.instance.UnlockEntrance(region);
       }
 
-      if (!sleevePaint && item.ItemId == Bindings.SLEEVE_PAINT_ITEM_ID)
+      if (item.ItemId == Bindings.SLEEVE_PAINT_ITEM_ID)
       {
         sleevePaint = true;
       }
@@ -152,6 +151,54 @@ internal static class UnlockItemPatch
     }
 
     return matcher.InstructionEnumeration();
+  }
+
+  [HarmonyPatch(nameof(scnLevelSelect.UnlockNightShiftLevel))]
+  [HarmonyPrefix]
+  private static void DoNotUnlockNightShiftLevelPatch(ref bool __runOriginal)
+  {
+    __runOriginal = false;
+  }
+
+  /// <summary>
+  /// Do not unlock levels while loading level data (i.e. collabs).
+  /// </summary>
+  /// <param name="instructions">Original method IL instructions</param>
+  /// <returns>Modified IL instructions</returns>
+  [HarmonyPatch(nameof(scnLevelSelect.LoadLevelData))]
+  [HarmonyTranspiler]
+  private static IEnumerable<CodeInstruction> DoNotUnlockLevelsPatch(IEnumerable<CodeInstruction> instructions)
+  {
+    CodeMatcher matcher = new(instructions);
+    // csharpier-ignore
+    int startIndex = matcher
+      .MatchForward(false, new CodeMatch(OpCodes.Ldstr, "1-X"))
+      .Advance(-2)
+      .Pos;
+    int endIndex = matcher
+      .MatchForward(false, new CodeMatch(OpCodes.Newobj, AccessTools.Constructor(typeof(List<Level>))))
+      .Advance(-1)
+      .Pos;
+
+    matcher.RemoveInstructionsInRange(startIndex, endIndex);
+    return matcher.InstructionEnumeration();
+  }
+
+  [HarmonyPatch(nameof(scnLevelSelect.Awake))]
+  [HarmonyTranspiler]
+  private static IEnumerable<CodeInstruction> DoNotUnlockArtRoomLevels(IEnumerable<CodeInstruction> instructions)
+  {
+    // csharpier-ignore
+    return new CodeMatcher(instructions)
+      // For Helping Hands
+      .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(RDUtils), nameof(RDUtils.Locked))))
+      .Advance(-1).SetOpcodeAndAdvance(OpCodes.Nop) // otherwise stack will be messed up
+      .SetOpcodeAndAdvance(OpCodes.Ldc_I4_0) // force false
+      // For Art Exercise
+      .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(RDUtils), nameof(RDUtils.Locked))))
+      .Advance(-1).SetOpcodeAndAdvance(OpCodes.Nop) // otherwise stack will be messed up
+      .SetOpcodeAndAdvance(OpCodes.Ldc_I4_0) // force false
+      .InstructionEnumeration();
   }
 
   internal static bool HasUnlockedBossSong(Act act)
