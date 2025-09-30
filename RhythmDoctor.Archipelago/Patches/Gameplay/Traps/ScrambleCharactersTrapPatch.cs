@@ -71,20 +71,21 @@ internal class ScrambleCharactersTrapPatch : ITrap
     _harmony.UnpatchSelf();
   }
 
-  [HarmonyPatch(typeof(RDLevelData))]
+  [HarmonyPatch]
   private static class Patch
   {
-    [HarmonyPatch(nameof(RDLevelData.Decode))]
+    [HarmonyPatch(typeof(RDLevelData), nameof(RDLevelData.Decode))]
     [HarmonyPostfix]
     private static void ModifyCharacterDataPatch(RDLevelData __result)
     {
       Plugin.Logger.LogDebug("Scramble Characters: Modifying MakeRow and ChangeCharacter level events");
 
-      foreach (LevelEvent_MakeRow row in __result.rows)
-      {
-        Plugin.Logger.LogDebug($"MakeRow in rows: {row.character} -> {scrambled[row.character]}");
-        row.character = scrambled[row.character];
-      }
+      // Leads to characters being randomized twice
+      // foreach (LevelEvent_MakeRow row in __result.rows)
+      // {
+      //   Plugin.Logger.LogDebug($"MakeRow in rows: {row.character} -> {scrambled[row.character]}");
+      //   row.character = scrambled[row.character];
+      // }
 
       foreach (LevelEvent_Base levelEvent in __result.levelEvents)
       {
@@ -114,6 +115,20 @@ internal class ScrambleCharactersTrapPatch : ITrap
           // Some levels such as X-0 Helping Hands use the MakeRow event manually
           makeRow.character = scrambled[makeRow.character];
         }
+      }
+    }
+
+    [HarmonyPatch(typeof(RDInk), nameof(RDInk.ParsePortrait))]
+    [HarmonyPrefix]
+    private static void ModifyInkPortraitPatch(ref string fullName)
+    {
+      string character = fullName.Split("_")[0];
+      if (Enum.TryParse(character, out Character toRandomize))
+      {
+        Character randomized = scrambled[toRandomize];
+        string scrambledTo = randomized.ToString();
+        Plugin.Logger.LogDebug($"Scramble Characters: Modifying portrait from {toRandomize} to {scrambledTo}");
+        fullName = fullName.Replace(character, scrambledTo);
       }
     }
   }
