@@ -15,6 +15,8 @@ public class Plugin : BaseUnityPlugin
   internal static DebugMenu DebugMenu = null!;
 #endif
 
+  internal static Plugin Instance = null!;
+
   // ReSharper restore NullableWarningSuppressionIsUsed
 
   internal const string PATCH_ID_ALWAYS_ACTIVE = MyPluginInfo.PLUGIN_GUID;
@@ -67,6 +69,7 @@ public class Plugin : BaseUnityPlugin
   /// </summary>
   private void Awake()
   {
+    Instance = this;
     Logger = base.Logger;
     Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} loaded");
 

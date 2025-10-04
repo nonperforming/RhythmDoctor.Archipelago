@@ -258,14 +258,7 @@ public class DebugMenu : MonoBehaviour
           Notify("Unlocking all levels");
           foreach (Level level in Enum.GetValues(typeof(Level)))
           {
-            try
-            {
-              Persistence.SetLevelRank(level, Rank.NotFinished, true);
-            }
-            catch (NotImplementedException)
-            {
-              Persistence.SetLevelRank(level, Rank.NotFinished, true);
-            }
+            Persistence.SetLevelRank(level, Rank.NotFinished, true);
           }
           scnBase.GoToLevelSelect();
         }

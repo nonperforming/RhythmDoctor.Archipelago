@@ -6,22 +6,41 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 [HarmonyPatch]
 internal static class ClearLocationPatch
 {
-  // [HarmonyPatch(typeof(LevelBase), nameof(LevelBase.LoadLevelAsset))]
-  // [HarmonyPrefix]
-  // private static void ScoutLocationChecks()
-  // {
-  //   // TODO: Implement.
-  //   // Get the locations we will clear so we can show the user
-  //   // the locations they clear when they pass the level (replace the rank text)
-  // }
+  private static Dictionary<long, ScoutedItemInfo> ItemsToSend = new();
+
+  // TODO: Hack for ShowSentItemsPatch as ShowAndSaveRank is called before we show the rank description text.
+  //       Someone should probably clean this up.
+  private static long[] JustSentLocations = [];
+
+  [HarmonyPatch(typeof(LevelBase), nameof(LevelBase), MethodType.Constructor)]
+  [HarmonyPrefix]
+  private static void ScoutItemsSentPatch()
+  {
+    Plugin.Logger.LogDebug("Scouting locations to send");
+    ItemsToSend.Clear();
+    JustSentLocations = [];
+
+    // Get the locations we will clear so we can show the user
+    // the locations they clear when they pass the level (replace the rank text)
+    if (!Enum.TryParse(scnGame.internalIdentifier, out Level level))
+    {
+      Plugin.Logger.LogError($"Couldn't find Level. Level identifier: {scnGame.internalIdentifier}");
+      Plugin.Client.TrapManager.ClearActiveTraps(false);
+      return;
+    }
+
+    // Guaranteed to be ordered from the highest to lowest rank's locations.
+    IReadOnlyCollection<long> ids = Bindings.LevelToStage[level].GetLocationsToClear(Rank.S);
+    Plugin.Instance.StartCoroutine(ScoutLocationChecks(ids.ToArray()));
+  }
 
   /// <summary>
-  /// Loading a level.
+  /// Send relevant locations (and end goal if applicable) when clearing a level.
   /// </summary>
   /// <exception cref="ArgumentOutOfRangeException">Thrown if end goal is not valid.</exception>
   [HarmonyPatch(typeof(HUD), nameof(HUD.ShowAndSaveRank))]
   [HarmonyPrefix]
-  private static void CustomClearLocationPatch(bool bossLevelFailed, bool onlySavePersistence)
+  private static void CustomClearLocationPatch(bool bossLevelFailed, bool onlySavePersistence, HUD __instance)
   {
     // Is onlySavePersistence is currently only used in custom levels?
     // "there's a function for custom levels to skip the rank text [rank screen] at the end"
@@ -45,39 +64,11 @@ internal static class ClearLocationPatch
       return;
     }
 
-    if (!Enum.TryParse(scnGame.instance.levelIdentifier, out Level level))
-    {
-      Plugin.Logger.LogError($"Couldn't find Level. Level identifier: {scnGame.instance.levelIdentifier}");
-      Plugin.Client.TrapManager.ClearActiveTraps(false);
-      return;
-    }
-
-    Plugin.Logger.LogDebug("Getting locations to clear");
+    Level level = GetCurrentLevel();
     Rank rank = scnGame.instance.currentLevel.GetRankFromMistakes();
+    IReadOnlyCollection<long> ids = GetStageLocationIDsToClear(rank);
 
-    IReadOnlyCollection<long> ids;
-    if (scnGame.instance.currentLevel.dogMode && level == Level.Lesmis)
-    {
-      Plugin.Logger.LogInfo("Detected Rhythm Dogtor");
-      // Playing 3-DOG - Rhythm Dogtor
-      // ReSharper disable once NullableWarningSuppressionIsUsed
-      BossStage rhythmDogtor = (Bindings.LevelToStage[level] as BossStage)!;
-
-      List<long> idsToClear = [rhythmDogtor.ExtraLocations["dog_clear"]];
-      if (rank.perfected)
-      {
-        idsToClear.Add(rhythmDogtor.ExtraLocations["dog_perfect"]);
-      }
-
-      ids = idsToClear.AsReadOnly();
-    }
-    else
-    {
-      ids = Bindings.LevelToStage[level].GetLocationsToClear(rank);
-      Plugin.Logger.LogDebug($"Stage to clear: {level} with rank {rank} ({string.Join(", ", ids)})");
-    }
-
-    // X-0 - Helping Hands end goal
+    // Check if we fulfill the End Goal requirements
     bool clearedAll = false;
     if (Plugin.Client.Slot.endGoal == SlotData.EndGoal.HelpingHands && level == Level.HelpingHands && rank.passed)
     {
@@ -127,22 +118,12 @@ internal static class ClearLocationPatch
       Plugin.Client.Session.SetGoalAchieved();
     }
 
-    bool clearedNewLocation = false;
-    foreach (long id in ids)
-    {
-      if (Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id))
-      {
-        continue;
-      }
-      clearedNewLocation = true;
-      break;
-    }
-
+    bool clearedNewLocation = ids.Any(id => !Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id));
     if (clearedNewLocation)
     {
       // FIXME: This blocks until completion - should be async!
-      long[] locationsToClear = ids.ToArray();
-      Plugin.Client.Session.Locations.CompleteLocationChecks(locationsToClear);
+      JustSentLocations = ids.Where(id => !Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id)).ToArray();
+      Plugin.Client.Session.Locations.CompleteLocationChecks(ids.ToArray());
       Plugin.Client.TrapManager.ClearActiveTraps(false);
     }
     else
@@ -165,4 +146,134 @@ internal static class ClearLocationPatch
       Bindings.RhythmWeightlifterStageToLocationID[RhythmWeightlifter.scnRhythmWeightlifter.gameInstance.LevelIndex]
     );
   }
+
+  [HarmonyPatch(typeof(HUD), nameof(HUD.ShowRankDescription))]
+  [HarmonyPostfix]
+  private static void ShowSentItemsPatch(HUD __instance)
+  {
+    // TODO: Need to check if this works with narration.
+    if (ItemsToSend.Count == 0)
+    {
+      Plugin.Logger.LogWarning("Couldn't get items sent, possibly due to a network issue.");
+      __instance.description.text = "<color=red>Couldn't get items sent.</color>";
+    }
+    else
+    {
+      Rank rank = scnGame.instance.currentLevel.GetRankFromMistakes();
+      IReadOnlyCollection<long> ids = GetStageLocationIDsToClear(rank);
+      long[] newLocations = ids.Where(id =>
+          !Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id) || JustSentLocations.Contains(id)
+        )
+        .ToArray();
+
+      Plugin.Logger.LogDebug($"IDs: {string.Join(", ", ids)} (of which {string.Join(", ", newLocations)} are new)");
+
+      // TODO: It'd be nice to show which rank sent what item.
+
+      if (ids.Count == 0)
+      {
+        __instance.description.text = "Didn't find anything.";
+        return;
+      }
+      else if (newLocations.Length == 0)
+      {
+        __instance.description.text = "Didn't find anything new.";
+        return;
+      }
+
+      // We can't use <size> tags, as we will get this error:
+      //  Font 'RDLatinFontPoint (UnityEngine.Font)' is not dynamic, which is required to override its size
+      __instance.description.text = "";
+      __instance.description.fontSize = 10;
+      foreach (long id in newLocations)
+      {
+        ScoutedItemInfo itemInfo = ItemsToSend[id];
+
+        string color = "silver"; // Filler
+        if (itemInfo.Flags.HasFlag(ItemFlags.Advancement) || itemInfo.Flags.HasFlag(ItemFlags.NeverExclude))
+        {
+          color = "yellow";
+        }
+        else if (itemInfo.Flags.HasFlag(ItemFlags.Trap))
+        {
+          color = "red";
+        }
+
+        if (itemInfo.IsReceiverRelatedToActivePlayer)
+        {
+          __instance.description.text += $"\nFound <color={color}>{itemInfo.ItemDisplayName}</color>";
+        }
+        else
+        {
+          __instance.description.text +=
+            $"\nSent <color={color}>{itemInfo.ItemDisplayName}</color> to {itemInfo.Player.Alias}";
+        }
+      }
+    }
+
+    ItemsToSend.Clear();
+    JustSentLocations = [];
+  }
+
+  private static IEnumerator ScoutLocationChecks(long[] ids)
+  {
+    Plugin.Logger.LogDebug("Scouting location checks...");
+    Task<Dictionary<long, ScoutedItemInfo>> scout = Task.Run(
+      () => Plugin.Client.Session.Locations.ScoutLocationsAsync(HintCreationPolicy.None, ids)
+    );
+    yield return new WaitUntil(() => scout.IsCompleted);
+    Plugin.Logger.LogDebug("Completed scouting");
+
+    if (!scout.IsCompletedSuccessfully)
+    {
+      Plugin.Logger.LogWarning("Couldn't scout locations");
+      yield break;
+    }
+
+    ItemsToSend = scout.Result;
+  }
+
+  private static Level GetCurrentLevel()
+  {
+    if (!Enum.TryParse(scnGame.internalIdentifier, out Level level))
+    {
+      Plugin.Logger.LogError($"Couldn't find Level. Level identifier: {scnGame.internalIdentifier}");
+      Plugin.Client.TrapManager.ClearActiveTraps(false);
+      throw new ArgumentOutOfRangeException($"Couldn't find level {scnGame.internalIdentifier}");
+    }
+
+    return level;
+  }
+
+#pragma warning disable Harmony003
+  private static IReadOnlyCollection<long> GetStageLocationIDsToClear(Rank rank)
+  {
+    Level level = GetCurrentLevel();
+    Plugin.Logger.LogDebug("Getting locations to clear");
+
+    IReadOnlyCollection<long> ids;
+    if (scnGame.instance.currentLevel.dogMode && level == Level.Lesmis)
+    {
+      Plugin.Logger.LogInfo("Detected Rhythm Dogtor");
+      // Playing 3-DOG - Rhythm Dogtor
+      // ReSharper disable once NullableWarningSuppressionIsUsed
+      BossStage rhythmDogtor = (Bindings.LevelToStage[level] as BossStage)!;
+
+      List<long> idsToClear = [rhythmDogtor.ExtraLocations["dog_clear"]];
+      if (rank.perfected)
+      {
+        idsToClear.Add(rhythmDogtor.ExtraLocations["dog_perfect"]);
+      }
+
+      ids = idsToClear.AsReadOnly();
+    }
+    else
+    {
+      ids = Bindings.LevelToStage[level].GetLocationsToClear(rank);
+      Plugin.Logger.LogDebug($"Stage to clear: {level} with rank {rank} ({string.Join(", ", ids)})");
+    }
+
+    return ids;
+  }
+#pragma warning restore Harmony003
 }

@@ -12,7 +12,7 @@ internal static class LogClearLevelPatch
       @$"--- HUD.ShowAndSaveRank(bool bossLevelFailed = {bossLevelFailed}, bool onlySavePersistence = {onlySavePersistence})
 Rank: {scnGame.instance.currentLevel.GetRankFromMistakes().ToString()}
 Mistakes: {scnGame.instance.mistakesManager.mistakes}
-Level ID: {scnGame.instance.levelIdentifier}
+Level ID: {scnGame.instance.levelIdentifier} (internal: {scnGame.internalIdentifier})
 ---"
     );
   }

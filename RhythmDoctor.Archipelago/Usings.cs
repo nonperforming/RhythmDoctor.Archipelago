@@ -4,6 +4,7 @@ global using Archipelago.MultiClient.Net.Enums;
 global using Archipelago.MultiClient.Net.Helpers;
 global using Archipelago.MultiClient.Net.MessageLog.Messages;
 global using Archipelago.MultiClient.Net.Models;
+global using Archipelago.MultiClient.Net.Packets;
 
 global using BepInEx;
 global using BepInEx.Logging;
