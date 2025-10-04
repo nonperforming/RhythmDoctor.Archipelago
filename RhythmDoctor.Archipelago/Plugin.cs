@@ -15,6 +15,8 @@ public class Plugin : BaseUnityPlugin
   internal static DebugMenu DebugMenu = null!;
 #endif
 
+  internal static ConcurrentQueue<Action> ToExecuteOnMainThread = new();
+
   internal static Plugin Instance = null!;
 
   // ReSharper restore NullableWarningSuppressionIsUsed
@@ -26,6 +28,7 @@ public class Plugin : BaseUnityPlugin
   internal const string PATCH_ID_ARCHIPELAGO_MENU = $"{MyPluginInfo.PLUGIN_GUID}.cls";
   internal const string PATCH_ID_POST_LOGIN = $"{MyPluginInfo.PLUGIN_GUID}.post";
   internal const string PATCH_ID_TRAP = $"{MyPluginInfo.PLUGIN_GUID}.trap";
+  internal const string PATCH_ID_SLEEVE_PAINT = $"{MyPluginInfo.PLUGIN_GUID}.sleevepaint";
 
   // Harmony's PatchCategories are not available on HarmonyX yet.
 
@@ -83,6 +86,14 @@ public class Plugin : BaseUnityPlugin
     ApplyPatches(AlwaysActivePatches, PATCH_ID_ALWAYS_ACTIVE);
   }
 
+  private void Update()
+  {
+    while (ToExecuteOnMainThread.TryDequeue(out Action action))
+    {
+      action.Invoke();
+    }
+  }
+
   private static void ApplyPatches(Type[] patches, string id)
   {
     Logger.LogInfo($"Applying patches as {id}");
@@ -99,12 +110,14 @@ public class Plugin : BaseUnityPlugin
   {
     Logger.LogInfo("Applying gameplay patches");
     ApplyPatches(PostLoginPatches, PATCH_ID_POST_LOGIN);
+    Harmony.CreateAndPatchAll(typeof(LockSleevePaintPatch), PATCH_ID_SLEEVE_PAINT);
   }
 
   internal static void UnapplyGameplayPatches()
   {
     Logger.LogInfo("Unapplying gameplay patches");
     Harmony.UnpatchID(PATCH_ID_POST_LOGIN);
+    Harmony.UnpatchID(PATCH_ID_SLEEVE_PAINT);
   }
 
 #if DEBUG

@@ -320,8 +320,17 @@ internal sealed class Client
     }
     else if (Bindings.SLEEVE_PAINT_ITEM_ID == item.ItemId)
     {
-      // We do this in UnlockItemPatch
-      Plugin.Logger.LogInfo($"Ignoring item {item.ItemName} ({item.ItemId})");
+      Harmony.UnpatchID(Plugin.PATCH_ID_SLEEVE_PAINT);
+
+      // Unity will crash if we do not call this on the main thread.
+      Plugin.Logger.LogDebug("Queueing reloading Sleeve Paint on main thread");
+      Plugin.ToExecuteOnMainThread.Enqueue(() =>
+      {
+        // Reload our actual Sleeve Paint.
+        Persistence.p1Skin.Reload();
+        Persistence.p2Skin.Reload();
+      });
+
       return;
     }
     // ReSharper restore NullableWarningSuppressionIsUsed

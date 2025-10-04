@@ -22,7 +22,7 @@ internal static class SavingPatch
     __runOriginal = false;
     // .ToString() shouldn't modify an enum???
 #pragma warning disable Harmony003
-    __result = Path.Combine(Persistence.GetSaveFileFolderPath(), "scribble", $"{player.ToString()}_AP.png");
+    __result = Path.Combine(Persistence.GetSaveFileFolderPath(), $"scribble{player.ToString()}_AP.png");
 #pragma warning restore Harmony003
   }
 }

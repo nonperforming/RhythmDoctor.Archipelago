@@ -4,7 +4,6 @@ global using Archipelago.MultiClient.Net.Enums;
 global using Archipelago.MultiClient.Net.Helpers;
 global using Archipelago.MultiClient.Net.MessageLog.Messages;
 global using Archipelago.MultiClient.Net.Models;
-global using Archipelago.MultiClient.Net.Packets;
 
 global using BepInEx;
 global using BepInEx.Logging;
@@ -34,9 +33,10 @@ global using RhythmDoctor.Archipelago.World.Data;
 
 global using System;
 global using System.Collections;
-global using System.Collections.Generic;
+global using System.Collections.Concurrent;
 global using System.Diagnostics.CodeAnalysis;
 global using System.Diagnostics.Contracts;
+global using System.Collections.Generic;
 global using System.IO;
 global using System.Linq;
 global using System.Reflection.Emit;
