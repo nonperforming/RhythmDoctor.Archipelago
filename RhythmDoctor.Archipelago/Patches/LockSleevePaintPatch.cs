@@ -9,7 +9,7 @@ internal static class LockSleevePaintPatch
   {
     __runOriginal = false;
 
-    int slot = new Random().Next(0, 2);
+    int slot = Plugin.Random.Next(0, 2);
 
     // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
     switch (__instance.player)

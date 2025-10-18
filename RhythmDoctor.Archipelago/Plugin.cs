@@ -15,7 +15,8 @@ public class Plugin : BaseUnityPlugin
   internal static DebugMenu DebugMenu = null!;
 #endif
 
-  internal static ConcurrentQueue<Action> ToExecuteOnMainThread = new();
+  internal static readonly Random Random = new();
+  internal static readonly ConcurrentQueue<Action> ToExecuteOnMainThread = new();
 
   internal static Plugin Instance = null!;
 

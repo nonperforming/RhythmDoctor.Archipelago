@@ -20,10 +20,12 @@ internal static class UnapplyPatchesPatch
     try
     {
       scnMenu.instance.slots[0].LoadSlotData();
+      Plugin.Logger.LogDebug("Reloaded slot data");
     }
     catch (NullReferenceException)
     {
       // We aren't in the Main Menu yet. Don't do anything.
+      Plugin.Logger.LogDebug("Not in main menu, could not load slot data");
     }
 
     Plugin.Client.Dispose();

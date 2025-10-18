@@ -215,9 +215,9 @@ internal static class ClearLocationPatch
     JustSentLocations = [];
   }
 
-  private static IEnumerator ScoutLocationChecks(long[] ids)
+  private static IEnumerator ScoutLocationChecks(long[] ids, int retries = 0)
   {
-    Plugin.Logger.LogDebug("Scouting location checks...");
+    Plugin.Logger.LogDebug($"Scouting location checks... (try {retries})");
     Task<Dictionary<long, ScoutedItemInfo>> scout = Task.Run(
       () => Plugin.Client.Session.Locations.ScoutLocationsAsync(HintCreationPolicy.None, ids)
     );
@@ -226,7 +226,14 @@ internal static class ClearLocationPatch
 
     if (!scout.IsCompletedSuccessfully)
     {
-      Plugin.Logger.LogWarning("Couldn't scout locations");
+      if (retries >= 3)
+      {
+        Plugin.Logger.LogError($"Couldn't scout locations - on try #{retries}, retrying");
+        Plugin.Instance.StartCoroutine(ScoutLocationChecks(ids, retries + 1));
+        yield break;
+      }
+
+      Plugin.Logger.LogError("Couldn't scout locations");
       yield break;
     }
 
