@@ -3,7 +3,7 @@ namespace RhythmDoctor.Archipelago.Client;
 /// <summary>
 /// Archipelago client
 /// </summary>
-internal sealed class Client
+internal sealed class Client : IDisposable
 {
   internal ArchipelagoSession? Session;
   internal DeathLinkService? DeathLink;
@@ -343,5 +343,27 @@ internal sealed class Client
   {
     Plugin.Logger.LogInfo($"DeathLink from {deathLink.Source} by \"{deathLink.Cause}\" at {deathLink.Timestamp}");
     // TODO: Implement
+  }
+
+  public void Dispose()
+  {
+    IEnumerator DisconnectSession(ArchipelagoSession __session)
+    {
+      Plugin.Logger.LogInfo("Disconnecting session...");
+      Task disconnect = Task.Run(__session.Socket.DisconnectAsync);
+      yield return new WaitUntil(() => disconnect.IsCompleted);
+    }
+
+    if (Session != null)
+    {
+      Session.MessageLog.OnMessageReceived -= MessageReceived;
+      Session.Items.ItemReceived -= ItemReceived;
+      if (DeathLink != null)
+      {
+        DeathLink.OnDeathLinkReceived -= DeathLinkReceived;
+      }
+      Plugin.Instance.StartCoroutine(DisconnectSession(Session));
+    }
+    TrapManager.Dispose();
   }
 }

@@ -1,10 +1,10 @@
 namespace RhythmDoctor.Archipelago.Client;
 
-internal sealed class TrapManager
+internal sealed class TrapManager : IDisposable
 {
   public TrapManager()
   {
-    Events.Instance.LevelDeselected += (_, _) => ClearPreviewTraps();
+    Events.Instance.LevelDeselected += OnLevelDeselected;
   }
 
   // TODO: trap manager: restore traps *in order* when connecting to a slot that always has traps (i.e. async), read
@@ -163,7 +163,7 @@ internal sealed class TrapManager
     return _previewTraps;
   }
 
-  internal void ClearPreviewTraps()
+  private void ClearPreviewTraps()
   {
     // FIXME: Find a more specific Exception
     // if (_previewTraps.Length == 0)
@@ -177,6 +177,11 @@ internal sealed class TrapManager
     }
 
     ClearTrapsList(ref _previewTraps, true);
+  }
+
+  private void OnLevelDeselected(object _, EventArgs __)
+  {
+    ClearPreviewTraps();
   }
   #endregion
 
@@ -226,4 +231,9 @@ internal sealed class TrapManager
     }
   }
   #endregion
+
+  public void Dispose()
+  {
+    Events.Instance.LevelDeselected -= OnLevelDeselected;
+  }
 }

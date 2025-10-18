@@ -26,14 +26,8 @@ internal static class UnapplyPatchesPatch
       // We aren't in the Main Menu yet. Don't do anything.
     }
 
-    // TODO: Correct way to tear down Archipelago client?
-    if (Plugin.Client.Session != null)
-    {
-      // For some reason session does not want to accept '?'
-      // NOTE: Disconnect in a non-async manner is under NET35
-      //       This should probably be made async.
-      Task.Run(Plugin.Client.Session.Socket.DisconnectAsync).Wait();
-    }
+    Plugin.Client.Dispose();
+    // ReSharper disable once NullableWarningSuppressionIsUsed
     Plugin.Client = null!;
   }
 }
