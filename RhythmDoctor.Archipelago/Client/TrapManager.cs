@@ -2,13 +2,13 @@ namespace RhythmDoctor.Archipelago.Client;
 
 internal sealed class TrapManager : IDisposable
 {
-  public TrapManager()
+  public TrapManager(Dictionary<string, int>? clearedTraps = null)
   {
     Events.Instance.LevelDeselected += OnLevelDeselected;
+    ClearedTraps = clearedTraps ?? new Dictionary<string, int>();
   }
 
-  // TODO: trap manager: restore traps *in order* when connecting to a slot that always has traps (i.e. async), read
-  //       datastorage for cleared traps (pop the applicable traps in order from lowest to highest)
+  internal Dictionary<string, int> remoteTrapClearCache = new();
 
   /// <summary>
   /// Ordered array of traps that were applied to the level preview, by the lowest index to the highest index.
@@ -54,15 +54,9 @@ internal sealed class TrapManager : IDisposable
   internal readonly List<ITrap> Traps = new();
 
   /// <summary>
-  /// Add a trap to the list of queued traps.
+  /// The traps previously cleared.
   /// </summary>
-  /// <param name="trap">The trap to add</param>
-  internal void AddTrap(ITrap trap)
-  {
-    Plugin.Logger.LogInfo($"Adding {trap.Name} trap");
-    Traps.Add(trap);
-    trap.InQueue();
-  }
+  internal readonly Dictionary<string, int> ClearedTraps;
 
   /// <summary>
   /// Add a trap to the list of queued traps.
@@ -72,6 +66,47 @@ internal sealed class TrapManager : IDisposable
   {
     Plugin.Logger.LogInfo($"Creating {type.Name} trap from type");
     AddTrap((ITrap)Activator.CreateInstance(type));
+  }
+
+  /// <summary>
+  /// Add a trap to the list of queued traps.
+  /// </summary>
+  /// <param name="trap">The trap to add.</param>
+  internal void AddTrap(ITrap trap)
+  {
+    bool CheckIfTrapAlreadyCleared(string trapName)
+    {
+      int local = ClearedTraps[trap.Name];
+
+      if (local < remoteTrapClearCache[trap.Name])
+      {
+        Plugin.Logger.LogDebug($"Already cleared: l:{local} < c:{remoteTrapClearCache[trap.Name]}");
+        return true;
+      }
+      else
+      {
+        int remote = Plugin.Client.Session!.DataStorage[Scope.Slot, trap.Name];
+        if (local < remote)
+        {
+          remoteTrapClearCache[trap.Name] = remote;
+          Plugin.Logger.LogDebug($"Already cleared: l:{local} < r:{remote} (updated cache)");
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    if (CheckIfTrapAlreadyCleared(trap.Name))
+    {
+      Plugin.Logger.LogInfo($"Skipping {trap.Name} trap as it has been cleared previously");
+      ClearedTraps[trap.Name]++;
+      return;
+    }
+
+    Plugin.Logger.LogInfo($"Adding {trap.Name} trap");
+    Traps.Add(trap);
+    trap.InQueue();
   }
 
   private void ClearTrapsList(ref (int index, ITrap trap)[] trapList, bool returnToQueue)
@@ -197,6 +232,11 @@ internal sealed class TrapManager : IDisposable
     foreach ((_, ITrap trap) in _activeTraps)
     {
       trap.ActiveEnd();
+      if (!returnToQueue)
+      {
+        ClearedTraps[trap.Name]++;
+        Plugin.Client.Session!.DataStorage[Scope.Slot, trap.Name] = ClearedTraps[trap.Name];
+      }
     }
 
     ClearTrapsList(ref _activeTraps, returnToQueue);

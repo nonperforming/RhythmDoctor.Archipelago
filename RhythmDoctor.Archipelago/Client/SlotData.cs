@@ -30,7 +30,9 @@ internal struct SlotData
     endGoal = (EndGoal)(long)slotData["end_goal"];
     bossUnlockRequirement = (BossUnlockRequirement)(long)slotData["boss_unlock_requirement"];
     deathLink = (long)slotData["death_link"] != 0;
-    Plugin.Logger.LogDebug($"Created SlotData - {endGoal}, {bossUnlockRequirement},  {deathLink}");
+    Plugin.Logger.LogDebug(
+      $"Created SlotData - End Goal {endGoal}, Boss Unlock Requirement {bossUnlockRequirement}, Death Link {deathLink}"
+    );
   }
 
   internal readonly EndGoal endGoal;

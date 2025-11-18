@@ -58,7 +58,6 @@ internal sealed class Client : IDisposable
   public Client(string server, string username, string? password = null, bool deathLink = false)
   {
     itemQueue = new Queue<ReceivedItemsHelper>();
-    TrapManager = new TrapManager();
 
     CreateSession(server);
     try
@@ -72,6 +71,8 @@ internal sealed class Client : IDisposable
         exception
       );
     }
+
+    TrapManager = new TrapManager();
   }
 
 #if DEBUG
@@ -123,6 +124,7 @@ internal sealed class Client : IDisposable
       DeathLink.OnDeathLinkReceived += DeathLinkReceived;
     }
 
+    Plugin.Logger.LogDebug("Attempting to login");
     LoginResult loginResult = Session.TryConnectAndLogin(
       "Rhythm Doctor",
       name,
@@ -136,6 +138,7 @@ internal sealed class Client : IDisposable
 
     if (loginResult is LoginFailure loginFailure)
     {
+      Plugin.Logger.LogError("Login failed");
       for (int i = 0; i < loginFailure.Errors.Length; i++)
       {
         string error = loginFailure.Errors[i];
@@ -302,13 +305,12 @@ internal sealed class Client : IDisposable
       TrapManager.AddTrap(trap);
       return;
     }
-    else if (Bindings.KeyItemIdToWard.ContainsKey(item.ItemId))
+    else if (Bindings.KeyItemIdToWard.TryGetValue(item.ItemId, out Region region))
     {
       // We also do this in UnlockItemPatch,
       // but regions are able to be unlocked cleanly while in level select.
       if (scnBase.instance is scnLevelSelect)
       {
-        Region region = Bindings.KeyItemIdToWard[item.ItemId];
         Plugin.Logger.LogInfo($"Unlocking entrance {region}");
         scnLevelSelect.instance.UnlockEntrance(region);
       }

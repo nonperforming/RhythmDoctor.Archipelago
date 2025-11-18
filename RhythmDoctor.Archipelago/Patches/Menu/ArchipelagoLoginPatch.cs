@@ -124,7 +124,7 @@ internal static class ArchipelagoLoginPatch
     }
 
     // Attempt to log in with the information given.
-    Plugin.Logger.LogInfo("Attempting to login");
+    Plugin.Logger.LogInfo("Creating client");
     try
     {
       Plugin.Client = new Client.Client(url, name, password);
@@ -132,10 +132,12 @@ internal static class ArchipelagoLoginPatch
     catch (Exception exception)
     {
       Plugin.Logger.LogError(exception);
+      Plugin.Client.Dispose();
+      Plugin.Client = null!;
       // Bail out
       __instance.CurrentContentName = LevelImporter.ContentName.LevelsInstalled;
       __instance.cls.CLSPlaySound("sndImportInstallFinish");
-      __instance.AddLevelToErrorSection(__instance.levelsToInstall[0], exception.Message);
+      __instance.AddLevelToErrorSection(__instance.levelsToInstall[0], exception.Message); // FIXME: Not showing anything
       yield break;
     }
 
@@ -145,19 +147,31 @@ internal static class ArchipelagoLoginPatch
     __instance.cls.CLSPlaySound("sndImportInstallFinish");
     Persistence.currentSlotIndex = 0; // Slot 1
     Plugin.ApplyGameplayPatches();
+
     // Scary!!!!!!!!!!!
     // Hopefully if we got here without any exceptions SavingPatch should be applied,
     //  so we shouldn't lose our first slot in the case of a crash.
     // When we are quitting, the original data should be reloaded by UnapplyPatchesPatch.
     Persistence.slotPrefs[0].Clear();
+
     // Let LockSleevePaintPatch set the Sleeve Paint to Slot 1's default
     Persistence.p1Skin.Reload();
     Persistence.p2Skin.Reload();
+
     // Some levels come unlocked by default, such as X-1.
     // Lock all levels to force the user to unlock them with an item.
     foreach (Level level in Enum.GetValues(typeof(Level)))
     {
       Persistence.SetLevelRank(level, Rank.NotAvailable, true);
+    }
+
+    // Setup DataStorage and TrapManager.ClearedTraps
+    foreach (Type trapType in Bindings.Traps)
+    {
+      ITrap trap = (ITrap)Activator.CreateInstance(trapType);
+      // ReSharper disable once NullableWarningSuppressionIsUsed
+      Plugin.Client.Session!.DataStorage[Scope.Slot, trap.Name].Initialize(0);
+      Plugin.Client.TrapManager.ClearedTraps.Add(trap.Name, 0);
     }
     Plugin.Client.ReadyForItems = true;
     UnpatchMenu();
