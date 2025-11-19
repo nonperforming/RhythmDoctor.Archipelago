@@ -76,24 +76,26 @@ internal sealed class TrapManager : IDisposable
   {
     bool CheckIfTrapAlreadyCleared(string trapName)
     {
-      int local = ClearedTraps[trap.Name];
+      int local = ClearedTraps[trapName];
+      remoteTrapClearCache.TryGetValue(trapName, out int remote);
 
-      if (local < remoteTrapClearCache[trap.Name])
+      if (remote != 0 && local <= remote)
       {
-        Plugin.Logger.LogDebug($"Already cleared: l:{local} < c:{remoteTrapClearCache[trap.Name]}");
+        Plugin.Logger.LogDebug($"Already cleared: l:{local} <= c:{remoteTrapClearCache[trapName]} != 0");
         return true;
       }
       else
       {
-        int remote = Plugin.Client.Session!.DataStorage[Scope.Slot, trap.Name];
-        if (local < remote)
+        remote = Plugin.Client.Session!.DataStorage[Scope.Slot, trapName];
+        if (remote != 0 && local <= remote)
         {
-          remoteTrapClearCache[trap.Name] = remote;
-          Plugin.Logger.LogDebug($"Already cleared: l:{local} < r:{remote} (updated cache)");
+          remoteTrapClearCache[trapName] = remote;
+          Plugin.Logger.LogDebug($"Already cleared: l:{local} <= r:{remote} != 0 (updated cache)");
           return true;
         }
       }
 
+      Plugin.Logger.LogDebug($"Not cleared: l:{local} <= r:{remote} != 0");
       return false;
     }
 
@@ -104,7 +106,7 @@ internal sealed class TrapManager : IDisposable
       return;
     }
 
-    Plugin.Logger.LogInfo($"Adding {trap.Name} trap");
+    Plugin.Logger.LogInfo($"Adding {trap.Name} trap as we haven't cleared it yet");
     Traps.Add(trap);
     trap.InQueue();
   }
@@ -274,6 +276,18 @@ internal sealed class TrapManager : IDisposable
 
   public void Dispose()
   {
+    Plugin.Logger.LogInfo("Disposing of TrapManager");
+
     Events.Instance.LevelDeselected -= OnLevelDeselected;
+
+    foreach ((int _, ITrap trap) in _activeTraps)
+    {
+      trap.ActiveEnd();
+    }
+
+    foreach ((int _, ITrap trap) in _previewTraps)
+    {
+      trap.PreviewLevelEnd();
+    }
   }
 }
