@@ -127,6 +127,7 @@ internal static class ArchipelagoLoginPatch
     Plugin.Logger.LogInfo("Creating client");
     try
     {
+      // TODO: Make async, do not hang
       Plugin.Client = new Client.Client(url, name, password);
     }
     catch (Exception exception)
@@ -142,9 +143,9 @@ internal static class ArchipelagoLoginPatch
     }
 
     // Successful login
-    yield return null;
     Plugin.Logger.LogInfo("Logged in!");
     __instance.cls.CLSPlaySound("sndImportInstallFinish");
+    yield return null;
     Persistence.currentSlotIndex = 0; // Slot 1
     Plugin.ApplyGameplayPatches();
 
