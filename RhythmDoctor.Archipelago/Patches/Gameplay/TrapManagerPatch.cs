@@ -32,6 +32,47 @@ internal static class TrapManagerPatch
 #endif
   }
 
+  [HarmonyPatch(typeof(HeartMonitor), nameof(HeartMonitor.Show))]
+  [HarmonyPostfix]
+  private static void ShowTrapNameOnPhonePatch(HeartMonitor __instance)
+  {
+    if (Plugin.Client.TrapManager._previewTraps.Length == 0)
+      return;
+
+    Plugin.Logger.LogDebug("Instantiating guest credit for preview traps");
+    __instance.isGuestCreditShown = true;
+
+    foreach ((int _, ITrap trap) in Plugin.Client.TrapManager._previewTraps)
+    {
+      Plugin.Logger.LogDebug($"Creating guest credit for {trap.Name}");
+      GuestData guestData =
+        new()
+        {
+          type = null,
+          link = null,
+          linkType = "other-unused", // TODO: Load our own sprite
+          name = trap.Name,
+        };
+
+      // TODO: From HeartMonitor.Show(): local function InstantiateGuest(GuestData gd).
+      //       Pull this out using a reverse transpiler patch instead of duplicating its logic.
+      // TODO: Fix Pulse localization
+
+      GameObject guestCreditObject = UnityEngine.Object.Instantiate(
+        __instance.guestPrefab,
+        __instance.creditsContainer
+      );
+      HeartMonitorGuest heartMonitorGuest = guestCreditObject.GetComponent<HeartMonitorGuest>();
+      heartMonitorGuest.Setup(guestData);
+      __instance.creditStrings.Add(guestData.name);
+      __instance.links.Add(guestData.link);
+      __instance.creditsElements.Add(guestCreditObject);
+
+      // Have to set name manually to mitigate localization
+      heartMonitorGuest.nameText.text = trap.Name;
+    }
+  }
+
   // PreviewEnd is managed by TrapManager using an event from Pulse.
 
   [HarmonyPatch(typeof(scnLevelSelect), nameof(scnLevelSelect.GoToLevelSequence))]
