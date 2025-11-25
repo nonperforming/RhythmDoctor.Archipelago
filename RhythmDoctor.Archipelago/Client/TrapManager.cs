@@ -10,6 +10,7 @@ internal sealed class TrapManager : IDisposable
 
   internal Dictionary<string, int> remoteTrapClearCache = new();
 
+  // TODO: Probably make a method to get preview trap names instead of making this internal and accessible to others
   /// <summary>
   /// Ordered array of traps that were applied to the level preview, by the lowest index to the highest index.
   /// </summary>
@@ -18,12 +19,7 @@ internal sealed class TrapManager : IDisposable
   /// (i.e. after invoking <see cref="ClearPreviewTraps"/>), but never null.
   /// </remarks>
   /// <seealso cref="_activeTraps"/>
-#if DEBUG
-  // ReSharper disable once InconsistentNaming
-  internal (int index, ITrap trap)[] _previewTraps = [];
-#else
-  private (int index, ITrap trap)[] _previewTraps = [];
-#endif
+  internal (int index, ITrap trap)[] previewTraps = [];
 
   /// <summary>
   /// Ordered array of traps that were applied to the level, by the lowest index to the highest index.
@@ -40,7 +36,7 @@ internal sealed class TrapManager : IDisposable
   /// (5, <see cref="GhostTapTrapPatch"/>) -> Before <see cref="GhostTapTrapPatch"/> was active, it was at
   /// position 0 of <see cref="Traps"/>.
   /// </example>
-  /// <seealso cref="_previewTraps"/>
+  /// <seealso cref="previewTraps"/>
 #if DEBUG
   // ReSharper disable once InconsistentNaming
   internal (int index, ITrap trap)[] _activeTraps = [];
@@ -163,21 +159,21 @@ internal sealed class TrapManager : IDisposable
       Traps.RemoveAt(index);
     }
 
-    _previewTraps = okTraps.ToArray();
-    return _previewTraps;
+    previewTraps = okTraps.ToArray();
+    return previewTraps;
   }
 
   internal (int index, ITrap trap)[] ApplyApplicableTraps(Level level)
   {
     Plugin.Logger.LogInfo($"Applying applicable traps for {level}");
 
-    if (_previewTraps.Length != 0)
+    if (previewTraps.Length != 0)
     {
       Plugin.Logger.LogWarning(
         $"Preview traps for {level} will be returned to queue."
           + "Applying new preview traps without previously discarding or promoting them should not be possible."
       );
-      ClearTrapsList(ref _previewTraps, true);
+      ClearTrapsList(ref previewTraps, true);
     }
 
     if (_activeTraps.Length != 0)
@@ -189,31 +185,31 @@ internal sealed class TrapManager : IDisposable
       ClearTrapsList(ref _activeTraps, true);
     }
 
-    _previewTraps = PopApplicableTraps(level);
+    previewTraps = PopApplicableTraps(level);
 
-    foreach ((_, ITrap trap) in _previewTraps)
+    foreach ((_, ITrap trap) in previewTraps)
     {
       Plugin.Logger.LogInfo($"Invoking preview level for {trap.Name}");
       trap.PreviewLevel();
     }
 
-    return _previewTraps;
+    return previewTraps;
   }
 
   private void ClearPreviewTraps()
   {
     // FIXME: Find a more specific Exception
-    // if (_previewTraps.Length == 0)
+    // if (previewTraps.Length == 0)
     //   throw new Exception("There must be at least one preview trap to clear.");
     Plugin.Logger.LogInfo("Clearing preview traps");
 
-    foreach ((_, ITrap trap) in _previewTraps)
+    foreach ((_, ITrap trap) in previewTraps)
     {
       Plugin.Logger.LogInfo($"Ending preview level for {trap.Name}");
       trap.PreviewLevelEnd();
     }
 
-    ClearTrapsList(ref _previewTraps, true);
+    ClearTrapsList(ref previewTraps, true);
   }
 
   private void OnLevelDeselected(object _, EventArgs __)
@@ -250,7 +246,7 @@ internal sealed class TrapManager : IDisposable
   /// </summary>
   internal void PromotePreviewTrapsToActiveTraps()
   {
-    if (_previewTraps.Length == 0)
+    if (previewTraps.Length == 0)
     {
       Plugin.Logger.LogWarning(
         "There must be at least one trap under preview traps to promote to to an active trap,"
@@ -264,8 +260,8 @@ internal sealed class TrapManager : IDisposable
       ClearActiveTraps(false);
     }
 
-    _activeTraps = _previewTraps;
-    _previewTraps = [];
+    _activeTraps = previewTraps;
+    previewTraps = [];
     foreach ((_, ITrap trap) in _activeTraps)
     {
       Plugin.Logger.LogInfo($"Invoking active for {trap.Name}");
@@ -285,7 +281,7 @@ internal sealed class TrapManager : IDisposable
       trap.ActiveEnd();
     }
 
-    foreach ((int _, ITrap trap) in _previewTraps)
+    foreach ((int _, ITrap trap) in previewTraps)
     {
       trap.PreviewLevelEnd();
     }

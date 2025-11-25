@@ -36,13 +36,13 @@ internal static class TrapManagerPatch
   [HarmonyPostfix]
   private static void ShowTrapNameOnPhonePatch(HeartMonitor __instance)
   {
-    if (Plugin.Client.TrapManager._previewTraps.Length == 0)
+    if (Plugin.Client.TrapManager.previewTraps.Length == 0)
       return;
 
     Plugin.Logger.LogDebug("Instantiating guest credit for preview traps");
     __instance.isGuestCreditShown = true;
 
-    foreach ((int _, ITrap trap) in Plugin.Client.TrapManager._previewTraps)
+    foreach ((int _, ITrap trap) in Plugin.Client.TrapManager.previewTraps)
     {
       Plugin.Logger.LogDebug($"Creating guest credit for {trap.Name}");
       GuestData guestData =
@@ -83,7 +83,7 @@ internal static class TrapManagerPatch
 
     // Rhythm Dogtor and Rhythm Weightlifter dog mode can bypass selection,
     // so we may need apply preview patches here.
-    if (Plugin.Client.TrapManager._previewTraps.Length == 0 && levelToGo is "Lesmis" or "RhythmWeightlifter")
+    if (Plugin.Client.TrapManager.previewTraps.Length == 0 && levelToGo is "Lesmis" or "RhythmWeightlifter")
     {
       Plugin.Logger.LogInfo("Going to Rhythm Dogtor/Rhythm Weightlifter (dog) - applying preview traps now");
       // The cheat code for Rhythm Dogtor allows you to end it
