@@ -4,14 +4,14 @@
     <AssemblyName>gg.archipelago.rhythmdoctor</AssemblyName>
     <TargetName>RhythmDoctor.Archipelago</TargetName>
     <Product>RhythmDoctor.Archipelago</Product>
-    <Version>0.2.4</Version>
+    <Version>0.2.5</Version>
     <LangVersion>latest</LangVersion>
     <RestoreAdditionalProjectSources>
       https://api.nuget.org/v3/index.json;
       https://nuget.bepinex.dev/v3/index.json;
       https://nuget.samboy.dev/v3/index.json
     </RestoreAdditionalProjectSources>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies> <!-- Copy over required libraries such as YamlDotNet -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies> <!-- Copy over required libraries -->
     <RootNamespace>RhythmDoctor.Archipelago</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>

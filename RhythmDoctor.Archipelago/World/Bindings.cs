@@ -187,15 +187,17 @@ internal static class Bindings
     .GroupBy(pair => pair.Value.StageAct)
     .ToDictionary(grouping => grouping.Key, grouping => grouping.Select(c => c.Key));
 
-  internal static readonly Dictionary<Act, int> ClearedLevelsToUnlockBoss =
+  internal static readonly Dictionary<Act, int> LevelCountInActUnlockingBoss =
     new()
     {
-      { Act.Act1, 2 },
-      { Act.Act2, 4 },
-      { Act.Act3, 3 },
-      { Act.Act4, 4 },
-      { Act.Act5, 3 },
+      { Act.Act1, 4 },
+      { Act.Act2, 8 },
+      { Act.Act3, 6 },
+      { Act.Act4, 8 },
+      { Act.Act5, 5 },
     };
+
+  internal static readonly Level[] LevelsThatDoNotUnlockBoss = [Level.RhythmWeightlifter];
 
   internal static readonly Dictionary<Act, Level> ActBoss =
     new()

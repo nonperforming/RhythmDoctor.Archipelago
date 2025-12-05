@@ -212,14 +212,48 @@ internal static class UnlockItemPatch
     int clearedInAct = 0;
     foreach (Level level in Bindings.LevelsInAct[act])
     {
+      if (Bindings.LevelsThatDoNotUnlockBoss.Contains(level))
+      {
+        Plugin.Logger.LogDebug($"Level {level} is marked as does not unlock boss, skipping");
+        continue;
+      }
+
+      int minimumRank;
+      switch (Plugin.Client.Slot.bossUnlockRequirement)
+      {
+        case SlotData.BossUnlockRequirement.ARankAll:
+          minimumRank = Rank.A;
+          break;
+        case SlotData.BossUnlockRequirement.Perfect:
+          minimumRank = Rank.S;
+          break;
+        case SlotData.BossUnlockRequirement.BRankAll:
+        case SlotData.BossUnlockRequirement.Half:
+          minimumRank = Rank.B;
+          break;
+        default:
+          throw new IndexOutOfRangeException("Boss unlock requirement out of valid range");
+      }
+
       Plugin.Logger.LogDebug($"Checking level {level}");
       Rank rank = Persistence.GetLevelRank(level);
-      if (rank.passed)
+      if (rank.ToNormal() >= minimumRank)
       {
         clearedInAct++;
-        if (clearedInAct >= Bindings.ClearedLevelsToUnlockBoss[act])
+
+        if (Plugin.Client.Slot.bossUnlockRequirement == SlotData.BossUnlockRequirement.Half)
         {
-          Plugin.Logger.LogInfo($"Unlocking {act} boss");
+          // result truncates towards 0 - both are guaranteed to be positive so result is equivalent to floor
+          int levelsToClear = Bindings.LevelCountInActUnlockingBoss[act] / 2;
+          if (clearedInAct >= levelsToClear)
+          {
+            Plugin.Logger.LogInfo($"Unlocking {act} boss (half requirement, {levelsToClear} levels to clear)");
+            return true;
+          }
+        }
+        else if (clearedInAct >= Bindings.LevelCountInActUnlockingBoss[act])
+        {
+          Plugin.Logger.LogInfo($"Unlocking {act} boss (full requirement, rank {minimumRank})");
           return true;
         }
       }
