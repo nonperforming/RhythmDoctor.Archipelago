@@ -53,10 +53,10 @@ internal class GhostTapTrapPatch : ITrap
         group: RDUtils.GetMixerGroup(player == RDPlayer.P1 ? "PlayerOneMistakes" : "PlayerTwoMistakes")
       );
       __instance.game.OnMistakeOrHeal(0f, 1f, null, false, player);
-      RDBase.Vfx.FlashBorderFeedback(false);
+      scnGame.instance.FlashBorderFeedback(false);
     }
 
-    [HarmonyPatch(typeof(HUD), nameof(HUD.AdvanceGameover))]
+    [HarmonyPatch(typeof(Rankscreen), nameof(Rankscreen.AdvanceGameover))]
     [HarmonyPostfix]
     private static void DoNotDamageOnExitPatch()
     {

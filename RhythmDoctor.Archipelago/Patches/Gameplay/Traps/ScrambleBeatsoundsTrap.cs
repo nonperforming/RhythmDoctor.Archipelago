@@ -18,24 +18,24 @@ internal class ScrambleBeatsoundsTrapPatch : ITrap
 
   public void Active()
   {
-    SoundEffect[] randomizedOrder = (SoundEffect[])RDEditorConstants.PulseSounds.Clone();
+    SoundEffect[] randomizedOrder = (SoundEffect[])RDEditorConstants.BeatSounds.Clone();
 
     Random random = new();
     random.Shuffle(randomizedOrder);
 
     for (int i = 0; i < randomizedOrder.Length; i++)
     {
-      SoundEffect originalBeatsound = RDEditorConstants.PulseSounds[i];
+      SoundEffect originalBeatsound = RDEditorConstants.BeatSounds[i];
       SoundEffect randomizeTo = randomizedOrder[i];
 
       if (randomizeTo == SoundEffect.None)
       {
-        int num = random.Next(0, RDEditorConstants.PulseSounds.Length);
-        if (num == Array.IndexOf(RDEditorConstants.PulseSounds, SoundEffect.None))
+        int num = random.Next(0, RDEditorConstants.BeatSounds.Length);
+        if (num == Array.IndexOf(RDEditorConstants.BeatSounds, SoundEffect.None))
         {
           num++;
         }
-        randomizeTo = RDEditorConstants.PulseSounds[num];
+        randomizeTo = RDEditorConstants.BeatSounds[num];
       }
 
       scrambled[originalBeatsound] = randomizeTo;
@@ -54,10 +54,10 @@ internal class ScrambleBeatsoundsTrapPatch : ITrap
     _harmony.UnpatchSelf();
   }
 
-  [HarmonyPatch(typeof(RDLevelData))]
+  [HarmonyPatch(typeof(LevelBase))]
   private static class Patch
   {
-    [HarmonyPatch(nameof(RDLevelData.Decode))]
+    [HarmonyPatch(nameof(LevelBase.DecodeLevelData))]
     [HarmonyPostfix]
     private static void ModifyCharacterDataPatch(RDLevelData __result)
     {

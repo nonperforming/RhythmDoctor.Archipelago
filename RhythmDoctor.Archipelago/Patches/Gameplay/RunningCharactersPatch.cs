@@ -57,7 +57,7 @@ internal static class RunningCharactersPatch
       }
 
       GameObject rinObject = GameObject.Find("/Scene/Corridor/GoToMuseDashRoom/Rin");
-      scrCharLevelSelect rinChar = rinObject.GetComponent<scrCharLevelSelect>();
+      scrChar rinChar = rinObject.GetComponent<scrChar>();
       rinChar.shaderData = shader;
       shader.SetFrameChanged();
     }

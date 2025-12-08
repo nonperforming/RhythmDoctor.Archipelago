@@ -40,7 +40,7 @@ public class DebugMenu : MonoBehaviour
   {
     try
     {
-      HUD.status = toShow;
+      LEDSign.status = toShow;
     }
     catch (NullReferenceException) { }
     Plugin.Logger.LogDebug(toShow);

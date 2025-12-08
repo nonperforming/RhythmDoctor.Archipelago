@@ -38,8 +38,9 @@ internal static class LogData
       .AppendLine($"Ink File: {data.settings.inkFile}")
       .AppendLine($"Level Volume: {data.settings.levelVolume}")
       .AppendLine($"Create Rows Manually: {data.settings.createRowsManually}")
-      .AppendLine($"Uses Window Dance: {data.settings.usesWindowDance}")
-      .AppendLine($"Resizes Window: {data.settings.resizesWindow}")
+      // FIXME: v1.0.0: Use LevelEvent_Base's usesWindowDance
+      //.AppendLine($"Uses Window Dance: {data.settings.usesWindowDance}")
+      //.AppendLine($"Resizes Window: {data.settings.resizesWindow}")
       .AppendLine($"Last Modified Time: {data.settings.lastModifiedTime}")
       .AppendLine($"First Song File Name: {data.settings.firstSongFileName}")
       .AppendLine($"First Song Offset: {data.settings.firstSongoffset}")

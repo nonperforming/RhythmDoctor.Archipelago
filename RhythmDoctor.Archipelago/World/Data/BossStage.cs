@@ -33,7 +33,7 @@ internal class BossStage : BaseStage
     // Higher ranks match first so we can `goto` lower ranks
     // TODO: probably use array for this
 
-    // From HUD.ShowAndSaveRank(bool, bool)
+    // From Rankscreen.ShowAndSaveRank(bool, bool)
     // ...
     // case LevelType.Boss:
     // {
