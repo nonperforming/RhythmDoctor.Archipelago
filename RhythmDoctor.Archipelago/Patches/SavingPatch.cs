@@ -3,16 +3,16 @@ namespace RhythmDoctor.Archipelago.Patches;
 /// <summary>
 /// Disable all saving progress to disk, and load Sleeve Paint images from our special AP file.
 /// </summary>
-[HarmonyPatch(typeof(Persistence))]
+[HarmonyPatch]
 internal static class SavingPatch
 {
-  [HarmonyPatch(nameof(Persistence.SaveSlot))]
+  [HarmonyPatch(typeof(PlayerPrefsJson), nameof(PlayerPrefsJson.Save))]
+  [HarmonyPatch(typeof(PlayerPrefsJson), nameof(PlayerPrefsJson.SaveBackup))]
   [HarmonyPrefix]
-  private static void DisableSavingToFilePatch(int slot, ref bool __runOriginal)
+  private static void DisableSavingToFilePatch(int slot, ref bool __runOriginal, ref PlayerPrefsJson __instance)
   {
-    // "Slot" -1 is settings, as shown by GetSavefilePath
-    // string text = ((slot == -1) ? "settings.rdsave" : $"slot{slot}.rdsave");
-    __runOriginal = slot == -1;
+    // Let the user change and save settings.
+    __runOriginal = __instance.fileType == PlayerPrefsJson.FileType.Settings;
   }
 
   [HarmonyPatch(typeof(ArmSkin), nameof(ArmSkin.GetDrawingPath))]
@@ -22,7 +22,7 @@ internal static class SavingPatch
     __runOriginal = false;
     // .ToString() shouldn't modify an enum???
 #pragma warning disable Harmony003
-    __result = Path.Combine(Persistence.GetSaveFileFolderPath(), $"scribble{player.ToString()}_AP.png");
+    __result = Path.Combine(PlayerPrefsJson.GetFileFolderPath(), $"scribble{player.ToString()}_AP.png");
 #pragma warning restore Harmony003
   }
 }

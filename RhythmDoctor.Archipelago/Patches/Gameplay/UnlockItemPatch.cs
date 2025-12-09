@@ -123,6 +123,7 @@ internal static class UnlockItemPatch
     {
       if (HasUnlockedBossSong(act))
       {
+        Plugin.Logger.LogDebug($"Unlocking act {act}");
         Persistence.SetLevelRank(Bindings.ActBoss[act], Rank.NotFinished, false, false);
       }
     }

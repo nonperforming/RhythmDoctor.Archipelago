@@ -68,10 +68,10 @@ internal class ScrambleHitsoundsTrapPatch : ITrap
     _harmony.UnpatchSelf();
   }
 
-  [HarmonyPatch(typeof(RDLevelData))]
+  [HarmonyPatch(typeof(LevelBase))]
   private static class Patch
   {
-    [HarmonyPatch(nameof(RDLevelData.Decode))]
+    [HarmonyPatch(nameof(LevelBase.DecodeLevelData))]
     [HarmonyPostfix]
     private static void ModifyCharacterDataPatch(RDLevelData __result)
     {

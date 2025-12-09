@@ -71,10 +71,10 @@ internal class ScrambleCharactersTrapPatch : ITrap
     _harmony.UnpatchSelf();
   }
 
-  [HarmonyPatch]
+  [HarmonyPatch(typeof(LevelBase))]
   private static class Patch
   {
-    [HarmonyPatch(typeof(RDLevelData), nameof(RDLevelData.Decode))]
+    [HarmonyPatch(nameof(LevelBase.DecodeLevelData))]
     [HarmonyPostfix]
     private static void ModifyCharacterDataPatch(RDLevelData __result)
     {

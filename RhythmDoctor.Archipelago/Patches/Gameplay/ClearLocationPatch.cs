@@ -38,20 +38,20 @@ internal static class ClearLocationPatch
   /// Send relevant locations (and end goal if applicable) when clearing a level.
   /// </summary>
   /// <exception cref="ArgumentOutOfRangeException">Thrown if end goal is not valid.</exception>
-  [HarmonyPatch(typeof(HUD), nameof(HUD.ShowAndSaveRank))]
+  [HarmonyPatch(typeof(Rankscreen), nameof(Rankscreen.ShowAndSaveRank))]
   [HarmonyPrefix]
-  private static void CustomClearLocationPatch(bool bossLevelFailed, bool onlySavePersistence, HUD __instance)
+  private static void CustomClearLocationPatch(bool bossLevelFailed, bool onlySavePersistence, Rankscreen __instance)
   {
     // Is onlySavePersistence is currently only used in custom levels?
     // "there's a function for custom levels to skip the rank text [rank screen] at the end"
     // "intended to be used to make your own custom rank screen"
     // Relevant scripts:
-    // global::HUD.AdvanceGameover(bool) L41:
+    // global::Rankscreen.AdvanceGameover(bool) L41:
     // `bool skipRankText = base.game.currentLevel.skipRankText;`
-    // global::HUD.AdvanceGameover(bool) L48:
+    // global::Rankscreen.AdvanceGameover(bool) L48:
     // `ShowAndSaveRank(bossLevelFailed: false, skipRankText);`
     // TODO: Boss levels and said "custom levels" will overwrite virtual LevelBase.ShowGameOver
-    //       Check for HUD.base.game.currentLevel.customGameover!!! When is this case applicable?
+    //       Check for Rankscreen.base.game.currentLevel.customGameover!!! When is this case applicable?
 
 #if DEBUG
     // Discard Debug Menu traps regardless of result.
@@ -147,9 +147,9 @@ internal static class ClearLocationPatch
     );
   }
 
-  [HarmonyPatch(typeof(HUD), nameof(HUD.ShowRankDescription))]
+  [HarmonyPatch(typeof(Rankscreen), nameof(Rankscreen.ShowRankDescription))]
   [HarmonyPostfix]
-  private static void ShowSentItemsPatch(HUD __instance)
+  private static void ShowSentItemsPatch(Rankscreen __instance)
   {
     // TODO: Need to check if this works with narration.
     if (ItemsToSend.Count == 0)

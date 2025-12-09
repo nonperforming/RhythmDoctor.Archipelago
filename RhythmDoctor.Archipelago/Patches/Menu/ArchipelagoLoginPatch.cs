@@ -153,7 +153,7 @@ internal static class ArchipelagoLoginPatch
     // Hopefully if we got here without any exceptions SavingPatch should be applied,
     //  so we shouldn't lose our first slot in the case of a crash.
     // When we are quitting, the original data should be reloaded by UnapplyPatchesPatch.
-    Persistence.slotPrefs[0].Clear();
+    Persistence.slotPrefs[0].dict.Clear();
 
     // Let LockSleevePaintPatch set the Sleeve Paint to Slot 1's default
     Persistence.p1Skin.Reload();
