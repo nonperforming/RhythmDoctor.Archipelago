@@ -204,7 +204,6 @@ internal sealed class Client : IDisposable
         Plugin.Logger.LogInfo($"Attempting to get rank from locations cleared for {level}");
 
         // Attempt to get rank from locations sent
-
         if (level == Level.RhythmWeightlifter)
         {
           // Rhythm Weightlifter is a special case in that it has 10 stages inside its level.
@@ -227,34 +226,66 @@ internal sealed class Client : IDisposable
         }
         else
         {
-          RegularStage levelStage = (RegularStage)Bindings.LevelToStage[level];
-          if (Session!.Locations.AllLocationsChecked.Contains(levelStage.SRankLocation))
+          BaseStage levelStage = Bindings.LevelToStage[level];
+
+          if (levelStage is RegularStage regularStage)
           {
-            Plugin.Logger.LogInfo("Found S rank location");
-            Persistence.SetLevelRank(level, Rank.S, false, false);
+            if (Session!.Locations.AllLocationsChecked.Contains(regularStage.SRankLocation))
+            {
+              Plugin.Logger.LogInfo("Found S rank location");
+              Persistence.SetLevelRank(level, Rank.S, false, false);
+            }
+            else if (
+              regularStage.ARankLocation.HasValue
+              && Session!.Locations.AllLocationsChecked.Contains(regularStage.ARankLocation.Value)
+            )
+            {
+              Plugin.Logger.LogInfo("Found A rank location");
+              Persistence.SetLevelRank(level, Rank.A, false, false);
+            }
+            else if (
+              regularStage.BRankLocation.HasValue
+              && Session!.Locations.AllLocationsChecked.Contains(regularStage.BRankLocation.Value)
+            )
+            {
+              Plugin.Logger.LogInfo("Found B rank location");
+              Persistence.SetLevelRank(level, Rank.B, false, false);
+            }
+            else
+            {
+              // We haven't cleared the level yet.
+              Plugin.Logger.LogInfo("Couldn't find any location");
+              Persistence.SetLevelRank(level, Rank.NotFinished, false, false);
+              return;
+            }
           }
-          else if (
-            levelStage.ARankLocation.HasValue
-            && Session!.Locations.AllLocationsChecked.Contains(levelStage.ARankLocation.Value)
-          )
+          else if (levelStage is BossStage bossStage)
           {
-            Plugin.Logger.LogInfo("Found A rank location");
-            Persistence.SetLevelRank(level, Rank.A, false, false);
-          }
-          else if (
-            levelStage.BRankLocation.HasValue
-            && Session!.Locations.AllLocationsChecked.Contains(levelStage.BRankLocation.Value)
-          )
-          {
-            Plugin.Logger.LogInfo("Found B rank location");
-            Persistence.SetLevelRank(level, Rank.B, false, false);
-          }
-          else
-          {
-            // We haven't cleared the level yet.
-            Plugin.Logger.LogInfo("Couldn't find any location");
-            Persistence.SetLevelRank(level, Rank.NotFinished, false, false);
-            return;
+            if (Session!.Locations.AllLocationsChecked.Contains(bossStage.PerfectLocation))
+            {
+              Plugin.Logger.LogInfo("Found Perfect rank location");
+              Persistence.SetLevelRank(level, Rank.BossPerfect, false, false);
+            }
+            else if (
+              bossStage.CompletePlusLocation.HasValue
+              && Session!.Locations.AllLocationsChecked.Contains(bossStage.CompletePlusLocation.Value)
+            )
+            {
+              Plugin.Logger.LogInfo("Found Complete+ rank location");
+              Persistence.SetLevelRank(level, Rank.BossNoCheckpoints, false, false);
+            }
+            else if (Session!.Locations.AllLocationsChecked.Contains(bossStage.ClearLocation))
+            {
+              Plugin.Logger.LogInfo("Found Clear rank location");
+              Persistence.SetLevelRank(level, Rank.BossClear, false, false);
+            }
+            else
+            {
+              // We haven't cleared the level yet.
+              Plugin.Logger.LogInfo("Couldn't find any location");
+              Persistence.SetLevelRank(level, Rank.NotFinished, false, false);
+              return;
+            }
           }
 
           // As we've cleared the level, we need to check if we have unlocked a boss song,
@@ -263,32 +294,36 @@ internal sealed class Client : IDisposable
           Act act = Bindings.LevelToAct[level];
           if (UnlockItemPatch.HasUnlockedBossSong(act))
           {
-            Level bossLevel = Bindings.ActBoss[act];
-            Plugin.Logger.LogInfo($"Attempting to get boss rank from locations cleared for {bossLevel}");
-            BossStage bossStage = (BossStage)Bindings.LevelToStage[bossLevel];
-            if (Session!.Locations.AllLocationsChecked.Contains(bossStage.PerfectLocation))
+            Level[] bossLevels = Bindings.ActBoss[act];
+
+            foreach (Level bossLevel in bossLevels)
             {
-              Plugin.Logger.LogInfo("Found Perfect location");
-              Persistence.SetLevelRank(bossLevel, Rank.BossPerfect, false, false);
-            }
-            else if (
-              bossStage.CompletePlusLocation.HasValue
-              && Session!.Locations.AllLocationsChecked.Contains(bossStage.CompletePlusLocation.Value)
-            )
-            {
-              Plugin.Logger.LogInfo("Found Complete+ location");
-              Persistence.SetLevelRank(bossLevel, Rank.BossNoCheckpoints, false, false);
-            }
-            else if (Session!.Locations.AllLocationsChecked.Contains(bossStage.ClearLocation))
-            {
-              Plugin.Logger.LogInfo("Found Clear location");
-              Persistence.SetLevelRank(bossLevel, Rank.BossClear, false, false);
-            }
-            else
-            {
-              // We haven't cleared the boss level yet.
-              Plugin.Logger.LogInfo("Couldn't find any location");
-              Persistence.SetLevelRank(bossLevel, Rank.NotFinished, false, false);
+              Plugin.Logger.LogInfo($"Attempting to get boss rank from locations cleared for {bossLevels}");
+              BossStage bossStage = (BossStage)Bindings.LevelToStage[bossLevel];
+              if (Session!.Locations.AllLocationsChecked.Contains(bossStage.PerfectLocation))
+              {
+                Plugin.Logger.LogInfo("Found Perfect location");
+                Persistence.SetLevelRank(bossLevel, Rank.BossPerfect, false, false);
+              }
+              else if (
+                bossStage.CompletePlusLocation.HasValue
+                && Session!.Locations.AllLocationsChecked.Contains(bossStage.CompletePlusLocation.Value)
+              )
+              {
+                Plugin.Logger.LogInfo("Found Complete+ location");
+                Persistence.SetLevelRank(bossLevel, Rank.BossNoCheckpoints, false, false);
+              }
+              else if (Session!.Locations.AllLocationsChecked.Contains(bossStage.ClearLocation))
+              {
+                Plugin.Logger.LogInfo("Found Clear location");
+                Persistence.SetLevelRank(bossLevel, Rank.BossClear, false, false);
+              }
+              else
+              {
+                // We haven't cleared the boss level yet.
+                Plugin.Logger.LogInfo("Couldn't find any location");
+                Persistence.SetLevelRank(bossLevel, Rank.NotFinished, false, false);
+              }
             }
           }
         }

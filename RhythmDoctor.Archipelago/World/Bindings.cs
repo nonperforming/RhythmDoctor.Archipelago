@@ -35,6 +35,7 @@ internal static class Bindings
       { Level.SongOfTheSea, new RegularStage(Act.Act2, null, null, 61) },
       { Level.SongOfTheSeaH, new RegularStage(Act.Act2, null, null, 62) },
       { Level.BeansHopper, new RegularStage(Act.Act2, 63, 64, 65) },
+      { Level.Bitterness, new BossStage(Act.Act7, 150, 151, 152) },
       { Level.Heldbeats, new RegularStage(Act.Act4, 68, 69, 70) },
       { Level.Rollerdisco, new RegularStage(Act.Act4, 71, 72, 73) },
       { Level.Invisible, new RegularStage(Act.Act4, 74, 75, 76) },
@@ -48,6 +49,10 @@ internal static class Bindings
       { Level.Freezeshot, new RegularStage(Act.Act5, 100, 101, 102) },
       { Level.FreezeshotH, new RegularStage(Act.Act5, 103, 104, 105) },
       { Level.AthleteTherapy, new RegularStage(Act.Act5, null, null, 106) },
+      { Level.StevensonsTango, new RegularStage(Act.Act5, 147, 148, 149) },
+      { Level.HaileyDuet, new RegularStage(Act.Act6, 153, 154, 155) },
+      { Level.EdegaRave, new RegularStage(Act.Act6, 156, 157, 158) },
+      { Level.Blurred, new RegularStage(Act.Act7, 159, 160, 161) },
       { Level.VividStasis, new RegularStage(Act.None, 120, 121, 122) },
       { Level.SparkLine, new RegularStage(Act.None, 123, 124, 125) },
       { Level.Unbeatable, new RegularStage(Act.None, 126, 127, 128) },
@@ -61,6 +66,9 @@ internal static class Bindings
       { Level.Boss2, new BossStage(Act.Act2, 66, null, 67) },
       { Level.InsomniacHard, new BossStage(Act.Act4, 92, null, 93) },
       { Level.AthleteFinale, new BossStage(Act.Act5, 117, 118, 119) },
+      { Level.PaigesReckoning, new BossStage(Act.Act6, 162, 163, 164) },
+      { Level.Montage, new BossStage(Act.Act7, 165, 166, 167) },
+      { Level.Montage2, new BossStage(Act.Act7, 168, 169, 170) },
       {
         Level.Lesmis,
         new BossStage(
@@ -100,6 +108,7 @@ internal static class Bindings
       { 19, Level.SongOfTheSea },
       { 20, Level.SongOfTheSeaH },
       { 21, Level.BeansHopper },
+      { 60, Level.Bitterness },
       { 22, Level.Heldbeats },
       { 23, Level.Rollerdisco },
       { 24, Level.Invisible },
@@ -113,7 +122,11 @@ internal static class Bindings
       { 32, Level.Freezeshot },
       { 33, Level.FreezeshotH },
       { 34, Level.AthleteTherapy },
+      { 61, Level.StevensonsTango },
       { 44, Level.RhythmWeightlifter },
+      { 62, Level.HaileyDuet },
+      { 63, Level.EdegaRave },
+      { 64, Level.Blurred },
       { 35, Level.VividStasis },
       { 36, Level.SparkLine },
       { 37, Level.Unbeatable },
@@ -152,8 +165,9 @@ internal static class Bindings
       { 44, Region.SVTWard },
       { 45, Region.Train },
       { 46, Region.PhysiotherapyWard },
+      { 60, Region.RecordsRoom },
       { 47, Region.Basement },
-      { 48, Region.ArtRoom },
+      { 48, Region.GardenRoom },
     };
 
   /// <summary>
@@ -194,18 +208,22 @@ internal static class Bindings
       { Act.Act2, 8 },
       { Act.Act3, 6 },
       { Act.Act4, 8 },
-      { Act.Act5, 5 },
+      { Act.Act5, 6 },
+      { Act.Act6, 2 },
+      { Act.Act7, 2 },
     };
 
   internal static readonly Level[] LevelsThatDoNotUnlockBoss = [Level.RhythmWeightlifter];
 
-  internal static readonly Dictionary<Act, Level> ActBoss =
+  internal static readonly Dictionary<Act, Level[]> ActBoss =
     new()
     {
-      { Act.Act1, Level.OrientalInsomniac },
-      { Act.Act2, Level.Boss2 },
-      { Act.Act3, Level.Lesmis },
-      { Act.Act4, Level.InsomniacHard },
-      { Act.Act5, Level.AthleteFinale },
+      { Act.Act1, [Level.OrientalInsomniac] },
+      { Act.Act2, [Level.Boss2] },
+      { Act.Act3, [Level.Lesmis] },
+      { Act.Act4, [Level.InsomniacHard] },
+      { Act.Act5, [Level.AthleteFinale] },
+      { Act.Act6, [Level.PaigesReckoning] },
+      { Act.Act7, [Level.Montage, Level.Montage2] },
     };
 }

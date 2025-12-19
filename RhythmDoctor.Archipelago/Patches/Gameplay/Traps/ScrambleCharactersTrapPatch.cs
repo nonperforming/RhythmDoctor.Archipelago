@@ -9,8 +9,22 @@ internal class ScrambleCharactersTrapPatch : ITrap
 
   public string Name => "Scramble Characters";
   public IEnumerable<Type> IncompatibleWithTraps => [typeof(ScrambleCharactersTrapPatch)];
-  public IEnumerable<Level> IncompatibleWithLevels =>
-    [Level.SongOfTheSea, Level.SongOfTheSeaH, Level.AthleteTherapy, Level.HelpingHands];
+  public IEnumerable<Level> IncompatibleWithLevels => [Level.SongOfTheSea, Level.SongOfTheSeaH, Level.AthleteTherapy];
+
+  private static readonly IReadOnlyCollection<Character> _disallowedCharacters =
+  [
+    Character.None,
+    Character.Otto,
+    Character.Custom,
+    Character.Rodney,
+    Character.DancingCouple,
+    Character.Janitor,
+    Character.Player,
+    Character.BlankCPU,
+    Character.AthletePhysio,
+    Character.New,
+    Character.Weightlifter,
+  ];
 
   public void InQueue()
   {
@@ -22,22 +36,8 @@ internal class ScrambleCharactersTrapPatch : ITrap
     Character[] characters = (Character[])Enum.GetValues(typeof(Character));
     Character[] randomizedOrder = (Character[])characters.Clone();
     // Do not randomize these characters, as they will appear broken/as no character
-    IReadOnlyCollection<Character> disallowedCharacters =
-    [
-      Character.None,
-      Character.Otto,
-      Character.Custom,
-      Character.Rodney,
-      Character.DancingCouple,
-      Character.Janitor,
-      Character.Player,
-      Character.BlankCPU,
-      Character.AthletePhysio,
-      Character.New,
-      Character.Weightlifter,
-    ];
     IReadOnlyList<Character> allowedCharacters = characters
-      .Where(character => !disallowedCharacters.Contains(character))
+      .Where(character => !_disallowedCharacters.Contains(character))
       .ToList();
     IList<Character> pool = ((Character[])allowedCharacters.ToArray().Clone()).ToList();
     Random random = new();
@@ -48,7 +48,7 @@ internal class ScrambleCharactersTrapPatch : ITrap
       Character originalCharacter = characters[i];
       Character randomizeTo = randomizedOrder[i];
 
-      if (disallowedCharacters.Contains(randomizeTo))
+      if (_disallowedCharacters.Contains(randomizeTo))
       {
         int randomizeIndex = random.Next(0, pool.Count);
         randomizeTo = allowedCharacters[randomizeIndex];
@@ -79,13 +79,6 @@ internal class ScrambleCharactersTrapPatch : ITrap
     private static void ModifyCharacterDataPatch(RDLevelData __result)
     {
       Plugin.Logger.LogDebug("Scramble Characters: Modifying MakeRow and ChangeCharacter level events");
-
-      // Leads to characters being randomized twice
-      // foreach (LevelEvent_MakeRow row in __result.rows)
-      // {
-      //   Plugin.Logger.LogDebug($"MakeRow in rows: {row.character} -> {scrambled[row.character]}");
-      //   row.character = scrambled[row.character];
-      // }
 
       foreach (LevelEvent_Base levelEvent in __result.levelEvents)
       {

@@ -8,4 +8,6 @@ internal enum Act
   Act3,
   Act4,
   Act5,
+  Act6,
+  Act7,
 }

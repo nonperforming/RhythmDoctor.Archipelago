@@ -3,7 +3,7 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 /// <summary>
 /// Patch to not play cutscenes.
 /// </summary>
-[HarmonyPatch(typeof(Persistence))]
+[HarmonyPatch]
 internal static class SkipCutscenePatch
 {
   /// <summary>
@@ -16,11 +16,14 @@ internal static class SkipCutscenePatch
   /// <seealso cref="LevelSelectDoNotPlayCutscenePatch"/>
   /// <param name="__result">The return value of the method.</param>
   /// <param name="__runOriginal">Whether to run the original method or not.</param>
-  [HarmonyPatch(nameof(Persistence.GetPlayedPassedLevelCutscene))]
-  [HarmonyPatch(nameof(Persistence.GetPlayedPostAct2Cutscene))]
-  [HarmonyPatch(nameof(Persistence.GetPlayedPostAct3Cutscene))]
-  [HarmonyPatch(nameof(Persistence.GetPlayedPostAct4Cutscene))]
-  [HarmonyPatch(nameof(Persistence.GetPlayedPreAct5Cutscene))]
+  [HarmonyPatch(typeof(Persistence), nameof(Persistence.GetPlayedPassedLevelCutscene))]
+  [HarmonyPatch(typeof(Persistence), nameof(Persistence.GetPlayedPostAct2Cutscene))]
+  [HarmonyPatch(typeof(Persistence), nameof(Persistence.GetPlayedPostAct3Cutscene))]
+  [HarmonyPatch(typeof(Persistence), nameof(Persistence.GetPlayedPostAct4Cutscene))]
+  [HarmonyPatch(typeof(Persistence), nameof(Persistence.GetPlayedPreAct5Cutscene))]
+  [HarmonyPatch(typeof(Persistence), nameof(Persistence.GetPlayedHaileyDuetIntroduction))]
+  [HarmonyPatch(typeof(Persistence), nameof(Persistence.GetPlayedPreBitternessCutscene))]
+  [HarmonyPatch(typeof(Persistence), nameof(Persistence.GetPlayedRooftopCutscene))]
   [HarmonyPrefix]
   private static void PersistenceDoNotPlayCutscenePatch(ref bool __result, ref bool __runOriginal)
   {
@@ -41,5 +44,16 @@ internal static class SkipCutscenePatch
   private static void LevelSelectDoNotPlayCutscenePatch(ref bool __runOriginal)
   {
     __runOriginal = false;
+  }
+
+  [HarmonyPatch(typeof(scnLevelSelect), nameof(scnLevelSelect.Start))]
+  [HarmonyPostfix]
+  private static void SkipStoryAndCutscenePatch(scnLevelSelect __instance)
+  {
+    scnLevelSelect.bitternessWarningPlayed = true;
+    __instance.voidItemProgress = 3;
+    __instance.selectableEntities.Find(entity => entity.id == "VoidItem1").normalEnabled = true;
+    __instance.selectableEntities.Find(entity => entity.id == "VoidItem1").normalEnabled = true;
+    __instance.selectableEntities.Find(entity => entity.id == "VoidItem1").normalEnabled = true;
   }
 }

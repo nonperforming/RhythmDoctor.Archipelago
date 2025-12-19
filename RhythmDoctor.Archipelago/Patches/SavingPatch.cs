@@ -9,7 +9,7 @@ internal static class SavingPatch
   [HarmonyPatch(typeof(PlayerPrefsJson), nameof(PlayerPrefsJson.Save))]
   [HarmonyPatch(typeof(PlayerPrefsJson), nameof(PlayerPrefsJson.SaveBackup))]
   [HarmonyPrefix]
-  private static void DisableSavingToFilePatch(int slot, ref bool __runOriginal, ref PlayerPrefsJson __instance)
+  private static void DisableSavingToFilePatch(ref bool __runOriginal, ref PlayerPrefsJson __instance)
   {
     // Let the user change and save settings.
     __runOriginal = __instance.fileType == PlayerPrefsJson.FileType.Settings;

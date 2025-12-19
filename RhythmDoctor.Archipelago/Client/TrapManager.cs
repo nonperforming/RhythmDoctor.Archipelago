@@ -68,10 +68,16 @@ internal sealed class TrapManager : IDisposable
   /// Add a trap to the list of queued traps.
   /// </summary>
   /// <param name="trap">The trap to add.</param>
-  internal void AddTrap(ITrap trap)
+  /// <param name="doNotCheckPriorClear">Whether to check for a prior clear with a connected Archipelago server. If false, trap is always added.</param>
+  internal void AddTrap(ITrap trap, bool doNotCheckPriorClear = false)
   {
     bool CheckIfTrapAlreadyCleared(string trapName)
     {
+      if (doNotCheckPriorClear)
+      {
+        return false;
+      }
+
       int local = ClearedTraps[trapName];
       remoteTrapClearCache.TryGetValue(trapName, out int remote);
 

@@ -134,53 +134,53 @@ public class DebugMenu : MonoBehaviour
         if (GUI.Button(new Rect(30, 90, 300, 20), "Add Chilli Speed Trap"))
         {
           Notify("Adding ChilliSpeedTrap patch");
-          TrapManager.AddTrap(new ChilliSpeedTrapPatch());
+          TrapManager.AddTrap(new ChilliSpeedTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 120, 300, 20), "Add Ice Speed Trap"))
         {
           Notify("Adding IceSpeedTrap patch");
-          TrapManager.AddTrap(new IceSpeedTrapPatch());
+          TrapManager.AddTrap(new IceSpeedTrapPatch(), true);
         }
 
         if (GUI.Button(new Rect(30, 150, 300, 20), "Add Strong Heart Powerup"))
         {
           Notify("Adding StrongHeartPowerup patch");
-          TrapManager.AddTrap(new StrongHeartPowerupPatch());
+          TrapManager.AddTrap(new StrongHeartPowerupPatch(), true);
         }
         if (GUI.Button(new Rect(30, 180, 300, 20), "Add Fragile Heart Powerup"))
         {
           Notify("Adding FragileSpeedTrap patch");
-          TrapManager.AddTrap(new FragileHeartTrapPatch());
+          TrapManager.AddTrap(new FragileHeartTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 210, 300, 20), "Add Easy Mode Powerup"))
         {
           Notify("Adding EasyModePowerup patch");
-          TrapManager.AddTrap(new EasyDifficultyPowerupPatch());
+          TrapManager.AddTrap(new EasyDifficultyPowerupPatch(), true);
         }
         if (GUI.Button(new Rect(30, 240, 300, 20), "Add Hard Mode Trap"))
         {
           Plugin.Logger.LogInfo("Adding HardModeTrap patch");
-          TrapManager.AddTrap(new HardDifficultyTrapPatch());
+          TrapManager.AddTrap(new HardDifficultyTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 270, 300, 20), "Add Ghost Tap Trap"))
         {
           Notify("Adding GhostTapTrap patch");
-          TrapManager.AddTrap(new GhostTapTrapPatch());
+          TrapManager.AddTrap(new GhostTapTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 300, 300, 20), "Add Scramble Characters Trap"))
         {
           Notify("Adding ScrambleCharactersTrap patch");
-          TrapManager.AddTrap(new ScrambleCharactersTrapPatch());
+          TrapManager.AddTrap(new ScrambleCharactersTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 330, 300, 20), "Add Scramble Beatsounds Trap"))
         {
           Notify("Adding ScrambleBeatsoundsTrap patch");
-          TrapManager.AddTrap(new ScrambleBeatsoundsTrapPatch());
+          TrapManager.AddTrap(new ScrambleBeatsoundsTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 360, 300, 20), "Add Scramble Hitsounds Trap"))
         {
           Notify("Adding ScrambleHitsoundsTrap patch");
-          TrapManager.AddTrap(new ScrambleHitsoundsTrapPatch());
+          TrapManager.AddTrap(new ScrambleHitsoundsTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 390, 300, 20), "Recreate TrapManager"))
         {
@@ -267,14 +267,11 @@ public class DebugMenu : MonoBehaviour
         {
           Notify("Unlocking all entrances");
 
-          scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToSVTWard"));
-          scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToTrain"));
-          scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToBasement"));
-          scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToMuseDashRoom"));
-          scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToAthleteWard"));
-          scnLevelSelect.instance.UnlockEntrance(scnLevelSelect.instance.FindSelectableEntity("GoToArtRoom"));
-
-          scnLevelSelect.instance.ActivateEntranceRin();
+          foreach (Region region in Enum.GetValues(typeof(Region)))
+          {
+            scnLevelSelect.instance.UnlockEntrance(region);
+          }
+          scnLevelSelect.instance.UnlockAbandonedWard();
         }
 
         if (GUI.Button(new Rect(30, 120, 300, 20), "Unlock level 3-1"))

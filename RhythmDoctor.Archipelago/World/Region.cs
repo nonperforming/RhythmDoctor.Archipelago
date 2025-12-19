@@ -6,6 +6,7 @@ internal enum Region
   SVTWard,
   Train,
   PhysiotherapyWard,
+  RecordsRoom,
   Basement,
-  ArtRoom,
+  GardenRoom,
 }

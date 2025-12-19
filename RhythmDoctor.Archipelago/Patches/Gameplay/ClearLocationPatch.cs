@@ -37,6 +37,7 @@ internal static class ClearLocationPatch
   /// <summary>
   /// Send relevant locations (and end goal if applicable) when clearing a level.
   /// </summary>
+  /// <seealso cref="MiracleDefibrillatorClearLocationPatch"/>
   /// <exception cref="ArgumentOutOfRangeException">Thrown if end goal is not valid.</exception>
   [HarmonyPatch(typeof(Rankscreen), nameof(Rankscreen.ShowAndSaveRank))]
   [HarmonyPrefix]
@@ -75,14 +76,7 @@ internal static class ClearLocationPatch
       Plugin.Logger.LogInfo("Setting goal achieved - Helping Hands");
       Plugin.Client.Session.SetGoalAchieved();
     }
-    else if (
-      (
-        Plugin.Client.Slot.endGoal == SlotData.EndGoal.ARankAll
-        || Plugin.Client.Slot.endGoal == SlotData.EndGoal.BRankAll
-        || Plugin.Client.Slot.endGoal == SlotData.EndGoal.PerfectAll
-      )
-      && Plugin.Client.Slot.endGoal != SlotData.EndGoal.HelpingHands
-    )
+    else if (Plugin.Client.Slot.endGoal != SlotData.EndGoal.HelpingHands)
     {
       clearedAll = true;
       Rank minimumRank;
@@ -213,6 +207,86 @@ internal static class ClearLocationPatch
 
     ItemsToSend.Clear();
     JustSentLocations = [];
+  }
+
+  /// <remarks>
+  /// In Miracle Defibrillator, <see cref="CustomClearLocationPatch"/> will not fire.
+  /// </remarks>
+  /// <seealso cref="CustomClearLocationPatch"/>
+  [HarmonyPatch(typeof(Level_Montage), nameof(Level_Montage.SetLevelAsPassed))]
+  [HarmonyPostfix]
+  private static void MiracleDefibrillatorClearLocationPatch(Level_Montage __instance)
+  {
+#if DEBUG
+    Plugin.DebugMenu.TrapManager.ClearActiveTraps(false);
+#endif
+    // We need to calculate the level's rank manually...
+    int rank;
+    if (!__instance.missedOnce && !__instance.game.GetPassedLevelWithoutCheckpoints())
+    {
+      // Perfect
+      rank = Rank.BossPerfect;
+    }
+    else if (__instance.game.GetPassedLevelWithoutCheckpoints())
+    {
+      // Complete+
+      rank = Rank.BossNoCheckpoints;
+    }
+    else
+    {
+      // Clear
+      rank = Rank.BossClear;
+    }
+    IReadOnlyCollection<long> ids = Bindings.LevelToStage[Level.Montage].GetLocationsToClear(rank);
+
+    // TODO: a lot of duplicated logic with ShowSentItemsPatch
+    bool clearedNewLocation = ids.Any(id => !Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id));
+    if (clearedNewLocation)
+    {
+      // FIXME: This blocks until completion - should be async!
+      Plugin.Client.Session.Locations.CompleteLocationChecks(ids.ToArray());
+      Plugin.Client.TrapManager.ClearActiveTraps(false);
+    }
+    else
+    {
+      Plugin.Client.TrapManager.ClearActiveTraps(true);
+    }
+
+    if (ItemsToSend.Count == 0)
+    {
+      Plugin.Logger.LogWarning("Couldn't get items sent, possibly due to a network issue.");
+      __instance.game.statusText.SetStatusText("Couldn't get items sent.", Color.red, 10f, useUnscaledTime: true);
+    }
+    else
+    {
+      long[] newLocations = ids.Where(id =>
+          !Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id) || JustSentLocations.Contains(id)
+        )
+        .ToArray();
+      Plugin.Logger.LogDebug($"IDs: {string.Join(", ", ids)} (of which {string.Join(", ", newLocations)} are new)");
+
+      if (ids.Count == 0)
+      {
+        __instance.game.statusText.SetStatusText("Didn't find anything.");
+        return;
+      }
+      else if (newLocations.Length == 0)
+      {
+        __instance.game.statusText.SetStatusText("Didn't find anything new.");
+        return;
+      }
+
+      IEnumerable<string> itemNames = from id in newLocations select ItemsToSend[id].ItemDisplayName;
+      __instance.game.statusText.SetStatusText(
+        $"Found {string.Join(", ", itemNames)}",
+        duration: 10f,
+        useUnscaledTime: true
+      );
+    }
+
+    // We don't need to check for the Complete All goals or boss requirements, because
+    //  1. This is a boss level itself
+    //  2. This level directly segues into 7-X2, which will be caught by CustomClearLocationPatch.
   }
 
   private static IEnumerator ScoutLocationChecks(long[] ids, int retries = 0)
