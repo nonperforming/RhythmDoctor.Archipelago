@@ -197,7 +197,7 @@ internal sealed class Client : IDisposable
     // ReSharper disable NullableWarningSuppressionIsUsed
     if (Bindings.ItemIdToLevel.TryGetValue(item.ItemId, out Level level))
     {
-      Plugin.Logger.LogInfo($"Unlocking stage item {item.ItemName} ({item.ItemId}, {level})");
+      Plugin.Logger.LogInfo($"[{nameof(Client)}] Unlocking stage item {item.ItemName} ({item.ItemId}, {level})");
 
       if (wasQueued)
       {

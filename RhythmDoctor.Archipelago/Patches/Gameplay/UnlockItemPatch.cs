@@ -30,6 +30,15 @@ internal static class UnlockItemPatch
         Plugin.Logger.LogInfo($"Unlocking entrance {region}");
         scnLevelSelect.instance.UnlockEntrance(region);
       }
+      else if (Bindings.ItemIdToLevel.TryGetValue(item.ItemId, out Level level))
+      {
+        // Duplicated in Client, though sometimes it can appear to "drop" items (possibly issue with
+        //  being in a loading state/between scenes) which this should catch
+        Plugin.Logger.LogInfo(
+          $"[{nameof(UnlockItemPatch)}] Unlocking stage item {item.ItemName} ({item.ItemId}, {level})"
+        );
+        Persistence.SetLevelRank(level, Rank.NotFinished, false, false);
+      }
     }
 
     if (!hasBasementKey)
