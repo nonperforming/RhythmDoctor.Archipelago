@@ -175,6 +175,7 @@ internal static class UnlockItemPatch
   }
 
   [HarmonyPatch(nameof(scnLevelSelect.LoadLevelData))]
+  [HarmonyPatch(nameof(scnLevelSelect.LevelJustPassedSequenceCo))]
   [HarmonyTranspiler]
   private static IEnumerable<CodeInstruction> DoNotUnlockEntrancesPatch(IEnumerable<CodeInstruction> instructions)
   {
