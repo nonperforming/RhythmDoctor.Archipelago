@@ -62,6 +62,7 @@ public class Plugin : BaseUnityPlugin
     typeof(SkipTutorialPatch),
     typeof(TrapManagerPatch),
     typeof(UnlockItemPatch),
+    typeof(WelcomeBackPatch),
     typeof(SavingPatch),
     typeof(UnapplyPatchesPatch),
   ];
