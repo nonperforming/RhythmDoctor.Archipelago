@@ -217,17 +217,49 @@ internal static class UnlockItemPatch
   private static IEnumerable<CodeInstruction> DoNotUnlockLevelsPatch(IEnumerable<CodeInstruction> instructions)
   {
     CodeMatcher matcher = new(instructions);
-    // csharpier-ignore
-    int startIndex = matcher
-      .MatchForward(false, new CodeMatch(OpCodes.Ldstr, "1-X"))
-      .Advance(-2)
-      .Pos;
-    int endIndex = matcher
-      .MatchForward(false, new CodeMatch(OpCodes.Newobj, AccessTools.Constructor(typeof(List<Level>))))
-      .Advance(-1)
-      .Pos;
 
-    matcher.RemoveInstructionsInRange(startIndex, endIndex);
+    List<CodeInstruction> instructionList = matcher.Instructions();
+    for (int i = 0; i < instructionList.Count; i++)
+    {
+      CodeInstruction instruction = instructionList[i];
+      if (instruction.opcode == OpCodes.Call)
+      {
+        // Because for some reason RD uses both Level and string (calls ToString on **LEVEL**) for others
+        int initialPos;
+        if (
+          (MethodInfo)instruction.operand
+          == AccessTools.Method(
+            typeof(Persistence),
+            nameof(Persistence.SetLevelRank),
+            [typeof(string), typeof(Rank), typeof(bool), typeof(bool)]
+          )
+        )
+        {
+          initialPos = -9;
+        }
+        else if (
+          (MethodInfo)instruction.operand
+          == AccessTools.Method(
+            typeof(Persistence),
+            nameof(Persistence.SetLevelRank),
+            [typeof(Level), typeof(Rank), typeof(bool), typeof(bool)] // int = Level enum
+          )
+        )
+        {
+          initialPos = -5;
+        }
+        else
+        {
+          continue;
+        }
+
+        for (int pos = initialPos; pos <= 1; pos++)
+        {
+          instructionList[i + pos].opcode = OpCodes.Nop;
+        }
+      }
+    }
+
     return matcher.InstructionEnumeration();
   }
 
