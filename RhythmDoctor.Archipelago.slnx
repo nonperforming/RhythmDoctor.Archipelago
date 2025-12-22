@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="RhythmDoctor.Archipelago/libs/Pulse/PulseLib.csproj" />
+  <Project Path="RhythmDoctor.Archipelago/RhythmDoctor.Archipelago.csproj" />
+</Solution>
