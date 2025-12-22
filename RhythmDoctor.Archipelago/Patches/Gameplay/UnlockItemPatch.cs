@@ -217,17 +217,18 @@ internal static class UnlockItemPatch
   private static IEnumerable<CodeInstruction> DoNotUnlockLevelsPatch(IEnumerable<CodeInstruction> instructions)
   {
     CodeMatcher matcher = new(instructions);
-    // csharpier-ignore
-    int startIndex = matcher
-      .MatchForward(false, new CodeMatch(OpCodes.Ldstr, "1-X"))
-      .Advance(-2)
-      .Pos;
-    int endIndex = matcher
-      .MatchForward(false, new CodeMatch(OpCodes.Newobj, AccessTools.Constructor(typeof(List<Level>))))
-      .Advance(-1)
-      .Pos;
 
-    matcher.RemoveInstructionsInRange(startIndex, endIndex);
+    foreach (CodeInstruction instruction in matcher.Instructions())
+    {
+      if (
+        instruction.opcode == OpCodes.Call
+        && (MethodInfo)instruction.operand == AccessTools.Method(typeof(Persistence), nameof(Persistence.SetLevelRank))
+      )
+      {
+        instruction.opcode = OpCodes.Nop;
+      }
+    }
+
     return matcher.InstructionEnumeration();
   }
 
