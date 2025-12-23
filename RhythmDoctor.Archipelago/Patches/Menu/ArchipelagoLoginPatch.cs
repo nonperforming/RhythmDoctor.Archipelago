@@ -166,7 +166,11 @@ internal static class ArchipelagoLoginPatch
       Persistence.SetLevelRank(level, Rank.NotAvailable, true);
     }
 
-    // Setup DataStorage and TrapManager.ClearedTraps
+    // Setup DataStorage and TrapManager.ClearedTraps, initial Paige stays state (this can change!)
+    Plugin
+      .Client.Session!.DataStorage[Scope.Slot, Persistence.PaigeStaysKey]
+      .Initialize(Plugin.Random.Next() % 2 == 1);
+    Persistence.SetPaigeEnding(Plugin.Client.Session!.DataStorage[Scope.Slot, Persistence.PaigeStaysKey].To<bool>());
     foreach (Type trapType in Bindings.Traps)
     {
       ITrap trap = (ITrap)Activator.CreateInstance(trapType);

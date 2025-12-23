@@ -1,3 +1,5 @@
+using Newtonsoft.Json.Linq;
+
 namespace RhythmDoctor.Archipelago.Client;
 
 /// <summary>
@@ -57,6 +59,7 @@ internal sealed class Client : IDisposable
   /// <exception cref="Exception">Login failure</exception>
   public Client(string server, string username, string? password = null, bool deathLink = false)
   {
+    // TODO: move this into its own separate async method Connect
     itemQueue = new Queue<ReceivedItemsHelper>();
 
     CreateSession(server);
@@ -115,6 +118,7 @@ internal sealed class Client : IDisposable
     Plugin.Logger.LogDebug("Binding events");
     Session.MessageLog.OnMessageReceived += MessageReceived;
     Session.Items.ItemReceived += ItemReceived;
+    Session.DataStorage[Scope.Slot, Persistence.PaigeStaysKey].OnValueChanged += ReplicatePaigeStays;
 
     if (deathLink)
     {
@@ -382,6 +386,14 @@ internal sealed class Client : IDisposable
     // TODO: Implement
   }
 
+  #region Replicate state
+  private void ReplicatePaigeStays(JToken oldValue, JToken newValue, Dictionary<string, JToken> _)
+  {
+    Plugin.Logger.LogInfo($"[Replication] Paige stays {oldValue}->{newValue}");
+    Persistence.SetPaigeEnding(newValue.ToObject<bool>());
+  }
+  #endregion
+
   public void Dispose()
   {
     IEnumerator DisconnectSession(ArchipelagoSession __session)
@@ -395,6 +407,8 @@ internal sealed class Client : IDisposable
     {
       Session.MessageLog.OnMessageReceived -= MessageReceived;
       Session.Items.ItemReceived -= ItemReceived;
+      Session.DataStorage[Scope.Slot, Persistence.PaigeStaysKey].OnValueChanged -= ReplicatePaigeStays;
+
       if (DeathLink != null)
       {
         DeathLink.OnDeathLinkReceived -= DeathLinkReceived;
