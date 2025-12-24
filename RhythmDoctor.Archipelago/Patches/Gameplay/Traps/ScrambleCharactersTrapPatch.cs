@@ -40,8 +40,7 @@ internal class ScrambleCharactersTrapPatch : ITrap
       .Where(character => !_disallowedCharacters.Contains(character))
       .ToList();
     IList<Character> pool = ((Character[])allowedCharacters.ToArray().Clone()).ToList();
-    Random random = new();
-    random.Shuffle(randomizedOrder);
+    Plugin.Random.Shuffle(randomizedOrder);
 
     for (int i = 0; i < randomizedOrder.Length; i++)
     {
@@ -50,7 +49,7 @@ internal class ScrambleCharactersTrapPatch : ITrap
 
       if (_disallowedCharacters.Contains(randomizeTo))
       {
-        int randomizeIndex = random.Next(0, pool.Count);
+        int randomizeIndex = Plugin.Random.Next(0, pool.Count);
         randomizeTo = allowedCharacters[randomizeIndex];
         pool.RemoveAt(randomizeIndex);
       }

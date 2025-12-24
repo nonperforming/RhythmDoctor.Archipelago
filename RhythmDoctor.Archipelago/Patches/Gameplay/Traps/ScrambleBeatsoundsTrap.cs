@@ -20,8 +20,7 @@ internal class ScrambleBeatsoundsTrapPatch : ITrap
   {
     SoundEffect[] randomizedOrder = (SoundEffect[])RDEditorConstants.BeatSounds.Clone();
 
-    Random random = new();
-    random.Shuffle(randomizedOrder);
+    Plugin.Random.Shuffle(randomizedOrder);
 
     for (int i = 0; i < randomizedOrder.Length; i++)
     {
@@ -30,7 +29,7 @@ internal class ScrambleBeatsoundsTrapPatch : ITrap
 
       if (randomizeTo == SoundEffect.None)
       {
-        int num = random.Next(0, RDEditorConstants.BeatSounds.Length);
+        int num = Plugin.Random.Next(0, RDEditorConstants.BeatSounds.Length);
         if (num == Array.IndexOf(RDEditorConstants.BeatSounds, SoundEffect.None))
         {
           num++;

@@ -47,8 +47,7 @@ internal class ScrambleHitsoundsTrapPatch : ITrap
   {
     string[] randomizedOrder = hitsounds.ToArray();
 
-    Random random = new();
-    random.Shuffle(randomizedOrder);
+    Plugin.Random.Shuffle(randomizedOrder);
 
     for (int i = 0; i < randomizedOrder.Length; i++)
     {
