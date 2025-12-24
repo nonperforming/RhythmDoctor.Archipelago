@@ -1,3 +1,4 @@
+// FIXME
 /*
 #if DEBUG
 namespace RhythmDoctor.Archipelago.Debug.Patches;
@@ -6,7 +7,7 @@ internal static class LogLoadLevelAsset
 {
   [HarmonyPatch(typeof(LevelBase), nameof(LevelBase.LoadLevelAsset))]
   [HarmonyPrefix]
-  internal static void StringLoadLevelAsset(ref LevelBase __instance, string name)
+  internal static void LogStringLoadLevelAssetPatch(ref LevelBase __instance, string name)
   {
     Plugin.Logger.LogInfo(
       @$"--- LevelBase.LoadLevelAsset(string name = {name})
@@ -29,7 +30,7 @@ Dog Mode: {__instance.dogMode}
 [HarmonyPatch(typeof(RDSpaceBackground), nameof(LevelBase.LoadLevelAsset))]
 [HarmonyPatch(typeof(RDBoyWard), nameof(LevelBase.LoadLevelAsset))]
 [HarmonyPrefix]
-internal static void GenericLoadLevelAsset(ref LevelBase __instance)
+internal static void LogGenericLoadLevelAssetPatch(ref LevelBase __instance)
 {
   Type? type = __instance.GetType().DeclaringType;
   string name = (type != null) ? type.Name : "Unknown";

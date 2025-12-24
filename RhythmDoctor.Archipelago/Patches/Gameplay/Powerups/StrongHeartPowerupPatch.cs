@@ -39,7 +39,7 @@ internal class StrongHeartPowerupPatch : ITrap
   {
     [HarmonyPatch(nameof(MistakesManager.AddMistake))]
     [HarmonyPrefix]
-    private static void HalfMistakeWeight(ref float weight)
+    private static void HalfMistakeWeightPatch(ref float weight)
     {
       weight /= 2;
     }

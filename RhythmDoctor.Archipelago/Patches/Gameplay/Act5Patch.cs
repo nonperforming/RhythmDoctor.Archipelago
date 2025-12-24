@@ -26,7 +26,7 @@ internal static class Act5Patch
 
   [HarmonyPatch(nameof(scnLevelSelect.PrepareAthleteWardTransition))]
   [HarmonyPrefix]
-  private static void DoNotShowDreamBubbles(ref bool __runOriginal)
+  private static void DoNotShowDreamBubblesPatch(ref bool __runOriginal)
   {
     __runOriginal = false;
   }

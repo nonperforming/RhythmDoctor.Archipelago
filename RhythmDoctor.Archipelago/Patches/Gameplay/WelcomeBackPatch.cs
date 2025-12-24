@@ -17,7 +17,7 @@ internal static class WelcomeBackPatch
       if (!__runOriginal)
       {
         Plugin.Logger.LogInfo("Forcing 6-2 to 6-X transition off");
-        __result = false; // conditional is inverted for some reason
+        __result = false; // conditional is inverted
       }
     }
   }

@@ -3,18 +3,6 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 [HarmonyPatch(typeof(scnLevelSelect))]
 internal static class RunningCharactersPatch
 {
-  /// <summary>
-  /// The ward index for the Basement area.
-  /// </summary>
-  /// <seealso cref="scnLevelSelect.currentWardIndex"/>
-  private const int BASEMENT_AREA = 3;
-
-  /// <summary>
-  /// The ward index for the Muse Dash area.
-  /// </summary>
-  /// <seealso cref="scnLevelSelect.currentWardIndex"/>
-  private const int MUSE_DASH_AREA = 7;
-
   [HarmonyPatch(nameof(scnLevelSelect.UpdateCharacters))]
   [HarmonyPostfix]
   private static void FixRunningRinPatch(scnLevelSelect __instance)
@@ -25,7 +13,7 @@ internal static class RunningCharactersPatch
 
       switch (__instance.currentWardIndex)
       {
-        case MUSE_DASH_AREA:
+        case scnLevelSelectExtensions.MUSE_DASH_AREA:
         {
           Plugin.Logger.LogDebug("Applying locked appearance to Rin");
           // csharpier-ignore
@@ -37,7 +25,7 @@ internal static class RunningCharactersPatch
           );
           break;
         }
-        case BASEMENT_AREA:
+        case scnLevelSelectExtensions.BASEMENT_AREA:
         {
           Plugin.Logger.LogDebug("Applying unlocked appearance to Rin");
           // csharpier-ignore

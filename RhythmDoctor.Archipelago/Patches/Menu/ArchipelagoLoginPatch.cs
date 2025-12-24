@@ -1,11 +1,11 @@
 namespace RhythmDoctor.Archipelago.Patches.Menu;
 
-[HarmonyPatch(typeof(scnCLS))]
+[HarmonyPatch]
 internal static class ArchipelagoLoginPatch
 {
-  [HarmonyPatch(nameof(scnCLS.Start))]
+  [HarmonyPatch(typeof(scnCLS), nameof(scnCLS.Start))]
   [HarmonyPostfix]
-  private static void ConstructArchipelagoMenu(scnCLS __instance)
+  private static void ConstructArchipelagoMenuPatch(scnCLS __instance)
   {
     // TODO: Need to change applicable text on LevelDetail
 
@@ -65,7 +65,7 @@ internal static class ArchipelagoLoginPatch
 
   [HarmonyPatch(typeof(LevelImporter), nameof(LevelImporter.Install))]
   [HarmonyPostfix]
-  private static IEnumerator OverrideInstallButton(IEnumerator result, LevelImporter __instance)
+  private static IEnumerator OverrideInstallButtonPatch(IEnumerator result, LevelImporter __instance)
   {
     // TODO: Show appropriate errors rather than silently failing
 
@@ -179,22 +179,22 @@ internal static class ArchipelagoLoginPatch
       Plugin.Client.TrapManager.ClearedTraps.Add(trap.Name, 0);
     }
     Plugin.Client.ReadyForItems = true;
-    UnpatchMenu();
+    UnpatchMenuPatch();
 
     Plugin.Logger.LogInfo("Heading to Level Select...");
     scnBase.GoToScene("scnLevelSelect");
   }
 
-  [HarmonyPatch(nameof(scnCLS.Exit))]
+  [HarmonyPatch(typeof(scnCLS), nameof(scnCLS.Exit))]
   [HarmonyPostfix]
-  private static void UnpatchMenu()
+  private static void UnpatchMenuPatch()
   {
     Plugin.UnapplyArchipelagoMenuPatch();
   }
 
-  [HarmonyPatch(nameof(scnCLS.SelectWardOption))]
+  [HarmonyPatch(typeof(scnCLS), nameof(scnCLS.SelectWardOption))]
   [HarmonyPostfix]
-  private static void CustomSelectOption(ref bool __runOriginal, scnCLS __instance)
+  private static void CustomSelectOptionPatch(ref bool __runOriginal, scnCLS __instance)
   {
     __runOriginal = false;
     switch (__instance.CurrentWardOption.name)
@@ -213,7 +213,7 @@ internal static class ArchipelagoLoginPatch
 
   [HarmonyPatch(typeof(LevelImporter), nameof(LevelImporter.Showing), MethodType.Setter)]
   [HarmonyPostfix]
-  private static void ArchipelagoImportScreen()
+  private static void ArchipelagoImportScreenPatch()
   {
     GameObject levelImporterObject = scnCLS.instance.levelImporter.gameObject;
     GameObject screenObject = levelImporterObject.transform.Find("screen").gameObject;
@@ -243,7 +243,7 @@ internal static class ArchipelagoLoginPatch
 
   [HarmonyPatch(typeof(LevelImporter), nameof(LevelImporter.ValidateUrl))]
   [HarmonyPrefix]
-  private static void StubValidateUrl(ref bool __runOriginal, LevelImporter __instance)
+  private static void StubValidateUrlPatch(ref bool __runOriginal, LevelImporter __instance)
   {
     // Seems to be called on the "install" button being clicked.
     // Redirect it to our login patch.

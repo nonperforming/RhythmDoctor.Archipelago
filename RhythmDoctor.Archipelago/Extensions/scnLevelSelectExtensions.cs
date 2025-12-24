@@ -3,6 +3,20 @@ namespace RhythmDoctor.Archipelago.Extensions;
 // ReSharper disable once InconsistentNaming
 internal static class scnLevelSelectExtensions
 {
+  // TODO: Consider pulling some of these into Pulse
+
+  /// <summary>
+  /// The ward index for the Basement area.
+  /// </summary>
+  /// <seealso cref="scnLevelSelect.currentWardIndex"/>
+  internal const int BASEMENT_AREA = 3;
+
+  /// <summary>
+  /// The ward index for the Muse Dash area.
+  /// </summary>
+  /// <seealso cref="scnLevelSelect.currentWardIndex"/>
+  internal const int MUSE_DASH_AREA = 7;
+
   /// <summary>
   /// Unlock a ward's entrance.
   /// </summary>

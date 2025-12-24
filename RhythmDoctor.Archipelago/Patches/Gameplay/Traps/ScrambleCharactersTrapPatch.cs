@@ -63,7 +63,7 @@ internal class ScrambleCharactersTrapPatch : ITrap
     {
       Plugin.Logger.LogDebug($"  {originalCharacter} -> {randomizedCharacter}");
     }
-    _harmony.PatchAll(typeof(Patch));
+    _harmony.PatchAll(typeof(ActivePatch));
   }
 
   public void ActiveEnd()
@@ -72,7 +72,7 @@ internal class ScrambleCharactersTrapPatch : ITrap
   }
 
   [HarmonyPatch(typeof(LevelBase))]
-  private static class Patch
+  private static class ActivePatch
   {
     [HarmonyPatch(nameof(LevelBase.DecodeLevelData))]
     [HarmonyPostfix]

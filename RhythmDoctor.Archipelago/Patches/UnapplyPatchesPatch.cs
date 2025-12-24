@@ -1,12 +1,12 @@
 namespace RhythmDoctor.Archipelago.Patches;
 
-[HarmonyPatch(typeof(scnBase))]
+[HarmonyPatch]
 internal static class UnapplyPatchesPatch
 {
   // Access modifier is internal instead of private as the finalizer for Plugin can call it
   // (i.e. when running under ScriptEngine).
   [HarmonyPatch(typeof(scnMenu), nameof(scnMenu.Awake))] // Just in case!
-  [HarmonyPatch(nameof(scnBase.GoToMainMenu))]
+  [HarmonyPatch(typeof(scnBase), nameof(scnBase.GoToMainMenu))]
   [HarmonyPrefix]
   internal static void TearDownClientPluginPatch()
   {

@@ -58,8 +58,7 @@ internal static class UnlockItemPatch
       Plugin.Logger.LogInfo("Moving X-1 to the basement");
       SelectableEntity artExercise = __instance.FindSelectableEntity("X-1");
       // Moving from group 6 (Art Room) to 3 (Basement)
-      // TODO: pull this (and associated RunningCharactersPatch) into Pulse
-      artExercise.group = 3; // Basement group
+      artExercise.group = scnLevelSelectExtensions.BASEMENT_AREA;
       // Set selection order to just after the basement computer. This is separate from world position.
       int index =
         __instance.selectableEntities.FindIndex((entity) => entity.gameObject.name == scnLevelSelect.BasementComputer)
@@ -213,6 +212,7 @@ internal static class UnlockItemPatch
   /// <param name="instructions">Original method IL instructions</param>
   /// <returns>Modified IL instructions</returns>
   [HarmonyPatch(nameof(scnLevelSelect.LoadLevelData))]
+  [HarmonyPatch(nameof(scnLevelSelect.Awake))]
   [HarmonyTranspiler]
   private static IEnumerable<CodeInstruction> DoNotUnlockLevelsPatch(IEnumerable<CodeInstruction> instructions)
   {
@@ -263,26 +263,9 @@ internal static class UnlockItemPatch
     return matcher.InstructionEnumeration();
   }
 
-  [HarmonyPatch(nameof(scnLevelSelect.Awake))]
-  [HarmonyTranspiler]
-  private static IEnumerable<CodeInstruction> DoNotUnlockArtRoomLevels(IEnumerable<CodeInstruction> instructions)
-  {
-    // csharpier-ignore
-    return new CodeMatcher(instructions)
-      // For Helping Hands
-      .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(RDUtils), nameof(RDUtils.Locked))))
-      .Advance(-1).SetOpcodeAndAdvance(OpCodes.Nop) // otherwise stack will be messed up
-      .SetOpcodeAndAdvance(OpCodes.Ldc_I4_0) // force false
-      // For Art Exercise
-      .MatchForward(false, new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(RDUtils), nameof(RDUtils.Locked))))
-      .Advance(-1).SetOpcodeAndAdvance(OpCodes.Nop) // otherwise stack will be messed up
-      .SetOpcodeAndAdvance(OpCodes.Ldc_I4_0) // force false
-      .InstructionEnumeration();
-  }
-
   [HarmonyPatch(nameof(scnLevelSelect.ShowRanksText))]
   [HarmonyPostfix]
-  private static void UnlockVerticalDestinations(int index, scnLevelSelect __instance)
+  private static void UnlockVerticalDestinationsPatch(int index, scnLevelSelect __instance)
   {
     if (__instance.selectableEntities[index] is SelectableObject selectableObject)
     {

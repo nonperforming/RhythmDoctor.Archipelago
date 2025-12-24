@@ -8,7 +8,7 @@ internal static class VersionTextPatch
 {
   [HarmonyPatch(nameof(RDVersionText.SetPage))]
   [HarmonyPostfix]
-  private static void Postfix(RDVersionText __instance)
+  private static void AppendClientVersionPatch(RDVersionText __instance)
   {
     string text = __instance.text.text += " / Archipelago v" + MyPluginInfo.PLUGIN_VERSION;
 

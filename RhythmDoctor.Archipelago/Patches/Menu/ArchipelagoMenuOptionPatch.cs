@@ -5,9 +5,10 @@ internal static class ArchipelagoMenuOptionPatch
 {
   private const string ARCHIPELAGO_OBJECT_NAME = "archipelago";
 
+  // TODO: We should create our own menu option instead of overriding one.
   [HarmonyPatch(nameof(scnMenu.Awake))]
   [HarmonyPrefix]
-  private static void RenameMusicOption(scnMenu __instance)
+  private static void RenameMusicOptionPatch(scnMenu __instance)
   {
     GameObject labelObject = __instance.transform.Find("mainMenu/options/optionsContainer/music").gameObject;
     // We need to set the object name to something other than 'music'
@@ -17,7 +18,7 @@ internal static class ArchipelagoMenuOptionPatch
 
   [HarmonyPatch(nameof(scnMenu.SelectOption))]
   [HarmonyPrefix]
-  private static void HandleArchipelagoOptionSelected(ref bool __runOriginal, scnMenu __instance)
+  private static void HandleArchipelagoOptionSelectedPatch(ref bool __runOriginal, scnMenu __instance)
   {
     bool archipelagoOptionSelected =
       __instance.optionsText[__instance.currentOption].gameObject.name == ARCHIPELAGO_OBJECT_NAME;

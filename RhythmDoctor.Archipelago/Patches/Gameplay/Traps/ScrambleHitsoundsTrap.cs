@@ -60,7 +60,7 @@ internal class ScrambleHitsoundsTrapPatch : ITrap
     {
       Plugin.Logger.LogDebug($"  {originalHitsound} -> {randomizedHitsound}");
     }
-    _harmony.PatchAll(typeof(Patch));
+    _harmony.PatchAll(typeof(ActivePatch));
   }
 
   public void ActiveEnd()
@@ -69,7 +69,7 @@ internal class ScrambleHitsoundsTrapPatch : ITrap
   }
 
   [HarmonyPatch(typeof(LevelBase))]
-  private static class Patch
+  private static class ActivePatch
   {
     [HarmonyPatch(nameof(LevelBase.DecodeLevelData))]
     [HarmonyPostfix]
