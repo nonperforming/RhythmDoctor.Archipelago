@@ -9,7 +9,9 @@ internal class StrongHeartPowerupPatch : ITrap
   public IEnumerable<Level> IncompatibleWithLevels =>
     LevelExtensions.AllBonusLevels.Concat(LevelExtensions.AllIntermissionLevels).Concat(LevelExtensions.AllBossLevels);
 
-  public bool Compatible()
+#pragma warning disable RCS1168
+  public bool Compatible(Level _)
+#pragma warning restore RCS1168
   {
     // 0 < 2 True (able to add one Strong Heart trap, 0.5x mistake weight)
     // 1 < 2 True (able to add another Strong Heart trap, 0.25x mistake weight)

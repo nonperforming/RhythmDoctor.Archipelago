@@ -7,8 +7,12 @@ internal class FragileHeartTrapPatch : ITrap
 
   public string Name => "Fragile Heart";
   public IEnumerable<Type> IncompatibleWithTraps => [typeof(StrongHeartPowerupPatch)];
+  public IEnumerable<Level> IncompatibleWithLevels =>
+    LevelExtensions.AllBonusLevels.Concat(LevelExtensions.AllIntermissionLevels).Concat(LevelExtensions.AllBossLevels);
 
-  public bool Compatible()
+#pragma warning disable RCS1168
+  public bool Compatible(Level _)
+#pragma warning restore RCS1168
   {
     // 0 < 2 True (able to add one Fragile Heart trap, 2x mistake weight)
     // 1 < 2 True (able to add another Fragile Heart trap, 4x mistake weight)
