@@ -322,7 +322,7 @@ internal static class UnlockItemPatch
       {
         SlotData.BossUnlockRequirement.ARankAll => Rank.A,
         SlotData.BossUnlockRequirement.Perfect => Rank.S,
-        SlotData.BossUnlockRequirement.BRankAll or SlotData.BossUnlockRequirement.Half => Rank.B,
+        SlotData.BossUnlockRequirement.BRankAll => Rank.B,
         _ => throw new IndexOutOfRangeException("Boss unlock requirement out of valid range"),
       };
 
@@ -332,17 +332,7 @@ internal static class UnlockItemPatch
       {
         clearedInAct++;
 
-        if (Plugin.Client.Slot.bossUnlockRequirement == SlotData.BossUnlockRequirement.Half)
-        {
-          // result truncates towards 0 - both are guaranteed to be positive so result is equivalent to floor
-          int levelsToClear = Bindings.LevelCountInActUnlockingBoss[act] / 2;
-          if (clearedInAct >= levelsToClear)
-          {
-            Plugin.Logger.LogInfo($"Unlocking {act} boss (half requirement, {levelsToClear} levels to clear)");
-            return true;
-          }
-        }
-        else if (clearedInAct >= Bindings.LevelCountInActUnlockingBoss[act])
+        if (clearedInAct >= Plugin.Client.Slot.GetBossSongLevelClearRequirement(act))
         {
           Plugin.Logger.LogInfo($"Unlocking {act} boss (full requirement, rank {minimumRank})");
           return true;
