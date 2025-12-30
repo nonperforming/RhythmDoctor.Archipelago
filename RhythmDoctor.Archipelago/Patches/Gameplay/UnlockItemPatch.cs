@@ -89,6 +89,10 @@ internal static class UnlockItemPatch
       level.normalEnabled = true;
     }
 
+    // Show all bonus levels/make them selectable
+    __instance.GetSelectableEntity("2-B1").normalEnabled = true;
+    __instance.GetSelectableEntity("5-B1").normalEnabled = true;
+
     // Show all Act 3 levels before we unlock 3-1
     foreach (SelectableEntity level in __instance.selectableEntities.Where((entity) => entity.id.StartsWith("3-")))
     {
