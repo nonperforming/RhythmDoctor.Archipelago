@@ -55,9 +55,8 @@ internal sealed class Client : IDisposable
   /// <param name="server">The server to connect to</param>
   /// <param name="username">The slot name</param>
   /// <param name="password">The password (if any)</param>
-  /// <param name="deathLink">Whether to enable Death Link</param>
   /// <exception cref="Exception">Login failure</exception>
-  public Client(string server, string username, string? password = null, bool deathLink = false)
+  public Client(string server, string username, string? password = null)
   {
     // TODO: move this into its own separate async method Connect
     itemQueue = new Queue<ReceivedItemsHelper>();
@@ -65,14 +64,11 @@ internal sealed class Client : IDisposable
     CreateSession(server);
     try
     {
-      Connect(username, password, deathLink);
+      Connect(username, password);
     }
     catch (Exception exception)
     {
-      throw new Exception(
-        $"Failed to connect to server {server} under {username}: {password} (Death Link: {deathLink})",
-        exception
-      );
+      throw new Exception($"Failed to connect to server {server} under {username}: {password}", exception);
     }
 
     TrapManager = new TrapManager();
@@ -105,10 +101,9 @@ internal sealed class Client : IDisposable
   /// </summary>
   /// <param name="name">Slot name to connect under</param>
   /// <param name="password">Password of the room</param>
-  /// <param name="deathLink">Whether to enable DeathLink</param>
   /// <exception cref="NullReferenceException">Session is null</exception>
   /// <exception cref="Exception">Login failure</exception>
-  private void Connect(string name, string? password = null, bool deathLink = false)
+  private void Connect(string name, string? password = null)
   {
     if (Session == null)
     {
@@ -119,14 +114,6 @@ internal sealed class Client : IDisposable
     Session.MessageLog.OnMessageReceived += MessageReceived;
     Session.Items.ItemReceived += ItemReceived;
     Session.DataStorage[Scope.Slot, Persistence.PaigeStaysKey].OnValueChanged += ReplicatePaigeStays;
-
-    if (deathLink)
-    {
-      Plugin.Logger.LogInfo("Creating DeathLink");
-      DeathLink = Session.CreateDeathLinkService();
-      DeathLink.EnableDeathLink();
-      DeathLink.OnDeathLinkReceived += DeathLinkReceived;
-    }
 
     Plugin.Logger.LogDebug("Attempting to login");
     LoginResult loginResult = Session.TryConnectAndLogin(
@@ -152,7 +139,7 @@ internal sealed class Client : IDisposable
       }
 
       // FIXME: Shouldn't use a generic exception for this
-      throw new Exception($"Failed to connect to server under {name}: {password} (Death Link: {deathLink})");
+      throw new Exception($"Failed to connect to server under {name}: {password})");
     }
     else if (loginResult is LoginSuccessful loginSuccessful)
     {
@@ -161,6 +148,16 @@ internal sealed class Client : IDisposable
       );
 
       Slot = new SlotData(loginSuccessful.SlotData);
+      if (
+        (Configuration.GetDeathLink() == Configuration.DeathLinkConfig.FollowSlot && Slot.deathLink)
+        || Configuration.GetDeathLink() == Configuration.DeathLinkConfig.On
+      )
+      {
+        Plugin.Logger.LogInfo("Creating DeathLink");
+        DeathLink = Session.CreateDeathLinkService();
+        DeathLink.EnableDeathLink();
+        DeathLink.OnDeathLinkReceived += DeathLinkReceived;
+      }
     }
     else
     {
@@ -383,7 +380,32 @@ internal sealed class Client : IDisposable
   private void DeathLinkReceived(DeathLink deathLink)
   {
     Plugin.Logger.LogInfo($"DeathLink from {deathLink.Source} by \"{deathLink.Cause}\" at {deathLink.Timestamp}");
-    // TODO: Implement
+
+    if (!DeathLinkPatch.enabled)
+      return;
+
+    if (scnGame.instance is not null)
+    {
+      Plugin.Logger.LogInfo("Cracking all hearts");
+      string text = string.IsNullOrWhiteSpace(deathLink.Cause) ? $"{deathLink.Source} died" : deathLink.Cause;
+
+      scnGame.instance.currentLevel.CrackAllHearts();
+      scnGame.instance.mistakesManager.mistakesCountP1 += 500;
+      scnGame.instance.mistakesManager.mistakesCountP2 += 500;
+      DeathLinkPatch.enabled = false;
+
+      if (scnGame.instance.currentLevel.shouldMakeHealthBar)
+      {
+        scnGame.instance.UpdatePlayerHealthBars();
+        if (!scnGame.instance.currentLevel.noBossFail)
+        {
+          scnGame.instance.FailLevel(scnGame.instance.rows[0].ent);
+        }
+      }
+
+      // We only show the status text after we (potentially game over) as it can overwrite its text
+      scnGame.instance.statusText.SetStatusText(text, Color.red, 10f, true, true);
+    }
   }
 
   #region Replicate state

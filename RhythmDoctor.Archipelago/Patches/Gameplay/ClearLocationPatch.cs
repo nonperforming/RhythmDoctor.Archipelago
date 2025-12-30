@@ -14,7 +14,10 @@ internal static class ClearLocationPatch
 
   [HarmonyPatch(typeof(LevelBase), nameof(LevelBase), MethodType.Constructor)]
   [HarmonyPrefix]
+#pragma warning disable HARMONIZE001
+
   private static void ScoutItemsSentPatch()
+#pragma warning restore HARMONIZE001
   {
     Plugin.Logger.LogDebug("Scouting locations to send");
     ItemsToSend.Clear();

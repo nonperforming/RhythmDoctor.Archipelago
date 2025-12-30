@@ -6,6 +6,7 @@ global using Archipelago.MultiClient.Net.MessageLog.Messages;
 global using Archipelago.MultiClient.Net.Models;
 
 global using BepInEx;
+global using BepInEx.Configuration;
 global using BepInEx.Logging;
 global using HarmonyLib;
 
@@ -14,6 +15,7 @@ global using PulseLib.Extensions;
 global using PulseLib.Localization;
 
 global using RDLevelEditor;
+
 global using RhythmDoctor.Archipelago;
 global using RhythmDoctor.Archipelago.Client;
 #if DEBUG

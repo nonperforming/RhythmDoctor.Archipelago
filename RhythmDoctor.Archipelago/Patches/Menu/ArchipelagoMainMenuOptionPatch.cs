@@ -1,7 +1,7 @@
 namespace RhythmDoctor.Archipelago.Patches.Menu;
 
 [HarmonyPatch(typeof(scnMenu))]
-internal static class ArchipelagoMenuOptionPatch
+internal static class ArchipelagoMainMenuOptionPatch
 {
   private const string ARCHIPELAGO_OBJECT_NAME = "archipelago";
 

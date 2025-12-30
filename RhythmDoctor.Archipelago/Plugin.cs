@@ -38,7 +38,7 @@ public class Plugin : BaseUnityPlugin
   /// </summary>
   private static readonly Type[] AlwaysActivePatches =
   [
-    typeof(ArchipelagoMenuOptionPatch),
+    typeof(ArchipelagoMainMenuOptionPatch),
     typeof(VersionTextPatch),
 #if DEBUG
     typeof(CreateDebugMenuPatch),
@@ -55,6 +55,7 @@ public class Plugin : BaseUnityPlugin
   [
     typeof(Act5Patch),
     typeof(ClearLocationPatch),
+    typeof(DeathLinkPatch),
     typeof(JanitorPatch),
     typeof(RhythmWeightlifterPatch),
     typeof(RunningCharactersPatch),
@@ -77,7 +78,9 @@ public class Plugin : BaseUnityPlugin
   {
     Instance = this;
     Logger = base.Logger;
-    Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} loaded");
+    Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} loading");
+
+    Configuration.Bind(Config);
 
     // TODO: Fix Pulse localization first
     // Logger.LogInfo("Registering custom localization");
@@ -87,6 +90,8 @@ public class Plugin : BaseUnityPlugin
     //  Unless we give Harmony the Type, it doesn't seem to apply the patch.
     Logger.LogInfo("Applying always active patches");
     ApplyPatches(AlwaysActivePatches, PATCH_ID_ALWAYS_ACTIVE);
+
+    Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} loaded");
   }
 
   private void Update()

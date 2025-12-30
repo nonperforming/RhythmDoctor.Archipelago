@@ -4,7 +4,7 @@
     <AssemblyName>gg.archipelago.rhythmdoctor</AssemblyName>
     <TargetName>RhythmDoctor.Archipelago</TargetName>
     <Product>RhythmDoctor.Archipelago</Product>
-    <Version>0.3.1</Version>
+    <Version>0.4.0</Version>
     <LangVersion>latest</LangVersion>
     <RestoreAdditionalProjectSources>
       https://api.nuget.org/v3/index.json;
@@ -17,9 +17,10 @@
   </PropertyGroup>
 
   <!-- MSB3277: Found conflicts between different versions of "System.IO.Compression" that could not be resolved. -->
+  <!-- HARMONIZE002 : Merging the same data fields from multiple attributes has undefined behavior -->
   <PropertyGroup>
     <MSBuildWarningsAsMessages>
-      $(MSBuildWarningsAsMessages);MSB3277
+      $(MSBuildWarningsAsMessages);MSB3277;HARMONIZE002
     </MSBuildWarningsAsMessages>
   </PropertyGroup>
 
