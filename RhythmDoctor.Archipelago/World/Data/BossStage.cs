@@ -59,7 +59,6 @@ internal class BossStage : BaseStage
       ids.Add(PerfectLocation);
     }
 
-    // No, rank.noCheckpoints does not work.
     if (CompletePlusLocation.HasValue && rank.noCheckpoints)
     {
       // Check if we've cleared without checkpoints.
@@ -69,8 +68,10 @@ internal class BossStage : BaseStage
       }
     }
 
-    // You must clear a boss location to save its rank.
-    ids.Add(ClearLocation);
+    if (rank.passed)
+    {
+      ids.Add(ClearLocation);
+    }
 
     return ids.AsReadOnly();
   }

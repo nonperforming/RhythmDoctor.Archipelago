@@ -3,28 +3,11 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 [HarmonyPatch]
 internal static class DeathLinkPatch
 {
-  private static readonly string[] DeathLinkMessages =
-  [
-    " couldn't defibrillate well enough",
-    " was defeated by Connectifia abortus",
-    " couldn't keep the beat",
-    " had to go back to med school",
-    " lost their ranked match",
-    "'s been waiting for so long",
-    " woof woof woof woof woof woof woof", // has been waiting for so long
-    " is living with regrets",
-    "'s dreams stopped",
-    " played Falcon",
-    " couldn't jump over the box of beans",
-    " hit that \"Don't Save Changes\" again",
-    " wishes they could write more, and care less",
-  ];
-
   internal static bool enabled = true;
 
   [HarmonyPatch(typeof(LevelBase), nameof(LevelBase), MethodType.Constructor)]
   [HarmonyPrefix]
-  private static void ResetPatch()
+  private static void ResetDeathLinkPatch()
   {
     Plugin.Logger.LogDebug("Enabling DeathLink patch");
     enabled = true;
@@ -32,7 +15,7 @@ internal static class DeathLinkPatch
 
   [HarmonyPatch(typeof(RowEntity), nameof(RowEntity.CrackAdvance))]
   [HarmonyPostfix]
-  private static void SendDeathLinkPatchOnCrackedHeart(RowEntity __instance)
+  private static void SendDeathLinkOnCrackedHeartPatch(RowEntity __instance)
   {
     if (Plugin.Client.DeathLink == null || !enabled)
       return;
@@ -41,15 +24,38 @@ internal static class DeathLinkPatch
       return;
 
     enabled = false;
+    Plugin.Client.SendDeathLink();
+  }
 
-    // ReSharper disable once NullableWarningSuppressionIsUsed
-    PlayerInfo player = Plugin.Client.Session!.Players.ActivePlayer;
+  [HarmonyPatch(typeof(scnGame), nameof(scnGame.FailLevel))]
+  [HarmonyPostfix]
+  private static void SendDeathLinkOnLevelFailPatch()
+  {
+    // TODO: We could have character-specific fail lines here?
+    enabled = false;
+    Plugin.Client.SendDeathLink();
+  }
 
-    string message = player.Alias + DeathLinkMessages[Plugin.Random.Next(DeathLinkMessages.Length)];
+  // currently only used by 7-X/7-X2
+  [HarmonyPatch(typeof(scnGame), nameof(scnGame.FailLevelLite))]
+  [HarmonyPostfix]
+  private static void SendDeathLinkOnLevelFailLitePatch(scnGame __instance)
+  {
+    if (__instance.levelIdentifier == "Montage") // 7-X, fake/forced game over
+      return;
 
-    DeathLink deathLink = new(player.Alias, message);
-    Plugin.Client.DeathLink?.SendDeathLink(deathLink);
+    enabled = false;
+    Plugin.Client.SendDeathLink();
+  }
 
-    Plugin.Logger.LogInfo($"Sent death link: \"{message}\"");
+  [HarmonyPatch(typeof(LevelBase), nameof(LevelBase.RunTag))]
+  [HarmonyPostfix]
+  private static void SendDeathLinkOnBeansHopperLossPatch(string tag)
+  {
+    if (tag != "miss" || scnGame.instance.currentLevel.GetRankFromMistakes().passed)
+      return;
+
+    // TODO: Some kind of visual indication that you failed Beans would be nice
+    Plugin.Client.SendDeathLink();
   }
 }

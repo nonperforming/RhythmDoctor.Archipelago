@@ -4,7 +4,7 @@
     <AssemblyName>gg.archipelago.rhythmdoctor</AssemblyName>
     <TargetName>RhythmDoctor.Archipelago</TargetName>
     <Product>RhythmDoctor.Archipelago</Product>
-    <Version>0.4.0</Version>
+    <Version>0.4.1</Version>
     <LangVersion>latest</LangVersion>
     <RestoreAdditionalProjectSources>
       https://api.nuget.org/v3/index.json;
@@ -82,6 +82,9 @@
       </Reference>
       <Reference Include="UnityEngine.UI">
         <HintPath>$(GameDir)\UnityEngine.UI.dll</HintPath>
+      </Reference>
+      <Reference Include="Unity.TextMeshPro">
+        <HintPath>$(GameDir)\Unity.TextMeshPro.dll</HintPath>
       </Reference>
       <Reference Include="RDTools">
         <HintPath>$(GameDir)\RDTools.dll</HintPath>
