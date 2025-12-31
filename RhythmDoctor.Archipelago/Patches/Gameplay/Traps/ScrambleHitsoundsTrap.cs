@@ -54,10 +54,10 @@ internal class ScrambleHitsoundsTrapPatch : ITrap
       scrambled[hitsounds[i]] = randomizedOrder[i];
     }
 
-    Plugin.Logger.LogDebug("Randomized hitsounds:");
+    Plugin.Logger.LogDebug("[Scramble Hitsounds] Randomized hitsounds:");
     foreach ((string originalHitsound, string randomizedHitsound) in scrambled)
     {
-      Plugin.Logger.LogDebug($"  {originalHitsound} -> {randomizedHitsound}");
+      Plugin.Logger.LogDebug($"[Scramble Hitsounds]  {originalHitsound} -> {randomizedHitsound}");
     }
     _harmony.PatchAll(typeof(ActivePatch));
   }
@@ -74,31 +74,31 @@ internal class ScrambleHitsoundsTrapPatch : ITrap
     [HarmonyPostfix]
     private static void ModifyCharacterDataPatch(RDLevelData __result)
     {
-      Plugin.Logger.LogDebug("Scramble Hitsounds: Modifying SetClapSounds level events");
+      Plugin.Logger.LogDebug("[Scramble Hitsounds] Modifying SetClapSounds level events");
 
       foreach (LevelEvent_Base levelEvent in __result.levelEvents)
       {
         if (levelEvent is LevelEvent_SetClapSounds setClapSounds)
         {
-          Plugin.Logger.LogDebug("SetClapSounds in level events:");
+          Plugin.Logger.LogDebug("[Scramble Hitsounds] SetClapSounds in level events:");
           if (setClapSounds.p1Sound.HasValue)
           {
             Plugin.Logger.LogDebug(
-              $"  P1  {setClapSounds.p1Sound.Value.filename} -> {scrambled[setClapSounds.p1Sound.Value.filename]}"
+              $"[Scramble Hitsounds]  P1  {setClapSounds.p1Sound.Value.filename} -> {scrambled[setClapSounds.p1Sound.Value.filename]}"
             );
             setClapSounds.p1Sound = new SoundDataStruct(scrambled[setClapSounds.p1Sound.Value.filename]);
           }
           if (setClapSounds.p2Sound.HasValue)
           {
             Plugin.Logger.LogDebug(
-              $"  P2  {setClapSounds.p2Sound.Value.filename} -> {scrambled[setClapSounds.p2Sound.Value.filename]}"
+              $"[Scramble Hitsounds]  P2  {setClapSounds.p2Sound.Value.filename} -> {scrambled[setClapSounds.p2Sound.Value.filename]}"
             );
             setClapSounds.p2Sound = new SoundDataStruct(scrambled[setClapSounds.p2Sound.Value.filename]);
           }
           if (setClapSounds.cpuSound.HasValue)
           {
             Plugin.Logger.LogDebug(
-              $"  CPU {setClapSounds.cpuSound.Value.filename} -> {scrambled[setClapSounds.cpuSound.Value.filename]}"
+              $"[Scramble Hitsounds]  CPU {setClapSounds.cpuSound.Value.filename} -> {scrambled[setClapSounds.cpuSound.Value.filename]}"
             );
             setClapSounds.cpuSound = new SoundDataStruct(scrambled[setClapSounds.cpuSound.Value.filename]);
           }

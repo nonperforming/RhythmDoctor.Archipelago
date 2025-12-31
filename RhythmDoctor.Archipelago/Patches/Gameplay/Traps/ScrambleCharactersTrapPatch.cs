@@ -45,6 +45,13 @@ internal class ScrambleCharactersTrapPatch : ITrap
     for (int i = 0; i < randomizedOrder.Length; i++)
     {
       Character originalCharacter = characters[i];
+      // Unscramble forbidden characters
+      if (_disallowedCharacters.Contains(originalCharacter))
+      {
+        scrambled[originalCharacter] = originalCharacter;
+        continue;
+      }
+
       Character randomizeTo = randomizedOrder[i];
 
       if (_disallowedCharacters.Contains(randomizeTo))
@@ -119,7 +126,7 @@ internal class ScrambleCharactersTrapPatch : ITrap
       {
         Character randomized = scrambled[toRandomize];
         string scrambledTo = randomized.ToString();
-        Plugin.Logger.LogDebug($"Scramble Characters: Modifying portrait from {toRandomize} to {scrambledTo}");
+        Plugin.Logger.LogDebug($"[Scramble Characters] Modifying portrait from {toRandomize} to {scrambledTo}");
         fullName = fullName.Replace(character, scrambledTo);
       }
     }
