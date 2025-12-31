@@ -1,5 +1,7 @@
 namespace RhythmDoctor.Archipelago.Patches.Menu;
 
+// TODO: This script needs a cleanup, maybe don't use scnCLS as base for login?
+
 [HarmonyPatch]
 internal static class ArchipelagoLoginPatch
 {
@@ -58,6 +60,18 @@ internal static class ArchipelagoLoginPatch
     );
     buttonObject.Find("Text").GetComponent<Text>().text = "Archipelago";
     #endregion
+
+    #region Hiding other Install Levels options
+    //Plugin.Logger.LogInfo("Hiding other install levels options");
+    //GameObject draggableContent = GameObject.Find("/Canvas/LevelImporter/screen/Contents/Draggable Content");
+    //draggableContent.transform.GetChild(0).gameObject.SetActive(false); // notDraggableInstructions
+    //draggableContent.transform.GetChild(1).gameObject.SetActive(false); // draggableInstructions
+    //draggableContent.transform.GetChild(2).gameObject.SetActive(false); // Browse Button
+    //draggableContent.transform.GetChild(3).gameObject.SetActive(true); // AddURL Button
+    #endregion
+
+    Plugin.Logger.LogInfo("Disabling DragAndDrop");
+    __instance.levelImporter.dragAndDrop.SetActive(false);
 
     // Fix UI breaking after changing selection
     __instance._currentWardOptionIndex = 0;
@@ -119,7 +133,8 @@ internal static class ArchipelagoLoginPatch
       Plugin.Logger.LogError("Invalid information, bailing out");
       __instance.CurrentContentName = LevelImporter.ContentName.LevelsInstalled;
       __instance.cls.CLSPlaySound("sndImportInstallFinish");
-      __instance.AddLevelToErrorSection(__instance.levelsToInstall[0], "URL or Name not present");
+      __instance.AddLevelToErrorSection(__instance.levelsToInstall[0], "URL or Name not present"); // FIXME: doesn't show
+      __instance.transform.Find("screen/Contents/Top Panel/Title Text").GetComponent<Text>().text = "LOGIN FAILED";
       yield break;
     }
 
@@ -133,12 +148,20 @@ internal static class ArchipelagoLoginPatch
     catch (Exception exception)
     {
       Plugin.Logger.LogError(exception);
-      Plugin.Client.Dispose();
+      try
+      {
+        Plugin.Client.Dispose();
+      }
+      catch
+      {
+        // ignore all exceptions
+      }
       Plugin.Client = null!;
       // Bail out
       __instance.CurrentContentName = LevelImporter.ContentName.LevelsInstalled;
       __instance.cls.CLSPlaySound("sndImportInstallFinish");
       __instance.AddLevelToErrorSection(__instance.levelsToInstall[0], exception.Message); // FIXME: Not showing anything
+      __instance.transform.Find("screen/Contents/Top Panel/Title Text").GetComponent<Text>().text = "LOGIN FAILED";
       yield break;
     }
 
@@ -249,5 +272,20 @@ internal static class ArchipelagoLoginPatch
     // Redirect it to our login patch.
     __runOriginal = false;
     __instance.Install_Public();
+  }
+
+  [HarmonyPatch(typeof(LevelImporter), nameof(LevelImporter.CanDragAndDrop), MethodType.Getter)]
+  [HarmonyPrefix]
+  private static void DisableDragAndDropInstallGetPatch(ref bool __result, ref bool __runOriginal)
+  {
+    __runOriginal = false;
+    __result = false;
+  }
+
+  [HarmonyPatch(typeof(LevelImporter), nameof(LevelImporter.CanDragAndDrop), MethodType.Setter)]
+  [HarmonyPrefix]
+  private static void DisableDragAndDropInstallSetPatch(ref bool __runOriginal)
+  {
+    __runOriginal = false;
   }
 }
