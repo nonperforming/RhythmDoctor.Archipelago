@@ -9,21 +9,11 @@ public class DebugMenu : MonoBehaviour
   {
     None,
     Main,
-    Data,
     Patches,
     Levels,
   }
 
   private ActivatedGUI _activatedGUI;
-
-  private string _url = "archipelago.gg";
-
-  // ReSharper disable once NullableWarningSuppressionIsUsed
-  private string _username = null!;
-
-  // ReSharper disable once NullableWarningSuppressionIsUsed
-  private string _password = null!;
-  private bool _deathLink;
 
   /// <remarks>
   /// Unlike the <see cref="Client"/>'s <see cref="Client.TrapManager"/>, traps from this Trap Manager will not be
@@ -52,8 +42,6 @@ public class DebugMenu : MonoBehaviour
     {
       if (Input.GetKeyDown(KeyCode.F3))
         return ActivatedGUI.Main;
-      else if (Input.GetKeyDown(KeyCode.F4))
-        return ActivatedGUI.Data;
       else if (Input.GetKeyDown(KeyCode.F5))
         return ActivatedGUI.Patches;
       else if (Input.GetKeyDown(KeyCode.F6))
@@ -89,36 +77,21 @@ public class DebugMenu : MonoBehaviour
       case ActivatedGUI.Main:
         GUI.Box(new Rect(10, 10, 330, 180), "Rhythm Doctor Archipelago Main Debug");
 
-        if (GUI.Button(new Rect(30, 30, 165, 20), "Toggle RD Debug"))
+        if (GUI.Button(new Rect(30, 30, 150, 20), "Toggle RD Debug"))
         {
           Notify("Toggling RD Debug to " + !DebugSettings.instance.Debug);
           DebugSettings.instance.Debug = !DebugSettings.instance.Debug;
         }
-        if (GUI.Button(new Rect(185, 30, 155, 20), "Toggle autoplay"))
+        if (GUI.Button(new Rect(180, 30, 150, 20), "Toggle autoplay"))
         {
           Notify("Toggling auto to " + !DebugSettings.instance.Auto);
           DebugSettings.instance.Debug = !DebugSettings.instance.Auto;
         }
-
-        GUI.Label(new Rect(30, 50, 150, 20), "URL");
-        _url = GUI.TextField(new Rect(180, 50, 150, 20), _url);
-
-        GUI.Label(new Rect(30, 70, 150, 20), "Username");
-        _username = GUI.TextField(new Rect(180, 70, 150, 20), _username);
-
-        GUI.Label(new Rect(30, 90, 150, 20), "Password");
-        _password = GUI.TextField(new Rect(180, 90, 150, 20), _password);
-
-        GUI.Label(new Rect(30, 110, 150, 20), "Death Link");
-        _deathLink = GUI.Toggle(new Rect(180, 110, 150, 20), _deathLink, "");
-
-        if (GUI.Button(new Rect(30, 130, 300, 20), "Connect"))
+        if (GUI.Button(new Rect(30, 90, 300, 20), "Disable Steam Achievements"))
         {
-          Plugin.Client = new Client.Client(_url, _username, _password);
+          Notify("Applying disable achievement patch");
+          Harmony.CreateAndPatchAll(typeof(DisableSteamAchievementsPatch), Plugin.PATCH_ID_DEBUG);
         }
-        break;
-      case ActivatedGUI.Data:
-        GUI.Box(new Rect(10, 10, 330, 150), "Rhythm Doctor Archipelago Data Debug");
         break;
       case ActivatedGUI.Patches:
         GUI.Box(new Rect(10, 10, 330, 890), "Rhythm Doctor Archipelago Patches Debug");
