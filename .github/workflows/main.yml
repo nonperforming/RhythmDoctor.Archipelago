@@ -1,4 +1,4 @@
-name: Build
+name: Debug Build
 on:
   push:
     paths-ignore:
@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: Debug Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -31,7 +31,7 @@ jobs:
       - name: Upload client plugin
         uses: actions/upload-artifact@v6.0.0
         with:
-          name: "RhythmDoctor.Archipelago.dll"
+          name: "RhythmDoctor.Archipelago"
           path: |
             build/Assets
             build/Archipelago.MultiClient.Net.dll
@@ -39,5 +39,4 @@ jobs:
             build/io.github.nonperforming.pulse.pdb
             build/RhythmDoctor.Archipelago.dll
             build/RhythmDoctor.Archipelago.pdb
-            build/YamlDotNet.dll
           if-no-files-found: error
