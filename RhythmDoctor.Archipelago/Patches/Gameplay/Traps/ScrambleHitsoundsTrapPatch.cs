@@ -1,5 +1,3 @@
-using System.Reflection;
-
 namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 
 internal class ScrambleHitsoundsTrapPatch : ITrap
@@ -11,7 +9,7 @@ internal class ScrambleHitsoundsTrapPatch : ITrap
 
   // ReSharper disable once NullableWarningSuppressionIsUsed
   // This will be populated in InQueue if need be.
-  private static IReadOnlyList<string> hitsounds = null!;
+  private static string[] hitsounds = null!;
 
   public string Name => "Scramble Hitsounds";
   public IEnumerable<Type> IncompatibleWithTraps => [typeof(ScrambleHitsoundsTrapPatch)];
@@ -19,33 +17,15 @@ internal class ScrambleHitsoundsTrapPatch : ITrap
 
   public void InQueue()
   {
-    // Populate Hitsounds
-    // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-    if (hitsounds == null)
-    {
-      // These all exist in the game.
-      // ReSharper disable NullableWarningSuppressionIsUsed
-      PropertyInfo p1Sound = typeof(LevelEvent_SetClapSounds).GetProperty(nameof(LevelEvent_SetClapSounds.p1Sound))!;
-      PropertyInfo p2Sound = typeof(LevelEvent_SetClapSounds).GetProperty(nameof(LevelEvent_SetClapSounds.p2Sound))!;
-      PropertyInfo cpuSound = typeof(LevelEvent_SetClapSounds).GetProperty(nameof(LevelEvent_SetClapSounds.cpuSound))!;
-      // ReSharper restore NullableWarningSuppressionIsUsed
-
-      SoundAttribute[] soundAttributes =
-      [
-        (SoundAttribute)p1Sound.GetCustomAttribute(typeof(SoundAttribute)),
-        (SoundAttribute)p2Sound.GetCustomAttribute(typeof(SoundAttribute)),
-        (SoundAttribute)cpuSound.GetCustomAttribute(typeof(SoundAttribute)),
-      ];
-
-      hitsounds = soundAttributes.SelectMany(soundAttribute => soundAttribute.options).Distinct().ToList();
-    }
-
+    // Although this method is marked for P1 the only difference is the order of the sound effects
+    // ReSharper disable once NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
+    hitsounds ??= LevelEvent_SetClapSounds.GetClapSoundsP1();
     _harmony = new Harmony($"{Plugin.PATCH_ID_TRAP}.{nameof(ScrambleHitsoundsTrapPatch)}");
   }
 
   public void Active()
   {
-    string[] randomizedOrder = hitsounds.ToArray();
+    string[] randomizedOrder = (string[])hitsounds.Clone();
 
     Plugin.Random.Shuffle(randomizedOrder);
 
@@ -81,6 +61,7 @@ internal class ScrambleHitsoundsTrapPatch : ITrap
         if (levelEvent is LevelEvent_SetClapSounds setClapSounds)
         {
           Plugin.Logger.LogDebug("[Scramble Hitsounds] SetClapSounds in level events:");
+          Plugin.Logger.LogWarning(setClapSounds.p1Sound?.filename);
           if (setClapSounds.p1Sound.HasValue)
           {
             Plugin.Logger.LogDebug(
