@@ -21,6 +21,7 @@ internal static class SkipCutscenePatch
   [HarmonyPatch(typeof(Persistence), nameof(Persistence.GetPlayedPostAct3Cutscene))]
   [HarmonyPatch(typeof(Persistence), nameof(Persistence.GetPlayedPostAct4Cutscene))]
   [HarmonyPatch(typeof(Persistence), nameof(Persistence.GetPlayedPreAct5Cutscene))]
+  [HarmonyPatch(typeof(Persistence), nameof(Persistence.GetPlayedPreAct6Cutscene))]
   [HarmonyPatch(typeof(Persistence), nameof(Persistence.GetPlayedHaileyDuetIntroduction))]
   [HarmonyPatch(typeof(Persistence), nameof(Persistence.GetPlayedPreBitternessCutscene))]
   [HarmonyPatch(typeof(Persistence), nameof(Persistence.GetPlayedRooftopCutscene))]
@@ -33,13 +34,14 @@ internal static class SkipCutscenePatch
 
   /// <summary>
   /// Do not move Paige to the Vending Machine (for the post-Act 3 cutscene), play the Act 5 intro,
-  /// or check for cutscenes to play.
+  /// or check cutscenes to play (or play cutscenes).
   /// </summary>
   /// <seealso cref="PersistenceDoNotPlayCutscenePatch"/>
   /// <param name="__runOriginal">Whether to run the original method or not.</param>
   [HarmonyPatch(typeof(scnLevelSelect), nameof(scnLevelSelect.MovePaigeToVendingMachine))]
   [HarmonyPatch(typeof(scnLevelSelect), nameof(scnLevelSelect.PlayAct5Intro))]
   [HarmonyPatch(typeof(scnLevelSelect), nameof(scnLevelSelect.CheckForCutscene))]
+  [HarmonyPatch(typeof(scnBase), nameof(scnBase.GoToCutscene))]
   [HarmonyPrefix]
   private static void LevelSelectDoNotPlayCutscenePatch(ref bool __runOriginal)
   {
@@ -53,7 +55,7 @@ internal static class SkipCutscenePatch
     scnLevelSelect.bitternessWarningPlayed = true;
     __instance.voidItemProgress = 3;
     __instance.selectableEntities.Find(entity => entity.id == "VoidItem1").normalEnabled = true;
-    __instance.selectableEntities.Find(entity => entity.id == "VoidItem1").normalEnabled = true;
-    __instance.selectableEntities.Find(entity => entity.id == "VoidItem1").normalEnabled = true;
+    __instance.selectableEntities.Find(entity => entity.id == "VoidItem2").normalEnabled = true;
+    __instance.selectableEntities.Find(entity => entity.id == "VoidItem3").normalEnabled = true;
   }
 }
