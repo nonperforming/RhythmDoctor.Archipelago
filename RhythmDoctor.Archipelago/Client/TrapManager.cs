@@ -50,6 +50,14 @@ internal sealed class TrapManager : IDisposable
   internal readonly List<ITrap> Traps = new();
 
   /// <summary>
+  /// Traps that will always be applied wherever possible.
+  /// </summary>
+  /// <remarks>
+  /// Sticky traps should be applied before the standard trap queue.
+  /// </remarks>
+  internal readonly List<ITrap> StickyTraps = new();
+
+  /// <summary>
   /// The traps previously cleared.
   /// </summary>
   internal readonly Dictionary<string, int> ClearedTraps;
@@ -113,6 +121,36 @@ internal sealed class TrapManager : IDisposable
     trap.InQueue();
   }
 
+  internal void AddStickyTraps(params string[] traps)
+  {
+    // TODO: better way of doing this.
+    //       build from trap names, do not hard code
+    ITrap GetTrapFromName(string name)
+    {
+      switch (name)
+      {
+        case "Scramble Characters":
+          return new ScrambleCharactersTrapPatch();
+        case "Scramble Beatsounds":
+          return new ScrambleBeatsoundsTrapPatch();
+        case "Scramble Hitsounds":
+          return new ScrambleHitsoundsTrapPatch();
+        case "Ghost Tap":
+          return new GhostTapTrapPatch();
+        default:
+          throw new NotImplementedException();
+      }
+    }
+
+    foreach (string trapName in traps)
+    {
+      Plugin.Logger.LogDebug($"Adding sticky trap {trapName}");
+      ITrap trap = GetTrapFromName(trapName);
+      trap.InQueue();
+      StickyTraps.Add(trap);
+    }
+  }
+
   private void ClearTrapsList(ref (int index, ITrap trap)[] trapList, bool returnToQueue)
   {
     Plugin.Logger.LogInfo($"Clearing traps list (return to queue: {returnToQueue})");
@@ -123,6 +161,13 @@ internal sealed class TrapManager : IDisposable
 
       foreach ((int index, ITrap trap) in trapList)
       {
+        // Do not return sticky traps.
+        if (index == -1)
+        {
+          Plugin.Logger.LogDebug($"Trap {trap.Name} is sticky, not returning.");
+          continue;
+        }
+
         Traps.Insert(index, trap);
       }
     }
@@ -136,6 +181,19 @@ internal sealed class TrapManager : IDisposable
     Plugin.Logger.LogDebug($"Getting applicable traps for level {level}");
 
     List<(int index, ITrap trap)> okTraps = new();
+
+    foreach (ITrap trap in StickyTraps)
+    {
+      Plugin.Logger.LogDebug($"Checking sticky trap {trap.Name}");
+      if (trap.IsIncompatibleWith(okTraps, level))
+      {
+        continue;
+      }
+
+      Plugin.Logger.LogDebug($"Adding sticky trap {trap.Name}");
+      okTraps.Add((-1, trap));
+    }
+
     for (int i = 0; i < Traps.Count; i++)
     {
       ITrap trap = Traps[i];
@@ -161,6 +219,12 @@ internal sealed class TrapManager : IDisposable
     for (int i = okTraps.Count - 1; i >= 0; i--)
     {
       int index = okTraps[i].index;
+      if (index == -1)
+      {
+        Plugin.Logger.LogDebug("Not removing sticky trap from main queue");
+        continue;
+      }
+
       Plugin.Logger.LogDebug($"{i}: Removing trap from main queue at {index}");
       Traps.RemoveAt(index);
     }
@@ -233,10 +297,10 @@ internal sealed class TrapManager : IDisposable
     // if (_activeTraps.Length == 0)
     //   throw new Exception("There must be at least one active trap to clear.");
 
-    foreach ((_, ITrap trap) in _activeTraps)
+    foreach ((int index, ITrap trap) in _activeTraps)
     {
       trap.ActiveEnd();
-      if (!returnToQueue)
+      if (!returnToQueue && index != -1)
       {
         ClearedTraps[trap.Name]++;
         Plugin.Client.Session!.DataStorage[Scope.Slot, trap.Name] = ClearedTraps[trap.Name];

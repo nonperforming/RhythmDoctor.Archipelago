@@ -1,6 +1,8 @@
 namespace RhythmDoctor.Archipelago.Client;
 
-internal struct SlotData
+using Newtonsoft.Json.Linq;
+
+internal readonly struct SlotData
 {
   internal enum EndGoal
   {
@@ -22,7 +24,7 @@ internal struct SlotData
     string msg = "Creating SlotData from";
     foreach ((string key, object value) in slotData)
     {
-      msg += $"  key: {key}, value: {value} (type {value.GetType().Name})";
+      msg += $" key: {key}, value: {value} (type {value.GetType().Name})";
     }
     Plugin.Logger.LogDebug(msg);
 
@@ -35,6 +37,11 @@ internal struct SlotData
     act5BossUnlockRequirement = (long)slotData["act_5_boss_unlock_requirement"];
     act6BossUnlockRequirement = (long)slotData["act_6_boss_unlock_requirement"];
     act7BossUnlockRequirement = (long)slotData["act_7_boss_unlock_requirement"];
+    // https://stackoverflow.com/a/13565373
+    // have to cast object to JArray first to use ToObject<T>
+    // ReSharper disable once NullableWarningSuppressionIsUsed
+    stickyTraps = ((JArray)slotData["sticky_traps"]).ToObject<List<string>>()!.ToArray();
+    //stickyPowerups = ((JArray)slotData["sticky_powerups"]).ToObject<List<string>>()!.ToArray();
     deathLink = (long)slotData["death_link"] != 0;
     Plugin.Logger.LogDebug(
       $"Created SlotData - End Goal {endGoal}, Boss Unlock Requirement {bossUnlockRequirement}, [{act1BossUnlockRequirement}, {act2BossUnlockRequirement}, {act3BossUnlockRequirement}, {act4BossUnlockRequirement}, {act5BossUnlockRequirement}, {act6BossUnlockRequirement}, {act7BossUnlockRequirement}] Death Link {deathLink}"
@@ -50,6 +57,9 @@ internal struct SlotData
   internal readonly long act5BossUnlockRequirement;
   internal readonly long act6BossUnlockRequirement;
   internal readonly long act7BossUnlockRequirement;
+  internal readonly string[] stickyTraps;
+
+  //internal readonly string[] stickyPowerups;
   internal readonly bool deathLink;
 
   /// <summary>

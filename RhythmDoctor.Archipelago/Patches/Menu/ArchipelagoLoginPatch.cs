@@ -189,7 +189,8 @@ internal static class ArchipelagoLoginPatch
       Persistence.SetLevelRank(level, Rank.NotAvailable, true);
     }
 
-    // Setup DataStorage and TrapManager.ClearedTraps, initial Paige stays state (this can change!)
+    // TODO: This should preferably not be here.
+    // Setup DataStorage and TrapManager.ClearedTraps, Sticky Traps, initial Paige stays state (this can change!)
     Plugin
       .Client.Session!.DataStorage[Scope.Slot, Persistence.PaigeStaysKey]
       .Initialize(Plugin.Random.Next() % 2 == 1);
@@ -201,6 +202,7 @@ internal static class ArchipelagoLoginPatch
       Plugin.Client.Session!.DataStorage[Scope.Slot, trap.Name].Initialize(0);
       Plugin.Client.TrapManager.ClearedTraps.Add(trap.Name, 0);
     }
+    Plugin.Client.TrapManager.AddStickyTraps(Plugin.Client.Slot.stickyTraps);
     Plugin.Client.ReadyForItems = true;
     UnpatchMenuPatch();
 
