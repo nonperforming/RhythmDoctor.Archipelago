@@ -17,8 +17,8 @@ internal static class UnlockItemPatch
     // Unlocking regions and Sleeve Paint
     Plugin.Logger.LogInfo("Checking for regions to unlock");
 
-    // ReSharper disable once NullableWarningSuppressionIsUsed
     bool hasBasementKey = false;
+    // ReSharper disable once NullableWarningSuppressionIsUsed
     foreach (ItemInfo item in Plugin.Client.Session!.Items.AllItemsReceived)
     {
       if (Bindings.KeyItemIdToWard.TryGetValue(item.ItemId, out Region region))
@@ -108,6 +108,9 @@ internal static class UnlockItemPatch
       if (level.id is "5-1" or "5-2" or "5-3")
         level.hardEnabled = true;
     }
+    GameObject.Find("/Scene/Levels Container/Vertical Movement/5-2").SetActive(true);
+    GameObject.Find("/Scene/Levels Container/Vertical Movement/5-3").SetActive(true);
+    GameObject.Find("/Scene/Levels Container/Vertical Movement/5-X").SetActive(true);
     // Unhiding timed levels 1-CNY and 1-BOO
     SelectableEntity CNY = __instance.GetSelectableEntity("1-CNY");
     CNY.normalEnabled = true;
@@ -139,6 +142,7 @@ internal static class UnlockItemPatch
     {
       recordRoomLevel.normalEnabled = true;
     }
+    GameObject.Find("/Scene/Levels Container/Vertical Movement/6-2").SetActive(true);
     // Unhiding Abandoned Ward items and 7-X, 7-X2 (if 7-X was passed)
     __instance.GetSelectableEntity("VoidItem1").normalEnabled = true;
     __instance.GetSelectableEntity("VoidItem2").normalEnabled = true;
@@ -302,6 +306,68 @@ internal static class UnlockItemPatch
           )
         );
       }
+    }
+  }
+
+  [HarmonyPatch(nameof(scnLevelSelect.UpdateCharacters))]
+  [HarmonyPostfix]
+  private static void UpdateCharactersPatch(scnLevelSelect __instance)
+  {
+    // Fix Rin's shader on her RunningCharacter
+    if (Persistence.GetLevelRank(Level.BlackestLuxuryCar) == Rank.NotAvailable)
+    {
+      RDShaderProperties? shader = null;
+
+      switch (__instance.currentWardIndex)
+      {
+        case scnLevelSelectExtensions.MUSE_DASH_AREA:
+        {
+          Plugin.Logger.LogDebug("Applying locked appearance to Rin");
+          // csharpier-ignore
+            shader = new RDShaderProperties(
+              Color.black,
+              RDConstants.data.levelSelect_lockedLevelTextOutline,
+              1,
+              true
+            );
+          break;
+        }
+        case scnLevelSelectExtensions.BASEMENT_AREA:
+        {
+          Plugin.Logger.LogDebug("Applying unlocked appearance to Rin");
+          // csharpier-ignore
+            shader = new RDShaderProperties(
+              Color.clear,
+              Color.black,
+              1,
+              true
+            );
+          break;
+        }
+      }
+
+      if (shader == null)
+      {
+        return;
+      }
+
+      GameObject rinObject = GameObject.Find("/Scene/Corridor/GoToMuseDashRoom/Rin");
+      scrChar rinChar = rinObject.GetComponent<scrChar>();
+      rinChar.shaderData = shader;
+      shader.SetFrameChanged();
+    }
+
+    // Remove the 'tarp' covering the Rhythm Weightlifter cab
+    if (
+      Persistence.GetLevelRank(Level.RhythmWeightlifter).ToNormal() != Rank.NotAvailable
+      && __instance.currentDifficulty != Difficulty.Hard
+    )
+    {
+      // Near the end of scnLevelSelect.UpdateCharacters():
+      // TODO: Consider using reverse transpiler
+      __instance.rwCabinetTarp.SetActive(false);
+      __instance.rwCabinet.gameObject.SetActive(true);
+      __instance.rwLowpassFilter.cutoffFrequency = 2800f;
     }
   }
 

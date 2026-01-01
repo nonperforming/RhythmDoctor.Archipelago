@@ -1,53 +1,36 @@
+using System.Reflection;
+
 namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 
-[HarmonyPatch(typeof(scnLevelSelect))]
+[HarmonyPatch(typeof(WalkingSelectableCharacter))]
 internal static class RunningCharactersPatch
 {
-  [HarmonyPatch(nameof(scnLevelSelect.UpdateCharacters))]
-  [HarmonyPostfix]
-  private static void FixRunningRinPatch(scnLevelSelect __instance)
+  /// <summary>
+  /// Let <see cref="WalkingSelectableCharacter"/>s walk over to locked levels.
+  /// </summary>
+  /// <param name="instructions">IL instructions</param>
+  /// <returns>Modified IL instructions</returns>
+  [HarmonyPatch(nameof(WalkingSelectableCharacter.UpdateCharacter))]
+  [HarmonyTranspiler]
+  private static IEnumerable<CodeInstruction> WalkingSelectableCharacterOverLockedLevelsPatch(
+    IEnumerable<CodeInstruction> instructions
+  )
   {
-    if (Persistence.GetLevelRank(Level.BlackestLuxuryCar) == Rank.NotAvailable)
+    CodeMatcher matcher = new(instructions);
+
+    foreach (CodeInstruction instruction in matcher.Instructions())
     {
-      RDShaderProperties? shader = null;
-
-      switch (__instance.currentWardIndex)
+      if (
+        instruction.opcode == OpCodes.Call
+        && (MethodInfo)instruction.operand
+          == AccessTools.Method(typeof(RDUtils), nameof(RDUtils.Locked), [typeof(Level)])
+      )
       {
-        case scnLevelSelectExtensions.MUSE_DASH_AREA:
-        {
-          Plugin.Logger.LogDebug("Applying locked appearance to Rin");
-          // csharpier-ignore
-          shader = new RDShaderProperties(
-            Color.black,
-            RDConstants.data.levelSelect_lockedLevelTextOutline,
-            1,
-            true
-          );
-          break;
-        }
-        case scnLevelSelectExtensions.BASEMENT_AREA:
-        {
-          Plugin.Logger.LogDebug("Applying unlocked appearance to Rin");
-          // csharpier-ignore
-          shader = new RDShaderProperties(
-            Color.clear,
-            Color.black,
-            1,
-            true
-          );
-          break;
-        }
+        // return false
+        instruction.opcode = OpCodes.Ldc_I4_0;
       }
-
-      if (shader == null)
-      {
-        return;
-      }
-
-      GameObject rinObject = GameObject.Find("/Scene/Corridor/GoToMuseDashRoom/Rin");
-      scrChar rinChar = rinObject.GetComponent<scrChar>();
-      rinChar.shaderData = shader;
-      shader.SetFrameChanged();
     }
+
+    return matcher.InstructionEnumeration();
   }
 }
