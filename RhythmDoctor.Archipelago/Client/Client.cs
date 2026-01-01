@@ -314,6 +314,11 @@ internal sealed class Client : IDisposable
           {
             Level[] bossLevels = Bindings.ActBoss[act];
 
+            if (act == Act.Act7)
+            {
+              scnLevelSelect.instance.UnlockAbandonedWard();
+            }
+
             foreach (Level bossLevel in bossLevels)
             {
               Plugin.Logger.LogInfo($"Attempting to get boss rank from locations cleared for {bossLevels}");
