@@ -15,8 +15,7 @@ internal static class ClearLocationPatch
   [HarmonyPatch(typeof(LevelBase), nameof(LevelBase), MethodType.Constructor)]
   [HarmonyPrefix]
 #pragma warning disable HARMONIZE001
-
-  private static void ScoutItemsSentPatch()
+  private static void ScoutItemsSentPatch(LevelBase __instance)
 #pragma warning restore HARMONIZE001
   {
     Plugin.Logger.LogDebug("Scouting locations to send");
@@ -32,8 +31,19 @@ internal static class ClearLocationPatch
       return;
     }
 
-    // Guaranteed to be ordered from the highest to lowest rank's locations.
-    IReadOnlyCollection<long> ids = Bindings.LevelToStage[level].GetLocationsToClear(Rank.S);
+    IReadOnlyCollection<long> ids;
+    if (level == Level.Lesmis && __instance.dogMode)
+    {
+      // ReSharper disable once NullableWarningSuppressionIsUsed
+      Dictionary<string, long> extraLocations = ((BossStage)Bindings.LevelToStage[Level.Lesmis]).ExtraLocations!;
+      ids = new List<long>([extraLocations["dog_perfect"], extraLocations["dog_clear"]]);
+    }
+    else
+    {
+      // Guaranteed to be ordered from the highest to lowest rank's locations.
+      ids = Bindings.LevelToStage[level].GetLocationsToClear(Rank.S);
+    }
+
     Plugin.Instance.StartCoroutine(ScoutLocationChecks(ids.ToArray()));
   }
 
