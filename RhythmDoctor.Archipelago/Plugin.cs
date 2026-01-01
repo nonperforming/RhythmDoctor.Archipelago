@@ -56,7 +56,7 @@ public class Plugin : BaseUnityPlugin
     typeof(Act5Patch),
     typeof(ClearLocationPatch),
     typeof(DeathLinkPatch),
-    typeof(JanitorPatch),
+    //typeof(JanitorPatch), // use pause menu for in/outbox
     typeof(RhythmWeightlifterPatch),
     typeof(RunningCharactersPatch),
     typeof(SkipCutscenePatch),
