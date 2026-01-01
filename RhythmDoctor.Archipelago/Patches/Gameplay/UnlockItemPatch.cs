@@ -105,7 +105,7 @@ internal static class UnlockItemPatch
     foreach (SelectableEntity level in __instance.selectableEntities.Where((entity) => entity.id.StartsWith("5-")))
     {
       level.normalEnabled = true;
-      if (level.id is "5-1" or "5-2")
+      if (level.id is "5-1" or "5-2" or "5-3")
         level.hardEnabled = true;
     }
     // Unhiding timed levels 1-CNY and 1-BOO
