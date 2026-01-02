@@ -100,6 +100,21 @@ internal static class TrapManagerPatch
 #endif
   }
 
+  [HarmonyPatch(typeof(scnBase), nameof(scnBase.GoToLevel))]
+  [HarmonyPostfix]
+  private static void ApplyApplicableTrapsOnLevelChangePatch(string path)
+  {
+    // ActiveEnd should be invoked by ClearLocationPatch prior to this patch being invoked.
+    Level level = RDUtils.ParseEnum(path, Level.None);
+
+    if (level == Level.Montage2)
+    {
+      Plugin.Logger.LogWarning($"Applying traps for {level} immediately");
+      Plugin.Client.TrapManager.ApplyApplicableTraps(level);
+      Plugin.Client.TrapManager.PromotePreviewTrapsToActiveTraps();
+    }
+  }
+
   // Unactive by clearing a level is handled by ClearLocationPatch.
 
   [HarmonyPatch(typeof(scnGame), nameof(scnGame.Quit))]

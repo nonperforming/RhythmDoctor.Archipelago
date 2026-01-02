@@ -7,9 +7,14 @@ internal class ScrambleCharactersTrapPatch : ITrap
 
   private static Dictionary<Character, Character> scrambled = new();
 
-  public string Name => "Scramble Characters";
+  public static string name = "Scramble Characters";
+  public string Name => name;
   public IEnumerable<Type> IncompatibleWithTraps => [typeof(ScrambleCharactersTrapPatch)];
-  public IEnumerable<Level> IncompatibleWithLevels => [Level.SongOfTheSea, Level.SongOfTheSeaH, Level.AthleteTherapy];
+
+  // FIXME: There should be no reason why Helping Hands is incompatible
+  //        It appears theres more than 4 rows in a single room at a time, but we're handling MakeRow in level events.
+  public IEnumerable<Level> IncompatibleWithLevels =>
+    [Level.SongOfTheSea, Level.SongOfTheSeaH, Level.AthleteTherapy, Level.HelpingHands];
 
   private static readonly IReadOnlyCollection<Character> _disallowedCharacters =
   [
@@ -64,10 +69,10 @@ internal class ScrambleCharactersTrapPatch : ITrap
       scrambled[originalCharacter] = randomizeTo;
     }
 
-    Plugin.Logger.LogDebug("Randomized characters:");
+    Plugin.Logger.LogDebug("[Scramble Characters] Randomized characters:");
     foreach ((Character originalCharacter, Character randomizedCharacter) in scrambled)
     {
-      Plugin.Logger.LogDebug($"  {originalCharacter} -> {randomizedCharacter}");
+      Plugin.Logger.LogDebug($"[Scramble Characters]  {originalCharacter} -> {randomizedCharacter}");
     }
     _harmony.PatchAll(typeof(ActivePatch));
   }
@@ -84,7 +89,7 @@ internal class ScrambleCharactersTrapPatch : ITrap
     [HarmonyPostfix]
     private static void ModifyCharacterDataPatch(RDLevelData __result)
     {
-      Plugin.Logger.LogDebug("Scramble Characters: Modifying MakeRow and ChangeCharacter level events");
+      Plugin.Logger.LogDebug("[Scramble Characters] Modifying MakeRow and ChangeCharacter level events");
 
       foreach (LevelEvent_Base levelEvent in __result.levelEvents)
       {
@@ -95,7 +100,7 @@ internal class ScrambleCharactersTrapPatch : ITrap
             continue;
           }
 
-          Plugin.Logger.LogDebug($"ChangeCharacter custom method: {callCustomMethod.methodName}");
+          Plugin.Logger.LogDebug($"[Scramble Characters] ChangeCharacter custom method: {callCustomMethod.methodName}");
 
           string changeToString = callCustomMethod
             .methodName.Replace("ChangeCharacterSmooth(str:", "", StringComparison.Ordinal)
@@ -104,13 +109,20 @@ internal class ScrambleCharactersTrapPatch : ITrap
           Character changeTo = Enum.Parse<Character>(changeToString);
           Character randomized = scrambled[changeTo];
 
-          Plugin.Logger.LogDebug($"Character changed to: {randomized}");
-
           callCustomMethod.methodName.Replace(changeToString, randomized.ToString(), StringComparison.Ordinal);
+          Plugin.Logger.LogDebug($"[Scramble Characters] Character changed to: {randomized}");
+        }
+        else if (levelEvent is LevelEvent_ChangeCharacter changeCharacter)
+        {
+          Plugin.Logger.LogDebug($"[Scramble Characters] ChangeCharacter event: {changeCharacter.character}");
+          changeCharacter.character = scrambled[changeCharacter.character];
+          Plugin.Logger.LogDebug($"[Scramble Characters] Character changed to: {changeCharacter.character}");
         }
         else if (levelEvent is LevelEvent_MakeRow makeRow)
         {
-          Plugin.Logger.LogDebug($"MakeRow in level events: {makeRow.character} -> {scrambled[makeRow.character]}");
+          Plugin.Logger.LogDebug(
+            $"[Scramble Characters] MakeRow in level events: {makeRow.character} -> {scrambled[makeRow.character]}"
+          );
           // Some levels such as X-0 Helping Hands use the MakeRow event manually
           makeRow.character = scrambled[makeRow.character];
         }

@@ -151,6 +151,19 @@ internal sealed class TrapManager : IDisposable
     }
   }
 
+  internal bool IsTrapActive(string trapName)
+  {
+    // TODO: .Any()
+    foreach ((int _, ITrap trap) in Plugin.Client.TrapManager._activeTraps)
+    {
+      if (trap.Name == trapName)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private void ClearTrapsList(ref (int index, ITrap trap)[] trapList, bool returnToQueue)
   {
     Plugin.Logger.LogInfo($"Clearing traps list (return to queue: {returnToQueue})");

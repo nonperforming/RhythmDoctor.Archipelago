@@ -230,6 +230,8 @@ internal static class ClearLocationPatch
   [HarmonyPostfix]
   private static void MiracleDefibrillatorClearLocationPatch(Level_Montage __instance)
   {
+    // TODO: .Any()
+    bool hasScrambledCharacter = Plugin.Client.TrapManager.IsTrapActive(ScrambleCharactersTrapPatch.name);
 #if DEBUG
     Plugin.DebugMenu.TrapManager.ClearActiveTraps(false);
 #endif
@@ -295,6 +297,14 @@ internal static class ClearLocationPatch
         duration: 10f,
         useUnscaledTime: true
       );
+    }
+
+    if (hasScrambledCharacter)
+    {
+      // Room 1, Row 2 - Cole Brew
+      // At this point, any trap will be unapplied.
+      Plugin.Logger.LogInfo("Setting Row 2 to Cole");
+      __instance.game.rows[1].ent.character.ChangeCharacter(Character.HoodieBoy);
     }
 
     // We don't need to check for the Complete All goals or boss requirements, because
