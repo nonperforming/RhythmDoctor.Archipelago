@@ -7,7 +7,7 @@ internal static class AssetHelper
     internal static class WardIcons
     {
       internal const string TYPE = "WardIcons";
-      internal const string ARCHIPELAGO = "archipelago.png";
+      internal const string ARCHIPELAGO = "Archipelago.png";
     }
   }
 
