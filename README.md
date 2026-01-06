@@ -29,7 +29,7 @@ To set up the Rhythm Doctor Archipelago mod, follow these steps:
 
 ### **Visual Studio** and **Rider**
 
-1. Open the `RhythmDoctor.Archipelago.sln`/`RhythmDoctor.Archipelago/RhythmDoctor.Archipelago.csproj` file.
+1. Open the `RhythmDoctor.Archipelago.slnx`/`RhythmDoctor.Archipelago/RhythmDoctor.Archipelago.csproj` file.
 2. Make your changes.
 3. Build the solution.
 4. Copy the following output files from `bin\<Configuration>\netstandard2.1\` to the game’s `BepInEx\plugins` directory:
