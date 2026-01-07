@@ -16,7 +16,7 @@ To set up the Rhythm Doctor Archipelago mod, follow these steps:
 
 3. **Install the RhythmDoctor.Archipelago plugin**
    - Obtain the mod files from a stable release in the `Releases` section or from GitHub Actions (these are debug builds and may be unstable).
-   - Place the following files in the `Rhythm Doctor\BepInEx\plugins` folder:
+   - Place the following files in the `Rhythm Doctor/BepInEx/plugins` folder:
       - `RhythmDoctor.Archipelago.dll`
       - `io.github.nonperforming.pulse.dll`
       - `Assets` folder
@@ -24,6 +24,12 @@ To set up the Rhythm Doctor Archipelago mod, follow these steps:
 
 5. Install **dependencies**
    Obtain and install [Pulse](https://github.com/nonperforming/Pulse) from [its releases page](https://github.com/nonperforming/Pulse/releases)
+
+6. (Linux) **Setup Steam launch options**
+   Set your Steam launch options to `./run_bepinex.sh "Rhythm Doctor" # %command%`. This is required for BepInEx to be able to run.
+
+7. (Linux) **Configure BepInEx**
+   In the `Rhythm Doctor/BepInEx/config/BepInEx.cfg` file, set `HideManagerGameObject` to `true`. The option should be on line 17.
 
 ## Development
 
