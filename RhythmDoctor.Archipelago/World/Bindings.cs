@@ -123,7 +123,7 @@ internal static class Bindings
       { 33, Level.FreezeshotH },
       { 34, Level.AthleteTherapy },
       { 61, Level.StevensonsTango },
-      { 44, Level.RhythmWeightlifter },
+      { 62, Level.RhythmWeightlifter },
       { 62, Level.HaileyDuet },
       { 63, Level.EdegaRave },
       { 64, Level.Blurred },
@@ -165,7 +165,7 @@ internal static class Bindings
       { 44, Region.SVTWard },
       { 45, Region.Train },
       { 46, Region.PhysiotherapyWard },
-      { 60, Region.RecordsRoom },
+      { 61, Region.RecordsRoom },
       { 47, Region.Basement },
       { 48, Region.GardenRoom },
     };
