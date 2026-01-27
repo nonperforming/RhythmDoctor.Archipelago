@@ -1,3 +1,5 @@
 .idea/*
+.run/*
+RhythmDoctor.Archipelago/.idea/*
 RhythmDoctor.Archipelago/Usings.cs
 RhythmDoctor.Archipelago/libs/*

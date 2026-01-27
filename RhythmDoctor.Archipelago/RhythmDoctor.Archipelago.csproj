@@ -11,7 +11,8 @@
       https://nuget.bepinex.dev/v3/index.json;
       https://nuget.samboy.dev/v3/index.json
     </RestoreAdditionalProjectSources>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies> <!-- Copy over required libraries -->
+    <!-- Copy over required libraries -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <RootNamespace>RhythmDoctor.Archipelago</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -25,21 +26,26 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="libs\**"/>
-    <EmbeddedResource Remove="libs\**"/>
-    <None Remove="libs\**"/>
+    <Compile Remove="libs\**" />
+    <EmbeddedResource Remove="libs\**" />
+    <None Remove="libs\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Archipelago.MultiClient.Net" Version="6.*"/>
+    <PackageReference Include="Archipelago.MultiClient.Net" Version="6.*" />
     <PackageReference Include="Archipelago.MultiClient.Net.Analyzers" Version="*">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all"/>
-    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="*" PrivateAssets="all"/> <!-- https://semver.org/#spec-item-4: Major version zero (0.y.z) is for initial development. Anything MAY change at any time. The public API SHOULD NOT be considered stable. -->
-    <PackageReference Include="BepInEx.Core" Version="5.*"/>
-    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*"/>
+    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+    <PackageReference
+      Include="BepInEx.AssemblyPublicizer.MSBuild"
+      Version="*"
+      PrivateAssets="all"
+    />
+    <!-- https://semver.org/#spec-item-4: Major version zero (0.y.z) is for initial development. Anything MAY change at any time. The public API SHOULD NOT be considered stable. -->
+    <PackageReference Include="BepInEx.Core" Version="5.*" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
     <PackageReference Include="Nitrox.Discovery.MSBuild" Version="0.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -52,26 +58,34 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="UnityEngine.Modules" Version="2022.3.33" IncludeAssets="compile"/>
+    <PackageReference Include="UnityEngine.Modules" Version="2022.3.33" IncludeAssets="compile" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all"/>
+    <PackageReference
+      Include="Microsoft.NETFramework.ReferenceAssemblies"
+      Version="1.0.2"
+      PrivateAssets="all"
+    />
   </ItemGroup>
 
-  <Target Name="FindGameAndIncludeReferences" BeforeTargets="ResolveAssemblyReferences" Condition="'$(_NitroxDiscovery_TaskAssembly)' != ''">
+  <Target
+    Name="FindGameAndIncludeReferences"
+    BeforeTargets="ResolveAssemblyReferences"
+    Condition="'$(_NitroxDiscovery_TaskAssembly)' != ''"
+  >
     <PropertyGroup>
       <GameName>Rhythm Doctor</GameName>
     </PropertyGroup>
     <DiscoverGame GameName="$(GameName)">
-      <Output TaskParameter="GamePath" PropertyName="GameDir"/>
+      <Output TaskParameter="GamePath" PropertyName="GameDir" />
     </DiscoverGame>
     <PropertyGroup>
       <GameDir>$(GameDir)\Rhythm Doctor_Data\Managed\</GameDir>
       <GameDir Condition="'$(GameDir)' == '\Rhythm Doctor_Data\Managed\'">libs\</GameDir>
     </PropertyGroup>
 
-    <Message Importance="high" Text="Using libraries at '$(GameDir)'"/>
+    <Message Importance="high" Text="Using libraries at '$(GameDir)'" />
 
     <ItemGroup>
       <Reference Include="Assembly-CSharp" Publicize="true">
@@ -94,11 +108,11 @@
 
   <!-- Copy required assets over -->
   <ItemGroup>
-    <None Update="Assets\**\*.*" CopyToOutputDirectory="Always"/>
+    <None Update="Assets\**\*.*" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="libs\Pulse\PulseLib.csproj"/>
+    <ProjectReference Include="libs\Pulse\PulseLib.csproj" />
   </ItemGroup>
 
   <ItemGroup>
