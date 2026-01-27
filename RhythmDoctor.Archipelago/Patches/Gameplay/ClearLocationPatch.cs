@@ -315,8 +315,8 @@ internal static class ClearLocationPatch
   private static IEnumerator ScoutLocationChecks(long[] ids, int retries = 0)
   {
     Plugin.Logger.LogDebug($"Scouting location checks... (try {retries})");
-    Task<Dictionary<long, ScoutedItemInfo>> scout = Task.Run(
-      () => Plugin.Client.Session.Locations.ScoutLocationsAsync(HintCreationPolicy.None, ids)
+    Task<Dictionary<long, ScoutedItemInfo>> scout = Task.Run(() =>
+      Plugin.Client.Session.Locations.ScoutLocationsAsync(HintCreationPolicy.None, ids)
     );
     yield return new WaitUntil(() => scout.IsCompleted);
     Plugin.Logger.LogDebug("Completed scouting");

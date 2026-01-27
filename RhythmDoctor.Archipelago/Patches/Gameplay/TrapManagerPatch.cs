@@ -45,14 +45,13 @@ internal static class TrapManagerPatch
     foreach ((int _, ITrap trap) in Plugin.Client.TrapManager.previewTraps)
     {
       Plugin.Logger.LogDebug($"Creating guest credit for {trap.Name}");
-      GuestData guestData =
-        new()
-        {
-          type = null,
-          link = null,
-          linkType = "other-unused", // TODO: Load our own sprite
-          name = trap.Name,
-        };
+      GuestData guestData = new()
+      {
+        type = null,
+        link = null,
+        linkType = "other-unused", // TODO: Load our own sprite
+        name = trap.Name,
+      };
 
       // TODO: From HeartMonitor.Show(): local function InstantiateGuest(GuestData gd).
       //       Pull this out using a reverse transpiler patch instead of duplicating its logic.

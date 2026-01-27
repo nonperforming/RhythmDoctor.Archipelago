@@ -195,7 +195,7 @@ function Prompt-Menu
         {
           Write-Host "Formatting using csharpier" -BackgroundColor Red
           dotnet tool restore
-          dotnet tool run dotnet-csharpier $RepositoryPath
+          dotnet tool run csharpier format $RepositoryPath
           continue
         }
         "t"
