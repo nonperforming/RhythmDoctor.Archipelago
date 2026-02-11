@@ -199,7 +199,7 @@ public class DebugMenu : MonoBehaviour
         }
 
         string trapsPreview = "";
-        foreach ((_, ITrap trap) in TrapManager.previewTraps)
+        foreach ((_, ITrap trap) in TrapManager._previewTraps)
         {
           trapsPreview += $"{trap.Name} ";
         }

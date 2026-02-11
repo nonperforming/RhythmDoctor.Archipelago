@@ -36,21 +36,22 @@ internal static class TrapManagerPatch
   [HarmonyPostfix]
   private static void ShowTrapNameOnPhonePatch(HeartMonitor __instance)
   {
-    if (Plugin.Client.TrapManager.previewTraps.Length == 0)
+    IEnumerable<string> previewTraps = Plugin.Client.TrapManager.GetPreviewTrapNames();
+    if (!previewTraps.Any())
       return;
 
     Plugin.Logger.LogDebug("Instantiating guest credit for preview traps");
     __instance.isGuestCreditShown = true;
 
-    foreach ((int _, ITrap trap) in Plugin.Client.TrapManager.previewTraps)
+    foreach (string trapName in previewTraps)
     {
-      Plugin.Logger.LogDebug($"Creating guest credit for {trap.Name}");
+      Plugin.Logger.LogDebug($"Creating guest credit for {trapName}");
       GuestData guestData = new()
       {
         type = null,
         link = null,
         linkType = "other-unused", // TODO: Load our own sprite
-        name = trap.Name,
+        name = trapName,
       };
 
       // TODO: From HeartMonitor.Show(): local function InstantiateGuest(GuestData gd).
@@ -67,8 +68,9 @@ internal static class TrapManagerPatch
       __instance.links.Add(guestData.link);
       __instance.creditsElements.Add(guestCreditObject);
 
-      // Have to set name manually to mitigate localization
-      heartMonitorGuest.nameText.text = trap.Name;
+      // FIXME: Have to set name manually to mitigate localization
+      //        This should instead be handled by Pulse
+      heartMonitorGuest.nameText.text = trapName;
     }
   }
 
@@ -82,7 +84,7 @@ internal static class TrapManagerPatch
 
     // Rhythm Dogtor and Rhythm Weightlifter dog mode can bypass selection,
     // so we may need apply preview patches here.
-    if (Plugin.Client.TrapManager.previewTraps.Length == 0 && levelToGo is "Lesmis" or "RhythmWeightlifter")
+    if (levelToGo is "Lesmis" or "RhythmWeightlifter")
     {
       Plugin.Logger.LogInfo("Going to Rhythm Dogtor/Rhythm Weightlifter (dog) - applying preview traps now");
       // The cheat code for Rhythm Dogtor allows you to end it
