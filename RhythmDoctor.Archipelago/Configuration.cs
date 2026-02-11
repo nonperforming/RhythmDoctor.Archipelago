@@ -28,12 +28,12 @@ internal static class Configuration
     );
   }
 
-  internal static DeathLinkConfig GetDeathLink()
+  internal static async Task<DeathLinkConfig> GetDeathLink()
   {
     // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
     if (Plugin.Client is null || Plugin.Client.Session is null)
       return _deathLink.Value;
 
-    return Plugin.Client.Session.DataStorage.GetRaceMode() ? DeathLinkConfig.FollowSlot : _deathLink.Value;
+    return await Plugin.Client.Session.DataStorage.GetRaceModeAsync() ? DeathLinkConfig.FollowSlot : _deathLink.Value;
   }
 }

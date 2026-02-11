@@ -1,3 +1,4 @@
+using Archipelago.MultiClient.Net.Packets;
 using Newtonsoft.Json.Linq;
 
 namespace RhythmDoctor.Archipelago.Client;
@@ -19,7 +20,7 @@ internal sealed class Client : IDisposable
   /// Items received when this is false will be put in <see cref="itemQueue"/>
   /// </summary>
   /// <seealso cref="itemQueue"/>
-  internal bool ReadyForItems
+  private bool ReadyForItems
   {
     get;
     set
@@ -63,37 +64,11 @@ internal sealed class Client : IDisposable
   /// <summary>
   /// Create an Archipelago client.
   /// </summary>
-  /// <param name="server">The server to connect to</param>
-  /// <param name="username">The slot name</param>
-  /// <param name="password">The password (if any)</param>
-  /// <exception cref="Exception">Login failure</exception>
-  public Client(string server, string username, string? password = null)
-  {
-    // TODO: move this into its own separate async method Connect
-    itemQueue = new Queue<ReceivedItemsHelper>();
-
-    CreateSession(server);
-    try
-    {
-      Connect(username, password);
-    }
-    catch (Exception exception)
-    {
-      throw new Exception($"Failed to connect to server {server} under {username}: {password}", exception);
-    }
-
-    TrapManager = new TrapManager();
-  }
-
-#if DEBUG
   public Client()
   {
-    Plugin.Logger.LogWarning("Creating client with no login");
-
     itemQueue = new Queue<ReceivedItemsHelper>();
     TrapManager = new TrapManager();
   }
-#endif
 
   /// <summary>
   /// Create an Archipelago session.
@@ -104,77 +79,146 @@ internal sealed class Client : IDisposable
   {
     Plugin.Logger.LogInfo($"Creating Archipelago session to {server}");
     Session = ArchipelagoSessionFactory.CreateSession(server);
-    return Session;
-  }
-
-  /// <summary>
-  /// Connect to an Archipelago room.
-  /// </summary>
-  /// <param name="name">Slot name to connect under</param>
-  /// <param name="password">Password of the room</param>
-  /// <exception cref="NullReferenceException">Session is null</exception>
-  /// <exception cref="Exception">Login failure</exception>
-  private void Connect(string name, string? password = null)
-  {
-    if (Session == null)
-    {
-      throw new NullReferenceException("Session is null");
-    }
 
     Plugin.Logger.LogDebug("Binding events");
     Session.MessageLog.OnMessageReceived += MessageReceived;
     Session.Items.ItemReceived += ItemReceived;
     Session.DataStorage[Scope.Slot, Persistence.PaigeStaysKey].OnValueChanged += ReplicatePaigeStays;
 
-    Plugin.Logger.LogDebug("Attempting to login");
-    LoginResult loginResult = Session.TryConnectAndLogin(
+    return Session;
+  }
+
+  /// <summary>
+  /// Connect to an Archipelago room.
+  /// </summary>
+  /// <remarks>
+  /// This method does not load the Level Select.
+  /// </remarks>
+  /// <param name="name">Slot name to connect under</param>
+  /// <param name="password">Password of the room</param>
+  /// <exception cref="NullReferenceException">Session is null</exception>
+  /// <exception cref="Exception">Login failure</exception>
+  private async Task<LoginResult> Connect(string name, string? password = null)
+  {
+    if (Session == null)
+    {
+      throw new NullReferenceException("Session is null");
+    }
+
+    Plugin.Logger.LogInfo("Attempting to connect");
+    RoomInfoPacket _ = await Session.ConnectAsync();
+    Plugin.Logger.LogInfo("Connected");
+
+    Plugin.Logger.LogInfo("Attempting to login");
+    LoginResult loginResult = await Session.LoginAsync(
       "Rhythm Doctor",
       name,
       ItemsHandlingFlags.AllItems,
       new Version("0.6.3"),
       null, // DeathLink is managed by DeathLinkService
       null, // Randomly generated
-      password,
-      true
+      password
     );
+    Plugin.Logger.LogInfo("Logged in");
 
-    if (loginResult is LoginFailure loginFailure)
+    switch (loginResult)
     {
-      Plugin.Logger.LogError("Login failed");
-      for (int i = 0; i < loginFailure.Errors.Length; i++)
+      case LoginFailure loginFailure:
       {
-        string error = loginFailure.Errors[i];
-        ConnectionRefusedError errorCode = loginFailure.ErrorCodes[i];
+        Plugin.Logger.LogError("Login failed");
+        for (int i = 0; i < loginFailure.Errors.Length; i++)
+        {
+          string error = loginFailure.Errors[i];
+          ConnectionRefusedError errorCode = loginFailure.ErrorCodes[i];
 
-        Plugin.Logger.LogError($"Error {errorCode}: {error}");
+          Plugin.Logger.LogError($"Error {errorCode}: {error}");
+        }
+
+        return loginResult;
       }
-
-      // FIXME: Shouldn't use a generic exception for this
-      throw new Exception($"Failed to connect to server under {name}: {password})");
-    }
-    else if (loginResult is LoginSuccessful loginSuccessful)
-    {
-      Plugin.Logger.LogInfo(
-        $"Successfully connected to {loginSuccessful.Slot}/{name} as {Session.ConnectionInfo.Uuid}"
-      );
-
-      Slot = new SlotData(loginSuccessful.SlotData);
-      if (
-        (Configuration.GetDeathLink() == Configuration.DeathLinkConfig.FollowSlot && Slot.deathLink)
-        || Configuration.GetDeathLink() == Configuration.DeathLinkConfig.On
-      )
+      case LoginSuccessful loginSuccessful:
       {
-        Plugin.Logger.LogInfo("Creating DeathLink");
-        DeathLink = Session.CreateDeathLinkService();
-        DeathLink.EnableDeathLink();
-        DeathLink.OnDeathLinkReceived += DeathLinkReceived;
+        Plugin.Logger.LogInfo(
+          $"Successfully logged into {loginSuccessful.Slot}/{name} as {Session.ConnectionInfo.Uuid}"
+        );
+
+        Configuration.DeathLinkConfig deathLink = await Configuration.GetDeathLink();
+        Slot = new SlotData(loginSuccessful.SlotData);
+        if (
+          (deathLink == Configuration.DeathLinkConfig.FollowSlot && Slot.deathLink)
+          || deathLink == Configuration.DeathLinkConfig.On
+        )
+        {
+          Plugin.Logger.LogInfo("Creating DeathLink");
+          DeathLink = Session.CreateDeathLinkService();
+          DeathLink.EnableDeathLink();
+          DeathLink.OnDeathLinkReceived += DeathLinkReceived;
+        }
+
+        Persistence.currentSlotIndex = 0; // Slot 1
+        Plugin.ApplyGameplayPatches();
+
+        // Scary!!!!!!!!!!!
+        // Hopefully if we got here without any exceptions SavingPatch should be applied,
+        //  so we shouldn't lose our first slot in the case of a crash.
+        // When we are quitting, the original data should be reloaded by UnapplyPatchesPatch.
+        Persistence.slotPrefs[0].dict.Clear();
+
+        // Let LockSleevePaintPatch set the Sleeve Paint to Slot 1's default
+        Persistence.p1Skin.Reload();
+        Persistence.p2Skin.Reload();
+
+        // Some levels come unlocked by default, such as X-1.
+        // Lock all levels to force the user to unlock them with an item.
+        foreach (Level level in Enum.GetValues(typeof(Level)))
+        {
+          Persistence.SetLevelRank(level, Rank.NotAvailable, true);
+        }
+
+        return loginResult;
       }
+      default:
+        throw new Exception($"Unknown error: failed to connect to {name}");
     }
-    else
+  }
+
+  private void PrepareSlot()
+  {
+    if (Session == null)
     {
-      // FIXME: Shouldn't use a generic exception?
-      throw new Exception($"Unknown error: failed to connect to {name}");
+      throw new NullReferenceException("Session is null");
     }
+    // TODO: Check if session exists but is invalid
+
+    // Setup DataStorage and TrapManager.ClearedTraps, Sticky Traps, initial Paige stays state (this can change!)
+    Plugin
+      .Client.Session!.DataStorage[Scope.Slot, Persistence.PaigeStaysKey]
+      .Initialize(Plugin.Random.Next() % 2 == 1);
+    Persistence.SetPaigeEnding(Plugin.Client.Session!.DataStorage[Scope.Slot, Persistence.PaigeStaysKey].To<bool>());
+    foreach (Type trapType in Bindings.Traps)
+    {
+      ITrap trap = (ITrap)Activator.CreateInstance(trapType);
+      // ReSharper disable once NullableWarningSuppressionIsUsed
+      Plugin.Client.Session!.DataStorage[Scope.Slot, trap.Name].Initialize(0);
+      Plugin.Client.TrapManager.ClearedTraps.Add(trap.Name, 0);
+    }
+    Plugin.Client.TrapManager.AddStickyTraps(Plugin.Client.Slot.stickyTraps);
+  }
+
+  /// <summary>
+  /// Create an Archipelago session and connect to a room.
+  /// </summary>
+  /// <param name="server">Server to connect to</param>
+  /// <param name="name">Slot name to connect under</param>
+  /// <param name="password">Password of the room</param>
+  internal async Task<LoginResult> CreateSessionAndConnect(string server, string name, string? password = null)
+  {
+    CreateSession(server);
+    LoginResult loginResult = await Connect(name, password);
+    PrepareSlot();
+    ReadyForItems = true;
+
+    return loginResult;
   }
 
   private void MessageReceived(LogMessage message)

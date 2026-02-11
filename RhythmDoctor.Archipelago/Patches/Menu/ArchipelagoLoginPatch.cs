@@ -96,6 +96,9 @@ internal static class ArchipelagoLoginPatch
       item.canToggleRemoveButton = false;
     }
     yield return null;
+
+    // TODO: Let user abandon while trying to connect.
+    __instance.stopButton.interactable = false;
     #endregion
 
     string[] text = __instance
@@ -140,74 +143,37 @@ internal static class ArchipelagoLoginPatch
 
     // Attempt to log in with the information given.
     Plugin.Logger.LogInfo("Creating client");
-    try
+    Plugin.Client = new Client.Client();
+
+    // Should be safe in this context
+    // ReSharper disable AccessToDisposedClosure
+    Task<LoginResult> login = Task.Run(() => Plugin.Client.CreateSessionAndConnect(url, name, password));
+    yield return new WaitUntil(() => login.IsCompleted);
+
+    LoginResult loginResult = login.Result;
+    switch (loginResult)
     {
-      // TODO: Make async, do not hang
-      Plugin.Client = new Client.Client(url, name, password);
-    }
-    catch (Exception exception)
-    {
-      Plugin.Logger.LogError(exception);
-      try
-      {
+      case LoginSuccessful:
+        Plugin.Logger.LogInfo("Logged in!");
+        __instance.cls.CLSPlaySound("sndImportInstallFinish");
+        yield return null;
+
+        UnpatchMenuPatch();
+
+        Plugin.Logger.LogInfo("Heading to Level Select...");
+        scnBase.GoToScene("scnLevelSelect");
+        yield break;
+      case LoginFailure loginFailure:
         Plugin.Client.Dispose();
-      }
-      catch
-      {
-        // ignore all exceptions
-      }
-      Plugin.Client = null!;
-      // Bail out
-      __instance.CurrentContentName = LevelImporter.ContentName.LevelsInstalled;
-      __instance.cls.CLSPlaySound("sndImportInstallFinish");
-      __instance.AddLevelToErrorSection(__instance.levelsToInstall[0], exception.Message); // FIXME: Not showing anything
-      __instance.transform.Find("screen/Contents/Top Panel/Title Text").GetComponent<Text>().text = "LOGIN FAILED";
-      yield break;
+        Plugin.Client = null!;
+        // Bail out
+        __instance.CurrentContentName = LevelImporter.ContentName.LevelsInstalled;
+        __instance.cls.CLSPlaySound("sndImportInstallFinish");
+        // TODO: Show all loginFailure.Errors
+        //__instance.AddLevelToErrorSection(__instance.levelsToInstall[0], "Failed to login"); // not showing anything
+        __instance.transform.Find("screen/Contents/Top Panel/Title Text").GetComponent<Text>().text = "LOGIN FAILED";
+        yield break;
     }
-
-    // Successful login
-    Plugin.Logger.LogInfo("Logged in!");
-    __instance.cls.CLSPlaySound("sndImportInstallFinish");
-    yield return null;
-    Persistence.currentSlotIndex = 0; // Slot 1
-    Plugin.ApplyGameplayPatches();
-
-    // Scary!!!!!!!!!!!
-    // Hopefully if we got here without any exceptions SavingPatch should be applied,
-    //  so we shouldn't lose our first slot in the case of a crash.
-    // When we are quitting, the original data should be reloaded by UnapplyPatchesPatch.
-    Persistence.slotPrefs[0].dict.Clear();
-
-    // Let LockSleevePaintPatch set the Sleeve Paint to Slot 1's default
-    Persistence.p1Skin.Reload();
-    Persistence.p2Skin.Reload();
-
-    // Some levels come unlocked by default, such as X-1.
-    // Lock all levels to force the user to unlock them with an item.
-    foreach (Level level in Enum.GetValues(typeof(Level)))
-    {
-      Persistence.SetLevelRank(level, Rank.NotAvailable, true);
-    }
-
-    // TODO: This should preferably not be here.
-    // Setup DataStorage and TrapManager.ClearedTraps, Sticky Traps, initial Paige stays state (this can change!)
-    Plugin
-      .Client.Session!.DataStorage[Scope.Slot, Persistence.PaigeStaysKey]
-      .Initialize(Plugin.Random.Next() % 2 == 1);
-    Persistence.SetPaigeEnding(Plugin.Client.Session!.DataStorage[Scope.Slot, Persistence.PaigeStaysKey].To<bool>());
-    foreach (Type trapType in Bindings.Traps)
-    {
-      ITrap trap = (ITrap)Activator.CreateInstance(trapType);
-      // ReSharper disable once NullableWarningSuppressionIsUsed
-      Plugin.Client.Session!.DataStorage[Scope.Slot, trap.Name].Initialize(0);
-      Plugin.Client.TrapManager.ClearedTraps.Add(trap.Name, 0);
-    }
-    Plugin.Client.TrapManager.AddStickyTraps(Plugin.Client.Slot.stickyTraps);
-    Plugin.Client.ReadyForItems = true;
-    UnpatchMenuPatch();
-
-    Plugin.Logger.LogInfo("Heading to Level Select...");
-    scnBase.GoToScene("scnLevelSelect");
   }
 
   [HarmonyPatch(typeof(scnCLS), nameof(scnCLS.Exit))]
