@@ -15,7 +15,7 @@ repos:
         description: Restore the .NET tools listed at .config/dotnet-tools.json.
       - id: csharpier
         name: Format using CSharpier
-        entry: dotnet tool run dotnet-csharpier
+        entry: dotnet tool run csharpier format
         language: system
         types:
           - c#
