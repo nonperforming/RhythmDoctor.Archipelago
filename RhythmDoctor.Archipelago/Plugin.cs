@@ -40,6 +40,7 @@ public class Plugin : BaseUnityPlugin
   [
     typeof(ArchipelagoMainMenuOptionPatch),
     typeof(VersionTextPatch),
+    typeof(scnGameExtensions),
 #if DEBUG
     typeof(CreateDebugMenuPatch),
     typeof(LogClearLevelPatch),

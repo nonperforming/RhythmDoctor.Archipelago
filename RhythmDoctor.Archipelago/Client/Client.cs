@@ -461,6 +461,8 @@ internal sealed class Client : IDisposable
         // Normal/boss level.
         Plugin.Logger.LogInfo("Cracking all hearts");
 
+        scrConductor.PlayFeedback(GameSoundType.BigMistake, group: RDUtils.GetMixerGroup("MistakesParent"));
+        scnGame.instance.FlashBorderFeedbackWithDuration(scnGame.BorderFeedbackType.Incorrect, 5f);
         scnGame.instance.currentLevel.CrackAllHearts();
         scnGame.instance.mistakesManager.mistakesCountP1 += 500;
         scnGame.instance.mistakesManager.mistakesCountP2 += 500;
