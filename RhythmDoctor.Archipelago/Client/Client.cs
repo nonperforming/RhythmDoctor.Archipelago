@@ -15,22 +15,16 @@ internal sealed class Client : IDisposable
 
   #region Ready for items
   /// <summary>
-  /// Backing store for <see cref="ReadyForItems"/>.
-  /// </summary>
-  /// <seealso cref="ReadyForItems"/>
-  private bool _readyForItems;
-
-  /// <summary>
   /// Whether to process items or not.
   /// Items received when this is false will be put in <see cref="itemQueue"/>
   /// </summary>
   /// <seealso cref="itemQueue"/>
   internal bool ReadyForItems
   {
-    get => _readyForItems;
+    get;
     set
     {
-      _readyForItems = value;
+      field = value;
       if (value)
       {
         Plugin.Logger.LogInfo("Processing all queued items");
