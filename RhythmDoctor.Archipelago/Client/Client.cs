@@ -215,6 +215,9 @@ internal sealed class Client : IDisposable
   {
     CreateSession(server);
     LoginResult loginResult = await Connect(name, password);
+    if (!loginResult.Successful)
+      return loginResult;
+
     PrepareSlot();
     ReadyForItems = true;
 
