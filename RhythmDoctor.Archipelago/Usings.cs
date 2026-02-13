@@ -23,7 +23,6 @@ global using RhythmDoctor.Archipelago.Debug;
 global using RhythmDoctor.Archipelago.Debug.Patches;
 #endif
 global using RhythmDoctor.Archipelago.Extensions;
-global using RhythmDoctor.Archipelago.Extensions.Patches;
 global using RhythmDoctor.Archipelago.Helpers;
 global using RhythmDoctor.Archipelago.Interfaces;
 global using RhythmDoctor.Archipelago.Patches;

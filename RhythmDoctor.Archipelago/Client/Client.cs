@@ -462,10 +462,12 @@ internal sealed class Client : IDisposable
       else
       {
         // Normal/boss level.
-        Plugin.Logger.LogInfo("Cracking all hearts");
+        Plugin.Logger.LogInfo("Breaking all hearts");
 
         scrConductor.PlayFeedback(GameSoundType.BigMistake, group: RDUtils.GetMixerGroup("MistakesParent"));
         scnGame.instance.FlashBorderFeedbackWithDuration(scnGame.BorderFeedbackType.Incorrect, 5f);
+        scnGame.instance.ShakeAllHearts(duration: 1f, 8);
+        scnGame.instance.ShakeAllCharacters(duration: 1f, 8);
         scnGame.instance.currentLevel.CrackAllHearts();
         scnGame.instance.mistakesManager.mistakesCountP1 += 500;
         scnGame.instance.mistakesManager.mistakesCountP2 += 500;

@@ -1,7 +1,7 @@
-namespace RhythmDoctor.Archipelago.Extensions.Patches;
+namespace RhythmDoctor.Archipelago.Extensions;
 
 [HarmonyPatch]
-internal static class scnGameExtensions
+internal static partial class scnGameExtensions
 {
   [HarmonyPatch(typeof(scnGame), nameof(scnGame.FlashBorderFeedback), typeof(scnGame.BorderFeedbackType), typeof(Row))]
   [HarmonyReversePatch(HarmonyReversePatchType.Snapshot)]
