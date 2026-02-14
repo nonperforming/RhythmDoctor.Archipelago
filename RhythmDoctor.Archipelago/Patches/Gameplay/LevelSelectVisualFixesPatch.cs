@@ -38,4 +38,43 @@ internal static class LevelSelectVisualFixesPatch
       character.levelType = LevelType.Boss;
     }
   }
+
+  [HarmonyPatch(nameof(scnLevelSelect.ShowRanksText))]
+  [HarmonyTranspiler]
+  private static IEnumerable<CodeInstruction> DoNotShowUnlockHintsPatch(IEnumerable<CodeInstruction> instructions)
+  {
+    return new CodeMatcher(instructions)
+      // Collaboration levels - do not show 'unlock X'
+      .MatchForward(false, new CodeMatch(OpCodes.Ldstr, "levelSelect.condition.{0}"))
+      .SetOpcodeAndAdvance(OpCodes.Nop) // x15
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      // Night shifts - do not show 'get A rank'
+      .MatchForward(
+        false,
+        new CodeMatch(
+          OpCodes.Ldfld,
+          AccessTools.Field(typeof(scnLevelSelect), nameof(scnLevelSelect.currentDifficulty))
+        )
+      )
+      .Advance(-1)
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Nop)
+      .SetOpcodeAndAdvance(OpCodes.Br_S)
+      .MatchForward(false, new CodeMatch(OpCodes.Ldstr, ""))
+      .InstructionEnumeration();
+  }
 }
