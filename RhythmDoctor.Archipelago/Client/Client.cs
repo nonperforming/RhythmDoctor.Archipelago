@@ -182,7 +182,7 @@ internal sealed class Client : IDisposable
     }
   }
 
-  private void PrepareSlot()
+  private async Task PrepareSlot()
   {
     if (Session == null)
     {
@@ -191,10 +191,24 @@ internal sealed class Client : IDisposable
     // TODO: Check if session exists but is invalid
 
     // Setup DataStorage and TrapManager.ClearedTraps, Sticky Traps, initial Paige stays state (this can change!)
-    Plugin
+    // Manual implementation of asynchronous DataStorageElement.Initialize() here to avoid timeout errors
+    bool? paigeStays = await Plugin
       .Client.Session!.DataStorage[Scope.Slot, Persistence.PaigeStaysKey]
-      .Initialize(Plugin.Random.Next() % 2 == 1);
-    Persistence.SetPaigeEnding(Plugin.Client.Session!.DataStorage[Scope.Slot, Persistence.PaigeStaysKey].To<bool>());
+      .GetAsync<bool?>();
+
+    if (!paigeStays.HasValue)
+    {
+      bool value = Plugin.Random.Next() % 2 == 1;
+      Plugin.Client.Session!.DataStorage[Scope.Slot, Persistence.PaigeStaysKey] = value;
+      Plugin.Logger.LogInfo($"Set initial {Persistence.PaigeStaysKey} state to {value}");
+      Persistence.SetPaigeEnding(value);
+    }
+    else
+    {
+      Plugin.Logger.LogInfo($"Found {Persistence.PaigeStaysKey} state: {paigeStays.Value}");
+      Persistence.SetPaigeEnding(paigeStays.Value);
+    }
+
     foreach (Type trapType in Bindings.Traps)
     {
       ITrap trap = (ITrap)Activator.CreateInstance(trapType);
@@ -218,7 +232,7 @@ internal sealed class Client : IDisposable
     if (!loginResult.Successful)
       return loginResult;
 
-    PrepareSlot();
+    await PrepareSlot();
     ReadyForItems = true;
 
     return loginResult;
