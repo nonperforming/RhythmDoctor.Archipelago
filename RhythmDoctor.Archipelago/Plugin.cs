@@ -91,7 +91,7 @@ public class Plugin : BaseUnityPlugin
     // TODO: Is there a simpler way to PatchAll()?
     //  Unless we give Harmony the Type, it doesn't seem to apply the patch.
     Logger.LogInfo("Applying always active patches");
-    ApplyPatches(AlwaysActivePatches, PATCH_ID_ALWAYS_ACTIVE);
+    ApplyPatches(PATCH_ID_ALWAYS_ACTIVE, AlwaysActivePatches);
 
     Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} loaded");
   }
@@ -104,7 +104,7 @@ public class Plugin : BaseUnityPlugin
     }
   }
 
-  private static void ApplyPatches(Type[] patches, string id)
+  private static void ApplyPatches(string id, params Type[] patches)
   {
     Logger.LogInfo($"Applying patches as {id}");
     Harmony harmony = new(id);
@@ -119,8 +119,8 @@ public class Plugin : BaseUnityPlugin
   internal static void ApplyGameplayPatches()
   {
     Logger.LogInfo("Applying gameplay patches");
-    ApplyPatches(PostLoginPatches, PATCH_ID_POST_LOGIN);
-    Harmony.CreateAndPatchAll(typeof(LockSleevePaintPatch), PATCH_ID_SLEEVE_PAINT);
+    ApplyPatches(PATCH_ID_POST_LOGIN, PostLoginPatches);
+    ApplyPatches(PATCH_ID_SLEEVE_PAINT, typeof(LockSleevePaintPatch));
   }
 
   internal static void UnapplyGameplayPatches()
