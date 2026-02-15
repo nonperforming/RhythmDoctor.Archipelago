@@ -10,7 +10,6 @@ internal sealed class TrapManager : IDisposable
 
   internal Dictionary<string, int> remoteTrapClearCache = new();
 
-  // TODO: Probably make a method to get preview trap names instead of making this internal and accessible to others
   /// <summary>
   /// Ordered array of traps that were applied to the level preview, by the lowest index to the highest index.
   /// </summary>
@@ -157,7 +156,6 @@ internal sealed class TrapManager : IDisposable
 
   internal bool IsTrapActive(string trapName)
   {
-    // TODO: .Any()
     foreach ((int _, ITrap trap) in Plugin.Client.TrapManager._activeTraps)
     {
       if (trap.Name == trapName)
@@ -297,9 +295,12 @@ internal sealed class TrapManager : IDisposable
 
   private void ClearPreviewTraps()
   {
-    // FIXME: Find a more specific Exception
-    // if (previewTraps.Length == 0)
-    //   throw new Exception("There must be at least one preview trap to clear.");
+    if (_activeTraps.Length == 0)
+    {
+      Plugin.Logger.LogWarning("There must be at least one preview trap to clear.");
+      return;
+    }
+
     Plugin.Logger.LogInfo("Clearing preview traps");
 
     foreach ((_, ITrap trap) in _previewTraps)
@@ -322,9 +323,11 @@ internal sealed class TrapManager : IDisposable
   {
     Plugin.Logger.LogInfo($"Clearing active traps (return to queue: {returnToQueue})");
 
-    // FIXME: Find a more specific Exception
-    // if (_activeTraps.Length == 0)
-    //   throw new Exception("There must be at least one active trap to clear.");
+    if (_activeTraps.Length == 0)
+    {
+      Plugin.Logger.LogWarning("There must be at least one active trap to clear.");
+      return;
+    }
 
     foreach ((int index, ITrap trap) in _activeTraps)
     {
