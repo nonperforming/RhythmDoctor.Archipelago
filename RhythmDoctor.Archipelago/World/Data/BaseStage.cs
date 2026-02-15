@@ -9,5 +9,5 @@ internal abstract class BaseStage
   /// </summary>
   /// <param name="rank">Rank achieved.</param>
   /// <returns>List of location IDs to clear.</returns>
-  internal abstract IReadOnlyCollection<long> GetLocationsToClear(Rank rank);
+  internal abstract IEnumerable<long> GetLocationsToClear(Rank rank);
 }

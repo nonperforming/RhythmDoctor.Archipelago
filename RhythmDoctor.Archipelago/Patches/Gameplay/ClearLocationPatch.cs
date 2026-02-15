@@ -31,7 +31,7 @@ internal static class ClearLocationPatch
       return;
     }
 
-    IReadOnlyCollection<long> ids;
+    IEnumerable<long> ids;
     if (level == Level.Lesmis && __instance.dogMode)
     {
       // ReSharper disable once NullableWarningSuppressionIsUsed
@@ -67,75 +67,9 @@ internal static class ClearLocationPatch
     // TODO: Boss levels and said "custom levels" will overwrite virtual LevelBase.ShowGameOver
     //       Check for Rankscreen.base.game.currentLevel.customGameover!!! When is this case applicable?
 
-#if DEBUG
-    // Discard Debug Menu traps regardless of result.
-    Plugin.DebugMenu.TrapManager.ClearActiveTraps(false);
-#endif
-
-    if (bossLevelFailed)
-    {
-      Plugin.Client.TrapManager.ClearActiveTraps(false);
-      return;
-    }
-
     Level level = GetCurrentLevel();
     Rank rank = scnGame.instance.currentLevel.GetRankFromMistakes();
-    IReadOnlyCollection<long> ids = GetStageLocationIDsToClear(rank);
-
-    // Check if we fulfill the End Goal requirements
-    bool clearedAll = false;
-    if (Plugin.Client.Slot.endGoal == SlotData.EndGoal.HelpingHands && level == Level.HelpingHands && rank.passed)
-    {
-      Plugin.Logger.LogInfo("Setting goal achieved - Helping Hands");
-      Plugin.Client.Session.SetGoalAchieved();
-    }
-    else if (Plugin.Client.Slot.endGoal != SlotData.EndGoal.HelpingHands)
-    {
-      clearedAll = true;
-      Rank minimumRank;
-      switch (Plugin.Client.Slot.endGoal)
-      {
-        case SlotData.EndGoal.PerfectAll:
-          minimumRank = Rank.S;
-          break;
-        case SlotData.EndGoal.ARankAll:
-          minimumRank = Rank.A;
-          break;
-        case SlotData.EndGoal.BRankAll:
-          minimumRank = Rank.B;
-          break;
-        default:
-          throw new ArgumentOutOfRangeException($"End Goal ({Plugin.Client.Slot.endGoal}) not valid value.");
-      }
-      foreach (Level otherLevel in Enum.GetValues(typeof(Level)))
-      {
-        Rank otherRank = Persistence.GetLevelRank(otherLevel);
-        // If we aren't above the minimum rank, bail.
-        if (minimumRank <= otherRank.ToNormal())
-        {
-          clearedAll = false;
-          break;
-        }
-      }
-    }
-
-    if (clearedAll)
-    {
-      Plugin.Logger.LogInfo("Setting goal achieved - Cleared all");
-      Plugin.Client.Session.SetGoalAchieved();
-    }
-
-    bool clearedNewLocation = ids.Any(id => !Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id));
-    if (clearedNewLocation)
-    {
-      JustSentLocations = ids.Where(id => !Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id)).ToArray();
-      Task.Run(() => Plugin.Client.Session.Locations.CompleteLocationChecksAsync(ids.ToArray()));
-      Plugin.Client.TrapManager.ClearActiveTraps(false);
-    }
-    else
-    {
-      Plugin.Client.TrapManager.ClearActiveTraps(true);
-    }
+    SendLocations(level, rank, bossLevelFailed);
   }
 
   [HarmonyPatch(typeof(RhythmWeightlifter.Level), nameof(RhythmWeightlifter.Level.GetRank))]
@@ -158,7 +92,7 @@ internal static class ClearLocationPatch
   private static void ShowSentItemsPatch(Rankscreen __instance)
   {
     // TODO: Need to check if this works with narration.
-    if (ItemsToSend.Count == 0)
+    if (!ItemsToSend.Any())
     {
       Plugin.Logger.LogWarning("Couldn't get items sent, possibly due to a network issue.");
       __instance.description.text = "<color=red>Couldn't get items sent.</color>";
@@ -166,7 +100,7 @@ internal static class ClearLocationPatch
     else
     {
       Rank rank = scnGame.instance.currentLevel.GetRankFromMistakes();
-      IReadOnlyCollection<long> ids = GetStageLocationIDsToClear(rank);
+      IEnumerable<long> ids = GetStageLocationIDsToClear(GetCurrentLevel(), rank);
       long[] newLocations = ids.Where(id =>
           !Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id) || JustSentLocations.Contains(id)
         )
@@ -176,7 +110,7 @@ internal static class ClearLocationPatch
 
       // TODO: It'd be nice to show which rank sent what item.
 
-      if (ids.Count == 0)
+      if (!ids.Any())
       {
         __instance.description.text = "Didn't find anything.";
         return;
@@ -230,9 +164,7 @@ internal static class ClearLocationPatch
   private static void MiracleDefibrillatorClearLocationPatch(Level_Montage __instance)
   {
     bool hasScrambledCharacter = Plugin.Client.TrapManager.IsTrapActive(ScrambleCharactersTrapPatch.name);
-#if DEBUG
-    Plugin.DebugMenu.TrapManager.ClearActiveTraps(false);
-#endif
+
     // We need to calculate the level's rank manually...
     int rank;
     if (!__instance.missedOnce && !__instance.game.GetPassedLevelWithoutCheckpoints())
@@ -250,21 +182,9 @@ internal static class ClearLocationPatch
       // Clear
       rank = Rank.BossClear;
     }
-    IReadOnlyCollection<long> ids = Bindings.LevelToStage[Level.Montage].GetLocationsToClear(rank);
+    IEnumerable<long> ids = SendLocations(Level.Montage, rank);
 
-    // TODO: a lot of duplicated logic with ShowSentItemsPatch
-    bool clearedNewLocation = ids.Any(id => !Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id));
-    if (clearedNewLocation)
-    {
-      Task.Run(() => Plugin.Client.Session.Locations.CompleteLocationChecks(ids.ToArray()));
-      Plugin.Client.TrapManager.ClearActiveTraps(false);
-    }
-    else
-    {
-      Plugin.Client.TrapManager.ClearActiveTraps(true);
-    }
-
-    if (ItemsToSend.Count == 0)
+    if (!ItemsToSend.Any())
     {
       Plugin.Logger.LogWarning("Couldn't get items sent, possibly due to a network issue.");
       __instance.game.statusText.SetStatusText("Couldn't get items sent.", Color.red, 10f, useUnscaledTime: true);
@@ -277,7 +197,7 @@ internal static class ClearLocationPatch
         .ToArray();
       Plugin.Logger.LogDebug($"IDs: {string.Join(", ", ids)} (of which {string.Join(", ", newLocations)} are new)");
 
-      if (ids.Count == 0)
+      if (!ids.Any())
       {
         __instance.game.statusText.SetStatusText("Didn't find anything.");
         return;
@@ -299,14 +219,84 @@ internal static class ClearLocationPatch
     if (hasScrambledCharacter)
     {
       // Room 1, Row 2 - Cole Brew
-      // At this point, any trap will be unapplied.
-      Plugin.Logger.LogInfo("Setting Row 2 to Cole");
+      // At this point, any trap will be unapplied,
+      //  so we do not need to worry about Scramble Characters re-scrambling Cole.
+      Plugin.Logger.LogInfo("Setting Room 1, Row 2 to Cole");
       __instance.game.rows[1].ent.character.ChangeCharacter(Character.HoodieBoy);
     }
+  }
 
-    // We don't need to check for the Complete All goals or boss requirements, because
-    //  1. This is a boss level itself
-    //  2. This level directly segues into 7-X2, which will be caught by CustomClearLocationPatch.
+  private static IEnumerable<long> SendLocations(Level level, Rank rank, bool bossLevelFailed = false)
+  {
+#if DEBUG
+    // Discard Debug Menu traps regardless of result.
+    Plugin.DebugMenu.TrapManager.ClearActiveTraps(false);
+#endif
+    if (bossLevelFailed)
+    {
+      Plugin.Client.TrapManager.ClearActiveTraps(false);
+      return [];
+    }
+
+    IEnumerable<long> ids = GetStageLocationIDsToClear(level, rank);
+
+    // Check if we fulfill the End Goal requirements
+#pragma warning disable Harmony003
+    if (Plugin.Client.Slot.endGoal == SlotData.EndGoal.HelpingHands && level == Level.HelpingHands && rank.passed)
+#pragma warning restore Harmony003
+    {
+      Plugin.Logger.LogInfo("Setting goal achieved - Helping Hands");
+      Plugin.Client.Session.SetGoalAchieved();
+    }
+    else if (Plugin.Client.Slot.endGoal != SlotData.EndGoal.HelpingHands)
+    {
+      bool clearedAll = true;
+      Rank minimumRank;
+      switch (Plugin.Client.Slot.endGoal)
+      {
+        case SlotData.EndGoal.PerfectAll:
+          minimumRank = Rank.S;
+          break;
+        case SlotData.EndGoal.ARankAll:
+          minimumRank = Rank.A;
+          break;
+        case SlotData.EndGoal.BRankAll:
+          minimumRank = Rank.B;
+          break;
+        default:
+          throw new ArgumentOutOfRangeException($"End Goal ({Plugin.Client.Slot.endGoal}) not valid value.");
+      }
+      foreach (Level otherLevel in Enum.GetValues(typeof(Level)))
+      {
+        Rank otherRank = Persistence.GetLevelRank(otherLevel);
+        // If we aren't above the minimum rank, bail.
+        if (minimumRank <= otherRank.ToNormal())
+        {
+          clearedAll = false;
+          break;
+        }
+      }
+
+      if (clearedAll)
+      {
+        Plugin.Logger.LogInfo("Setting goal achieved - Cleared all");
+        Plugin.Client.Session.SetGoalAchieved();
+      }
+    }
+
+    bool clearedNewLocation = ids.Any(id => !Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id));
+    if (clearedNewLocation)
+    {
+      JustSentLocations = ids.Where(id => !Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id)).ToArray();
+      Task.Run(() => Plugin.Client.Session.Locations.CompleteLocationChecksAsync(ids.ToArray()));
+      Plugin.Client.TrapManager.ClearActiveTraps(false);
+    }
+    else
+    {
+      Plugin.Client.TrapManager.ClearActiveTraps(true);
+    }
+
+    return ids;
   }
 
   private static IEnumerator ScoutLocationChecks(long[] ids, int retries = 0)
@@ -347,12 +337,11 @@ internal static class ClearLocationPatch
   }
 
 #pragma warning disable Harmony003
-  private static IReadOnlyCollection<long> GetStageLocationIDsToClear(Rank rank)
+  private static IEnumerable<long> GetStageLocationIDsToClear(Level level, Rank rank)
   {
-    Level level = GetCurrentLevel();
     Plugin.Logger.LogDebug("Getting locations to clear");
 
-    IReadOnlyCollection<long> ids;
+    IEnumerable<long> ids;
     if (scnGame.instance.currentLevel.dogMode && level == Level.Lesmis)
     {
       Plugin.Logger.LogInfo("Detected Rhythm Dogtor");

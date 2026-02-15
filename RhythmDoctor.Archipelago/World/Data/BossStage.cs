@@ -26,12 +26,9 @@ internal class BossStage : BaseStage
   /// </summary>
   internal Dictionary<string, long>? ExtraLocations { get; init; }
 
-  internal override IReadOnlyCollection<long> GetLocationsToClear(Rank rank)
+  internal override IEnumerable<long> GetLocationsToClear(Rank rank)
   {
     Plugin.Logger.LogDebug($"Getting locations to clear for rank {rank.internalValue}");
-
-    // Higher ranks match first so we can `goto` lower ranks
-    // TODO: probably use array for this
 
     // From Rankscreen.ShowAndSaveRank(bool, bool)
     // ...
