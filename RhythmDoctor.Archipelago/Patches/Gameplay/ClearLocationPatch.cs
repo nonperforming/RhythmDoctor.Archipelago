@@ -127,7 +127,15 @@ internal static class ClearLocationPatch
       __instance.description.fontSize = 10;
       foreach (long id in newLocations)
       {
-        ScoutedItemInfo itemInfo = ItemsToSend[id];
+        if (!ItemsToSend.TryGetValue(id, out ScoutedItemInfo? itemInfo))
+        {
+          Plugin.Logger.LogWarning(
+            $"Could not get scouted item information for location ID {id}. "
+              + "This is normal if this ID is tied to a Perfect rank, "
+              + "and Perfect locations are disabled."
+          );
+          continue;
+        }
 
         string color = "silver"; // Filler
         if (itemInfo.Flags.HasFlag(ItemFlags.Advancement) || itemInfo.Flags.HasFlag(ItemFlags.NeverExclude))
@@ -141,12 +149,12 @@ internal static class ClearLocationPatch
 
         if (itemInfo.IsReceiverRelatedToActivePlayer)
         {
-          __instance.description.text += $"\nFound <color={color}>{itemInfo.ItemDisplayName}</color>";
+          __instance.description.text += $"Found <color={color}>{itemInfo.ItemDisplayName}</color>\n";
         }
         else
         {
           __instance.description.text +=
-            $"\nSent <color={color}>{itemInfo.ItemDisplayName}</color> to {itemInfo.Player.Alias}";
+            $"Sent <color={color}>{itemInfo.ItemDisplayName}</color> to {itemInfo.Player.Alias}\n";
         }
       }
     }
