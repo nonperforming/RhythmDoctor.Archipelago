@@ -128,9 +128,8 @@ internal static class ClearLocationPatch
     bool clearedNewLocation = ids.Any(id => !Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id));
     if (clearedNewLocation)
     {
-      // FIXME: This blocks until completion - should be async!
       JustSentLocations = ids.Where(id => !Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id)).ToArray();
-      Plugin.Client.Session.Locations.CompleteLocationChecks(ids.ToArray());
+      Task.Run(() => Plugin.Client.Session.Locations.CompleteLocationChecksAsync(ids.ToArray()));
       Plugin.Client.TrapManager.ClearActiveTraps(false);
     }
     else
@@ -230,7 +229,6 @@ internal static class ClearLocationPatch
   [HarmonyPostfix]
   private static void MiracleDefibrillatorClearLocationPatch(Level_Montage __instance)
   {
-    // TODO: .Any()
     bool hasScrambledCharacter = Plugin.Client.TrapManager.IsTrapActive(ScrambleCharactersTrapPatch.name);
 #if DEBUG
     Plugin.DebugMenu.TrapManager.ClearActiveTraps(false);
@@ -258,8 +256,7 @@ internal static class ClearLocationPatch
     bool clearedNewLocation = ids.Any(id => !Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id));
     if (clearedNewLocation)
     {
-      // FIXME: This blocks until completion - should be async!
-      Plugin.Client.Session.Locations.CompleteLocationChecks(ids.ToArray());
+      Task.Run(() => Plugin.Client.Session.Locations.CompleteLocationChecks(ids.ToArray()));
       Plugin.Client.TrapManager.ClearActiveTraps(false);
     }
     else
