@@ -465,9 +465,12 @@ internal sealed class Client : IDisposable
 
     if (scnGame.instance is not null)
     {
-      if (scnGame.instance.levelIdentifier == "BeansHopper")
+      if (scnGame.instance.levelIdentifier == nameof(Level.BeansHopper))
       {
+        Plugin.Logger.LogInfo("Running tag 'miss'");
+
         // While Beans Hopper does technically have hearts, they're not visible/relevant in this minigame.
+        DeathLinkPatch.enabled = false;
         scnGame.instance.currentLevel.RunTag("miss");
 
         // FIXME: Doesn't show - gets overwritten by score text.
