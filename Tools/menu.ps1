@@ -14,7 +14,8 @@ function Update-Paths
   Set-Variable -Name "ProjectFilePath" -Value (Join-Path -Path $ProjectPath -ChildPath "RhythmDoctor.Archipelago.csproj") -Scope script
   Set-Variable -Name "BuildPath" -Value (Join-Path -Path $RepositoryPath -ChildPath "build") -Scope script
 
-  Set-Variable -Name "GameAssembly" -Value (Join-Path -Path $InstallPath -ChildPath "Rhythm Doctor_Data\Managed\Assembly-CSharp.dll") -Scope script
+  Set-Variable -Name "AssembliesPath" -Value (Join-Path -Path $InstallPath -ChildPath "Rhythm Doctor_Data\Managed\") -Scope script
+  Set-Variable -Name "GameAssembly" -Value (Join-Path -Path $AssembliesPath -ChildPath "Assembly-CSharp.dll") -Scope script
 
   Set-Variable -Name "BepInExPath" -Value (Join-Path -Path $InstallPath -ChildPath "BepInEx") -Scope script
   Set-Variable -Name "PluginPath" -Value (Join-Path -Path $BepInExPath -ChildPath "plugins") -Scope script
@@ -159,6 +160,7 @@ function Prompt-Menu
       Write-Host " 2: Restart Rhythm Doctor" -ForegroundColor Blue
       Write-Host " 3: Format using CSharpier" -ForegroundColor Blue
       Write-Host
+      Write-Host " u: Update stripped DLLs" -ForegroundColor Blue
       Write-Host " t: Tools" -ForegroundColor Blue
       Write-Host " l: Open log" -ForegroundColor Blue
       Write-Host " v: Print variables" -ForegroundColor Blue
@@ -198,6 +200,14 @@ function Prompt-Menu
           dotnet tool run csharpier format $RepositoryPath
           continue
         }
+        "u"
+        {
+          Write-Host "Updating stripped DLLs" -BackgroundColor DarkGray
+          Remove-Item -Path ["$($RepositoryPath)/RhythmDoctor.Archipelago/libs/Assembly-CSharp.dll" "$($RepositoryPath)/RhythmDoctor.Archipelago/libs/Assembly-CSharp-firstpass.dll" "$($RepositoryPath)/RhythmDoctor.Archipelago/libs/RDTools.dll" "$($RepositoryPath)/RhythmDoctor.Archipelago/libs/Unity.TextMeshPro.dll" "$($RepositoryPath)/RhythmDoctor.Archipelago/libs/UnityEngine.UI.dll"]
+          dotnet tool exec BepInEx.AssemblyPublicizer.Cli --strip-only "$($AssembliesPath)/Assembly-CSharp.dll" "$($AssembliesPath)/Assembly-CSharp-firstpass.dll" "$($AssembliesPath)/RDTools.dll" "$($AssembliesPath)/Unity.TextMeshPro.dll" "$($AssembliesPath)/UnityEngine.UI.dll" --output "$($RepositoryPath)/RhythmDoctor.Archipelago/libs/"
+          Get-ChildItem -Path "$($RepositoryPath)/RhythmDoctor.Archipelago/libs/*-publicized.dll" | Rename-Item -NewName { $_.Name -Replace "-publicized", "" }
+          continue
+        }
         "t"
         {
           Prompt-Tools
@@ -216,6 +226,7 @@ function Prompt-Menu
           Write-Host "Project Path: $ProjectPath" -ForegroundColor Yellow
           Write-Host ".csproj Path: $ProjectFilePath" -ForegroundColor Yellow
           Write-Host "Build Path: $BuildPath" -ForegroundColor Yellow
+          Write-Host "Assembly Path: $AssembliesPath" -ForegroundColor Yellow
           Write-Host
           Write-Host "Game Assembly: $GameAssembly" -ForegroundColor Yellow
           Write-Host
