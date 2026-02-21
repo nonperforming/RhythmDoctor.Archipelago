@@ -8,7 +8,7 @@ A mod for **Rhythm Doctor** to integrate with the [Archipelago Multi-World Rando
 
 To set up the Rhythm Doctor Archipelago mod, follow these steps:
 
-1. **Install BepInEx**
+1. **Install BepInEx 5**
    [Download and install BepInEx 5.](https://docs.bepinex.dev/v5.4.21/articles/user_guide/installation/index.html)
 
 2. **Run the Game**
@@ -24,10 +24,7 @@ To set up the Rhythm Doctor Archipelago mod, follow these steps:
       - `Assets` folder
       - `Archipelago.MultiClient.Net.dll`
 
-4. Install **dependencies**
-   Obtain and install [Pulse](https://github.com/nonperforming/Pulse) from [its releases page](https://github.com/nonperforming/Pulse/releases)
-
-5. **Configure BepInEx**
+4. **Configure BepInEx**
    In the `Rhythm Doctor/BepInEx/config/BepInEx.cfg` file, set `HideManagerGameObject` to `true`. The option should be on line 17.
 
 ## Development
