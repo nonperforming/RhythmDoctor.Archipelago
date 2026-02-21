@@ -50,6 +50,7 @@ internal static class TrapManagerPatch
       {
         type = null,
         link = null,
+        // FIXME: Doesn't work - no icon appears
         linkType = "other-unused", // TODO: Load our own sprite
         name = trapName,
       };

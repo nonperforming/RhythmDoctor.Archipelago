@@ -26,7 +26,6 @@ internal class RegularStage : BaseStage
       case Rank.Sminus:
       case Rank.S:
       case Rank.Splus:
-        // TODO: Need to check if clearing this with S-rank setting off breaks clearing locations
         ids.Add(SRankLocation);
         goto case Rank.A;
       // A Rank+

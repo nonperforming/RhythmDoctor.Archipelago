@@ -2,6 +2,8 @@ using System.Reflection;
 
 namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 
+using System.Text.RegularExpressions;
+
 [HarmonyPatch(typeof(scnLevelSelect))]
 internal static class UnlockItemPatch
 {
@@ -82,9 +84,12 @@ internal static class UnlockItemPatch
 
     #region Unhiding levels
     // Show all Basement levels
-    // FIXME: This query is a bit vague and currently pulls in X-0 and X-1 in addition to the basement levels.
-    //        Currently, this is not an issue (but it may be in a later update)
-    foreach (SelectableEntity level in __instance.selectableEntities.Where((entity) => entity.id.StartsWith("X-")))
+    // Do not pull in X-0 and X-1 (and any future non-collab levels)
+    foreach (
+      SelectableEntity level in __instance.selectableEntities.Where(
+        (entity) => entity.id.StartsWith("X-") && !Regex.IsMatch(entity.id, "/[0-9]/")
+      )
+    )
     {
       level.normalEnabled = true;
     }

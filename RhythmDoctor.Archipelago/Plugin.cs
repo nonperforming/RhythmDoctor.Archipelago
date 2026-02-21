@@ -88,8 +88,6 @@ public class Plugin : BaseUnityPlugin
     // Logger.LogInfo("Registering custom localization");
     // LocalizationHelpers.RegisterJson(LangCode.English, DataHelper.GetLocalizationJson(LangCode.English));
 
-    // TODO: Is there a simpler way to PatchAll()?
-    //  Unless we give Harmony the Type, it doesn't seem to apply the patch.
     Logger.LogInfo("Applying always active patches");
     ApplyPatches(PATCH_ID_ALWAYS_ACTIVE, AlwaysActivePatches);
 
