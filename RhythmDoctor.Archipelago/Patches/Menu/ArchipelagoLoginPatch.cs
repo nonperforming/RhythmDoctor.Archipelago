@@ -134,11 +134,7 @@ internal static class ArchipelagoLoginPatch
     {
       // Invalid information, bail out
       Plugin.Logger.LogError("Invalid information, bailing out");
-      __instance.CurrentContentName = LevelImporter.ContentName.LevelsInstalled;
-      __instance.cls.CLSPlaySound("sndImportInstallFinish");
-      __instance.AddLevelToErrorSection(__instance.levelsToInstall[0], "URL or Name not present"); // FIXME: doesn't show
-      __instance.transform.Find("screen/Contents/Top Panel/Title Text").GetComponent<Text>().text = "LOGIN FAILED";
-      yield break;
+      goto BailOut;
     }
 
     // Attempt to log in with the information given.
@@ -149,6 +145,9 @@ internal static class ArchipelagoLoginPatch
     // ReSharper disable AccessToDisposedClosure
     Task<LoginResult> login = Task.Run(() => Plugin.Client.CreateSessionAndConnect(url, name, password));
     yield return new WaitUntil(() => login.IsCompleted);
+
+    if (login.IsCanceled || login.IsFaulted)
+      goto Failure;
 
     LoginResult loginResult = login.Result;
     switch (loginResult)
@@ -163,9 +162,19 @@ internal static class ArchipelagoLoginPatch
         Plugin.Logger.LogInfo("Heading to Level Select...");
         scnBase.GoToScene("scnLevelSelect");
         yield break;
-      case LoginFailure loginFailure:
-        Plugin.Client.Dispose();
-        Plugin.Client = null!;
+      case LoginFailure:
+        goto Failure;
+    }
+
+    Plugin.Logger.LogWarning("Got to the end of OverrideInstallButtonPatch - this should never happen!");
+    yield break;
+    // csharpier-ignore-start
+    Failure:
+      Plugin.Logger.LogError("Login failed");
+      // ReSharper disable once ConstantConditionalAccessQualifier
+      Plugin.Client?.Dispose();
+      Plugin.Client = null!;
+      BailOut:
         // Bail out
         __instance.CurrentContentName = LevelImporter.ContentName.LevelsInstalled;
         __instance.cls.CLSPlaySound("sndImportInstallFinish");
@@ -173,7 +182,7 @@ internal static class ArchipelagoLoginPatch
         //__instance.AddLevelToErrorSection(__instance.levelsToInstall[0], "Failed to login"); // not showing anything
         __instance.transform.Find("screen/Contents/Top Panel/Title Text").GetComponent<Text>().text = "LOGIN FAILED";
         yield break;
-    }
+    // csharpier-ignore-end
   }
 
   [HarmonyPatch(typeof(scnCLS), nameof(scnCLS.Exit))]
