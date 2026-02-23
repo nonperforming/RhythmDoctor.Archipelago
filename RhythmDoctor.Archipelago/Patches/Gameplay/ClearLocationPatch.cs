@@ -274,7 +274,7 @@ internal static class ClearLocationPatch
         default:
           throw new ArgumentOutOfRangeException($"End Goal ({Plugin.Client.Slot.endGoal}) not valid value.");
       }
-      foreach (Level otherLevel in Enum.GetValues(typeof(Level)))
+      foreach (Level otherLevel in Bindings.Levels)
       {
         Rank otherRank = Persistence.GetLevelRank(otherLevel);
         // If we aren't above the minimum rank, bail.
