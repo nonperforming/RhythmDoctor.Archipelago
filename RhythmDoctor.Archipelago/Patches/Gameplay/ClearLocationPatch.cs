@@ -31,18 +31,11 @@ internal static class ClearLocationPatch
       return;
     }
 
-    IEnumerable<long> ids;
-    if (level == Level.Lesmis && __instance.dogMode)
-    {
-      // ReSharper disable once NullableWarningSuppressionIsUsed
-      Dictionary<string, long> extraLocations = ((BossStage)Bindings.LevelToStage[Level.Lesmis]).ExtraLocations!;
-      ids = new List<long>([extraLocations["dog_perfect"], extraLocations["dog_clear"]]);
-    }
-    else
-    {
-      // Guaranteed to be ordered from the highest to lowest rank's locations.
-      ids = Bindings.LevelToStage[level].GetLocationsToClear(Rank.S);
-    }
+    if (level == Level.Lesmis && (__instance.dogMode || scnGame.loadDogMode))
+      level = Bindings.RHYTHM_DOGTOR_LEVEL;
+
+    // Guaranteed to be ordered from the highest to lowest rank's locations.
+    IEnumerable<long> ids = Bindings.LevelToStage[level].GetLocationsToClear(Rank.S);
 
     Plugin.Instance.StartCoroutine(ScoutLocationChecks(ids.ToArray()));
   }
@@ -309,7 +302,7 @@ internal static class ClearLocationPatch
 
   private static IEnumerator ScoutLocationChecks(long[] ids, int retries = 0)
   {
-    Plugin.Logger.LogDebug($"Scouting location checks... (try {retries})");
+    Plugin.Logger.LogDebug($"Scouting location checks for ids {string.Join(", ", ids)}... (try {retries})");
     Task<Dictionary<long, ScoutedItemInfo>> scout = Task.Run(() =>
       Plugin.Client.Session.Locations.ScoutLocationsAsync(HintCreationPolicy.None, ids)
     );
@@ -341,6 +334,9 @@ internal static class ClearLocationPatch
       throw new ArgumentOutOfRangeException($"Couldn't find level {scnGame.internalIdentifier}");
     }
 
+    if (scnGame.instance.currentLevel.dogMode && level == Level.Lesmis)
+      level = Bindings.RHYTHM_DOGTOR_LEVEL;
+
     return level;
   }
 
@@ -349,27 +345,8 @@ internal static class ClearLocationPatch
   {
     Plugin.Logger.LogDebug("Getting locations to clear");
 
-    IEnumerable<long> ids;
-    if (scnGame.instance.currentLevel.dogMode && level == Level.Lesmis)
-    {
-      Plugin.Logger.LogInfo("Detected Rhythm Dogtor");
-      // Playing 3-DOG - Rhythm Dogtor
-      // ReSharper disable once NullableWarningSuppressionIsUsed
-      BossStage rhythmDogtor = (Bindings.LevelToStage[level] as BossStage)!;
-
-      List<long> idsToClear = [rhythmDogtor.ExtraLocations["dog_clear"]];
-      if (rank.perfected)
-      {
-        idsToClear.Add(rhythmDogtor.ExtraLocations["dog_perfect"]);
-      }
-
-      ids = idsToClear.AsReadOnly();
-    }
-    else
-    {
-      ids = Bindings.LevelToStage[level].GetLocationsToClear(rank);
-      Plugin.Logger.LogDebug($"Stage to clear: {level} with rank {rank} ({string.Join(", ", ids)})");
-    }
+    IEnumerable<long> ids = Bindings.LevelToStage[level].GetLocationsToClear(rank);
+    Plugin.Logger.LogDebug($"Stage to clear: {level} with rank {rank} ({string.Join(", ", ids)})");
 
     return ids;
   }

@@ -2,19 +2,12 @@ namespace RhythmDoctor.Archipelago.World.Data;
 
 internal class BossStage : BaseStage
 {
-  internal BossStage(
-    Act act,
-    long clearLocation,
-    long? completePlusLocation,
-    long perfectLocation,
-    Dictionary<string, long>? extraLocations = null
-  )
+  internal BossStage(Act act, long clearLocation, long? completePlusLocation, long perfectLocation)
   {
     StageAct = act;
     ClearLocation = clearLocation;
     CompletePlusLocation = completePlusLocation;
     PerfectLocation = perfectLocation;
-    ExtraLocations = extraLocations;
   }
 
   internal long ClearLocation { get; init; }
