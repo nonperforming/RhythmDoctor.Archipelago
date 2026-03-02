@@ -29,7 +29,7 @@ jobs:
         run: dotnet publish RhythmDoctor.Archipelago --configuration Debug --output build --verbosity normal
 
       - name: Upload client plugin
-        uses: actions/upload-artifact@v6.0.0
+        uses: actions/upload-artifact@v7.0.0
         with:
           name: "RhythmDoctor.Archipelago"
           path: |
