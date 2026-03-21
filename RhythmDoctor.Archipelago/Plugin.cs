@@ -85,9 +85,11 @@ public class Plugin : BaseUnityPlugin
 
     Configuration.Bind(Config);
 
-    // TODO: Fix Pulse localization first
-    // Logger.LogInfo("Registering custom localization");
-    // LocalizationHelpers.RegisterJson(LangCode.English, DataHelper.GetLocalizationJson(LangCode.English));
+    Logger.LogInfo("Setting up paths");
+    Paths.PopulatePaths();
+
+    Logger.LogInfo($"Registering custom localization ({Paths.Localization})");
+    CustomLocalizationHelper.SearchAndRegisterDirectory(Paths.Localization);
 
     Logger.LogInfo("Applying always active patches");
     ApplyPatches(PATCH_ID_ALWAYS_ACTIVE, AlwaysActivePatches);

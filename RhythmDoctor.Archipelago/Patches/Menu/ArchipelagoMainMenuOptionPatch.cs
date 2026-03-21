@@ -31,15 +31,4 @@ internal static class ArchipelagoMainMenuOptionPatch
     __instance.PlayConfirmSound();
     __instance.TransitionToScene("scnCLS");
   }
-
-  [HarmonyPatch(nameof(scnMenu.Localize))]
-  [HarmonyPostfix]
-  private static void HandleArchipelagoOptionLocalize(scnMenu __instance)
-  {
-    // TODO: Optimally this would be handled by Pulse localization but that hasn't actually been implemented yet so...
-    __instance
-      .transform.Find($"mainMenu/options/optionsContainer/{ARCHIPELAGO_OBJECT_NAME}")
-      .gameObject.GetComponent<Text>()
-      .text = "Archipelago";
-  }
 }

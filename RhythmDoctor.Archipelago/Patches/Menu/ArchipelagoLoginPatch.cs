@@ -15,7 +15,9 @@ internal static class ArchipelagoLoginPatch
 
     #region Rename LED sign
     Plugin.Logger.LogInfo("Renaming LED sign");
-    GameObject.Find("Canvas/Ward Container/LEDSign Container/WardTitle Text").GetComponent<Text>().text = "ARCHIPELAGO";
+    GameObject.Find("Canvas/Ward Container/LEDSign Container/WardTitle Text").GetComponent<Text>().text = RDString.Get(
+      "archipelago.connectScreenTitle"
+    );
     #endregion
 
     #region Rename ward options
@@ -58,7 +60,7 @@ internal static class ArchipelagoLoginPatch
       AssetHelper.AssetType.WardIcons.TYPE,
       AssetHelper.AssetType.WardIcons.ARCHIPELAGO
     );
-    buttonObject.Find("Text").GetComponent<Text>().text = "Archipelago";
+    buttonObject.Find("Text").GetComponent<Text>().text = RDString.Get("archipelago.loginButton");
     #endregion
 
     #region Hiding other Install Levels options
@@ -113,7 +115,10 @@ internal static class ArchipelagoLoginPatch
       // URL or Name are not present, bail out
       __instance.CurrentContentName = LevelImporter.ContentName.LevelsInstalled;
       __instance.cls.CLSPlaySound("sndImportInstallFinish");
-      __instance.AddLevelToErrorSection(__instance.levelsToInstall[0], "URL or Name not present");
+      __instance.AddLevelToErrorSection(
+        __instance.levelsToInstall[0],
+        RDString.Get("archipelago.login.fail.missingInformation")
+      );
       yield break;
     }
 
@@ -180,7 +185,7 @@ internal static class ArchipelagoLoginPatch
         __instance.cls.CLSPlaySound("sndImportInstallFinish");
         // TODO: Show all loginFailure.Errors
         //__instance.AddLevelToErrorSection(__instance.levelsToInstall[0], "Failed to login"); // not showing anything
-        __instance.transform.Find("screen/Contents/Top Panel/Title Text").GetComponent<Text>().text = "LOGIN FAILED";
+        __instance.transform.Find("screen/Contents/Top Panel/Title Text").GetComponent<Text>().text = RDString.Get("archipelago.login.fail.title");
         yield break;
     // csharpier-ignore-end
   }
@@ -231,14 +236,16 @@ internal static class ArchipelagoLoginPatch
     contentsObject.transform.Find("Draggable Content/AddURL Button").GetComponent<Button>().onClick.Invoke();
 
     // Rename the top bar from "INSTALL LEVELS" to "ARCHIPELAGO LOGIN"
-    contentsObject.transform.Find("Top Panel/Title Text").GetComponent<Text>().text = "ARCHIPELAGO LOGIN";
+    contentsObject.transform.Find("Top Panel/Title Text").GetComponent<Text>().text = RDString.Get(
+      "archipelago.login.menu.title"
+    );
 
     // FIXME: This removes the button to go back a page but the user can still use the 'escape' keybind
     urlContainerObject.transform.Find("Cancel Button").gameObject.SetActive(false);
 
-    instructionsText.text = "Put in your client information in the format given and hit Connect.";
-    placeholderText.text = "<URL>\n<Name>\n<Password>";
-    addButtonText.text = "Connect";
+    instructionsText.text = RDString.Get("archipelago.login.menu.instructions");
+    placeholderText.text = RDString.Get("archipelago.login.menu.hint");
+    addButtonText.text = RDString.Get("archipelago.login.menu.connectButton");
   }
 
   [HarmonyPatch(typeof(LevelImporter), nameof(LevelImporter.ValidateUrl))]

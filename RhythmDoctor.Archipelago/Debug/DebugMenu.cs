@@ -3,6 +3,8 @@ using System.Diagnostics;
 #if DEBUG
 namespace RhythmDoctor.Archipelago.Debug;
 
+using SA.GoogleDoc;
+
 public class DebugMenu : MonoBehaviour
 {
   private enum ActivatedGUI
@@ -82,10 +84,15 @@ public class DebugMenu : MonoBehaviour
           Notify("Toggling RD Debug to " + !DebugSettings.instance.Debug);
           DebugSettings.instance.Debug = !DebugSettings.instance.Debug;
         }
-        if (GUI.Button(new Rect(180, 30, 150, 20), "Toggle autoplay"))
+        if (GUI.Button(new Rect(180, 30, 150, 20), "Dump loc"))
         {
-          Notify("Toggling auto to " + !DebugSettings.instance.Auto);
-          DebugSettings.instance.Debug = !DebugSettings.instance.Auto;
+          Notify("-\n-dumping loc-\n-");
+
+          //foreach ((var lang, var content) in Localization.Client.SheetDictionary)
+          //{
+          //  Plugin.Logger.LogWarning(lang);
+          //  Plugin.Logger.LogWarning(Json.Serialize(content));
+          //}
         }
         if (GUI.Button(new Rect(30, 90, 300, 20), "Disable Steam Achievements"))
         {

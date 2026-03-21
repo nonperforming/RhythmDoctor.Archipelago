@@ -58,7 +58,7 @@ internal static class JanitorPatch
 
     __instance.ChangeTextOutline(RDConstants.data.levelSelect_notPassedLevelTextOutline);
     __instance.SetDifficultyArrowsVisible(false);
-    __instance.description.text = "Archipelago";
+    __instance.description.text = RDString.Get("mainMenu.Archipelago");
   }
 
   #region Preventing Janitor from being hidden

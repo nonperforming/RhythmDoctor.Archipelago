@@ -2,8 +2,19 @@ namespace RhythmDoctor.Archipelago;
 
 internal static class Paths
 {
-  internal static readonly string Assembly = Path.GetDirectoryName(Plugin.Instance.Info.Location)!;
-  internal static readonly string Assets = Path.Combine(Assembly, "Assets");
-  internal static readonly string Localization = Path.Combine(Assets, "Localization");
-  internal static readonly string WardIcons = Path.Combine(Assets, "WardIcons");
+  // ReSharper disable NullableWarningSuppressionIsUsed
+  internal static string Assembly = null!;
+  internal static string Assets = null!;
+  internal static string Localization = null!;
+  internal static string WardIcons = null!;
+
+  // ReSharper enable NullableWarningSuppressionIsUsed
+
+  internal static void PopulatePaths()
+  {
+    Assembly = Path.GetDirectoryName(Plugin.Instance.Info.Location)!;
+    Assets = Path.Combine(Assembly, "Assets");
+    Localization = Path.Combine(Assets, "Localization");
+    WardIcons = Path.Combine(Assets, "WardIcons");
+  }
 }
