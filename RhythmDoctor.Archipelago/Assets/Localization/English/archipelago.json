@@ -7,5 +7,10 @@
   "login.menu.hint": "<URL>\n<Name>\n<Password>",
   "login.menu.connectButton": "Connect",
   "login.fail.title": "LOGIN FAILED",
-  "login.fail.missingInformation": "URL or Name not present"
+  "login.fail.missingInformation": "URL or Name not present",
+  "rankscreen.error": "Couldn't get items sent.",
+  "rankscreen.found": "Found [item]\n",
+  "rankscreen.sentTo": "Sent [item] to [player]\n",
+  "rankscreen.nothing": "Didn't find anything.",
+  "rankscreen.nothingNew": "Didn't find anything new."
 }

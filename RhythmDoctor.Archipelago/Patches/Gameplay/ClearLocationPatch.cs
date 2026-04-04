@@ -18,7 +18,7 @@ internal static class ClearLocationPatch
   private static void ScoutItemsSentPatch(LevelBase __instance)
 #pragma warning restore HARMONIZE001
   {
-    Plugin.Logger.LogDebug("Scouting locations to send");
+    Plugin.Logger.LogDebug($"Scouting locations to send for {scnGame.internalIdentifier}");
     ItemsToSend.Clear();
     JustSentLocations = [];
 
@@ -88,7 +88,7 @@ internal static class ClearLocationPatch
     if (!ItemsToSend.Any())
     {
       Plugin.Logger.LogWarning("Couldn't get items sent, possibly due to a network issue.");
-      __instance.description.text = "<color=red>Couldn't get items sent.</color>";
+      __instance.description.text = $"<color=red>{RDString.Get("archipelago.rankscreen.error")}</color>";
     }
     else
     {
@@ -105,12 +105,12 @@ internal static class ClearLocationPatch
 
       if (!ids.Any())
       {
-        __instance.description.text = "Didn't find anything.";
+        __instance.description.text = RDString.Get("archipelago.rankscreen.nothing");
         return;
       }
       else if (newLocations.Length == 0)
       {
-        __instance.description.text = "Didn't find anything new.";
+        __instance.description.text = RDString.Get("archipelago.rankscreen.nothingNew");
         return;
       }
 
@@ -142,12 +142,18 @@ internal static class ClearLocationPatch
 
         if (itemInfo.IsReceiverRelatedToActivePlayer)
         {
-          __instance.description.text += $"Found <color={color}>{itemInfo.ItemDisplayName}</color>\n";
+          __instance.description.text += RDStringExtensions.GetWithSubstitution(
+            "archipelago.rankscreen.found",
+            new KeyValuePair<string, string>("item", $"<color={color}>{itemInfo.ItemDisplayName}</color>")
+          );
         }
         else
         {
-          __instance.description.text +=
-            $"Sent <color={color}>{itemInfo.ItemDisplayName}</color> to {itemInfo.Player.Alias}\n";
+          __instance.description.text += RDStringExtensions.GetWithSubstitution(
+            "archipelago.rankscreen.sentTo",
+            new KeyValuePair<string, string>("item", $"<color={color}>{itemInfo.ItemDisplayName}</color>"),
+            new KeyValuePair<string, string>("player", itemInfo.Player.Alias)
+          );
         }
       }
     }
@@ -200,12 +206,12 @@ internal static class ClearLocationPatch
 
       if (!ids.Any())
       {
-        __instance.game.statusText.SetStatusText("Didn't find anything.");
+        __instance.game.statusText.SetStatusText(RDString.Get("archipelago.rankscreen.nothing"));
         return;
       }
       else if (newLocations.Length == 0)
       {
-        __instance.game.statusText.SetStatusText("Didn't find anything new.");
+        __instance.game.statusText.SetStatusText(RDString.Get("archipelago.rankscreen.nothingNew"));
         return;
       }
 
@@ -302,12 +308,12 @@ internal static class ClearLocationPatch
 
   private static IEnumerator ScoutLocationChecks(long[] ids, int retries = 0)
   {
-    Plugin.Logger.LogDebug($"Scouting location checks for ids {string.Join(", ", ids)}... (try {retries})");
+    Plugin.Logger.LogInfo($"Scouting location checks for ids {string.Join(", ", ids)}... (try {retries})");
     Task<Dictionary<long, ScoutedItemInfo>> scout = Task.Run(() =>
       Plugin.Client.Session.Locations.ScoutLocationsAsync(HintCreationPolicy.None, ids)
     );
     yield return new WaitUntil(() => scout.IsCompleted);
-    Plugin.Logger.LogDebug("Completed scouting");
+    Plugin.Logger.LogInfo("Completed scouting");
 
     if (!scout.IsCompletedSuccessfully)
     {
@@ -346,7 +352,7 @@ internal static class ClearLocationPatch
     Plugin.Logger.LogDebug("Getting locations to clear");
 
     IEnumerable<long> ids = Bindings.LevelToStage[level].GetLocationsToClear(rank);
-    Plugin.Logger.LogDebug($"Stage to clear: {level} with rank {rank} ({string.Join(", ", ids)})");
+    Plugin.Logger.LogDebug($"Stage to clear: {level} with rank {rank.internalValue} ({string.Join(", ", ids)})");
 
     return ids;
   }
