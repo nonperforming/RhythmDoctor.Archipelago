@@ -141,39 +141,4 @@ internal static class RhythmDogtorLevelPatch
         break;
     }
   }
-
-  // TODO: Implement Pulse localization already
-  [HarmonyPatch(typeof(RDString), nameof(RDString.Get))]
-  [HarmonyPrefix]
-  private static void FixLocalizationHackPatch(string key, ref string __result, ref bool __runOriginal)
-  {
-    __runOriginal = false;
-    switch (key)
-    {
-      case "levelSelect.MyLevel":
-        __result = "Rhythm Dogtor";
-        break;
-      case "levelSelect.MyLevel.notPassed":
-        __result = "Bark bark bark bark bark, bark bark bark. Bark bark bark bark bark bark bark bark.";
-        break;
-      case "levelSelect.MyLevel.passed":
-        __result =
-          "[Bark bark bark bark ba'rk bark bark bark-bark bark bark bark bark bark bark bark bark bark bark bark bark bark, bark bark bark bark bark bark… bark bark bark bark bark bark]";
-        break;
-      case "levelSelect.MyLevel.patient.notPassed":
-        __result = "Whine :(";
-        break;
-      case "levelSelect.MyLevel.patient.passed":
-        __result = "Bark. Bark bark, bark bark bark bark bark bark bark bark bark bark bark.";
-        break;
-
-      case "enum.GuestType.VocalsAndArt":
-        __result = "Vocals and Art by ";
-        break;
-
-      default:
-        __runOriginal = true;
-        break;
-    }
-  }
 }
