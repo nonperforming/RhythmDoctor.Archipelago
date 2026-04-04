@@ -13,7 +13,10 @@ internal class ScrambleHitsoundsTrapPatch : ITrap
 
   public string Name => "Scramble Hitsounds";
   public IEnumerable<Type> IncompatibleWithTraps => [typeof(ScrambleHitsoundsTrapPatch)];
-  public IEnumerable<Level> IncompatibleWithLevels => [Level.SongOfTheSea, Level.SongOfTheSeaH, Level.AthleteTherapy];
+
+  // FIXME: Handle custom beatsounds properly and remove Bitterness from blacklist.
+  public IEnumerable<Level> IncompatibleWithLevels =>
+    [Level.SongOfTheSea, Level.SongOfTheSeaH, Level.AthleteTherapy, Level.Bitterness];
 
   public void InQueue()
   {
