@@ -114,7 +114,7 @@ internal sealed class Client : IDisposable
       "Rhythm Doctor",
       name,
       ItemsHandlingFlags.AllItems,
-      new Version("0.6.3"),
+      new Version("0.6.7"),
       null, // DeathLink is managed by DeathLinkService
       null, // Randomly generated
       password
