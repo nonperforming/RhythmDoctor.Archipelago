@@ -99,6 +99,21 @@ internal static class RhythmDogtorLevelPatch
   [HarmonyPrefix]
   private static void ShowAdogPatch(Difficulty newDifficulty, scnLevelSelect __instance)
   {
+    void HideSleepingPaige()
+    {
+      // On newer versions of RD (at least build 22503918) the Entity's shaderRenderer is
+      // not guaranteed to be non-null.
+      // Naively setting .visible to false may throw NRE.
+      if (__instance.sleepingPaige.shaderRenderer is not null)
+      {
+        __instance.sleepingPaige.visible = false;
+      }
+      else
+      {
+        Plugin.Logger.LogWarning($"{nameof(RhythmDogtorLevelPatch)} Sleeping Paige shader renderer is null");
+      }
+    }
+
     // TODO: Art of Adog sleeping on the pet bed, maybe?
     // if (Persistence.GetLevelRank(Level.MyLevel).passed)
     // {
@@ -110,9 +125,9 @@ internal static class RhythmDogtorLevelPatch
       case Difficulty.Normal:
         if (passedLesmis)
         {
-          // Does Paige leaving in 6-X affect this?
+          // TODO: Does Paige leaving in 6-X affect this?
           __instance.FindSelectableEntity("3-X").gameObject.SetActive(false);
-          __instance.sleepingPaige.visible = true;
+          HideSleepingPaige();
         }
         break;
       case Difficulty.Hard:
@@ -121,7 +136,8 @@ internal static class RhythmDogtorLevelPatch
         //       we might need to edit the image.
         __instance.FindSelectableEntity("3-X").gameObject.SetActive(true);
         // xnopyt
-        __instance.sleepingPaige.visible = false; // AA--
+
+        HideSleepingPaige(); // AA--
         break;
     }
   }
