@@ -110,7 +110,7 @@ internal static class RhythmDogtorLevelPatch
       }
       else
       {
-        Plugin.Logger.LogWarning($"{nameof(RhythmDogtorLevelPatch)} Sleeping Paige shader renderer is null");
+        Plugin.Logger.LogWarning($"[{nameof(RhythmDogtorLevelPatch)}] Sleeping Paige shader renderer is null");
       }
     }
 
