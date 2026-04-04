@@ -42,6 +42,8 @@ internal class BossStage : BaseStage
     // ...
 
     List<long> ids = new();
+    // To note: Boss stage ranks do not necessarily match up with conventional level ranks.
+    // For example, one could get D rank and still pass as Complete+
 
     // S ranks are always equivalent to Perfect.
     if (rank.perfected)
@@ -49,19 +51,17 @@ internal class BossStage : BaseStage
       ids.Add(PerfectLocation);
     }
 
-    if (CompletePlusLocation.HasValue && rank.noCheckpoints)
+    if (CompletePlusLocation.HasValue)
     {
       // Check if we've cleared without checkpoints.
-      if (scnGame.instance.GetPassedLevelWithoutCheckpoints())
+      if (rank.perfected || scnGame.instance.GetPassedLevelWithoutCheckpoints())
       {
         ids.Add(CompletePlusLocation.Value);
       }
     }
 
-    if (rank.passed)
-    {
-      ids.Add(ClearLocation);
-    }
+    // You must reach the end of a boss level in order to clear it.
+    ids.Add(ClearLocation);
 
     return ids.AsReadOnly();
   }
