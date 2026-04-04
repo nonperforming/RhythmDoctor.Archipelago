@@ -112,7 +112,7 @@ public class Plugin : BaseUnityPlugin
 
     foreach (Type patch in patches)
     {
-      Logger.LogDebug($"Applying {patch.Name}");
+      Logger.LogInfo($"Applying {patch.Name}");
       harmony.PatchAll(patch);
     }
   }
