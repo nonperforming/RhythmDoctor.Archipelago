@@ -23,6 +23,7 @@ internal static class UnlockItemPatch
     // ReSharper disable once NullableWarningSuppressionIsUsed
     foreach (ItemInfo item in Plugin.Client.Session!.Items.AllItemsReceived)
     {
+      Plugin.Logger.LogDebug($"Processing item {item.ItemName} ({item.ItemId})");
       if (Bindings.KeyItemIdToWard.TryGetValue(item.ItemId, out Region region))
       {
         if (region == Region.Basement)
@@ -351,20 +352,18 @@ internal static class UnlockItemPatch
         }
       }
 
-      if (shader == null)
+      if (shader != null)
       {
-        return;
+        GameObject rinObject = GameObject.Find("/Scene/Corridor/GoToMuseDashRoom/Rin");
+        scrChar rinChar = rinObject.GetComponent<scrChar>();
+        rinChar.shaderData = shader;
+        shader.SetFrameChanged();
       }
-
-      GameObject rinObject = GameObject.Find("/Scene/Corridor/GoToMuseDashRoom/Rin");
-      scrChar rinChar = rinObject.GetComponent<scrChar>();
-      rinChar.shaderData = shader;
-      shader.SetFrameChanged();
     }
 
-    // Remove the 'tarp' covering the Rhythm Weightlifter cab
+    // Remove the tarp covering the Rhythm Weightlifter cab
     if (
-      Persistence.GetLevelRank(Level.RhythmWeightlifter).ToNormal() != Rank.NotAvailable
+      Persistence.GetLevelRank(Level.RhythmWeightlifter) != Rank.NotAvailable
       && __instance.currentDifficulty != Difficulty.Hard
     )
     {
