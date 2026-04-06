@@ -14,11 +14,6 @@ internal class BossStage : BaseStage
   internal long? CompletePlusLocation { get; init; }
   internal long PerfectLocation { get; init; }
 
-  /// <summary>
-  /// Extra locations (currently only used for <see cref="Level.Lesmis"/> for 3-DOG).
-  /// </summary>
-  internal Dictionary<string, long>? ExtraLocations { get; init; }
-
   internal override IEnumerable<long> GetLocationsToClear(Rank rank)
   {
     Plugin.Logger.LogDebug($"Getting locations to clear for rank {rank.internalValue}");

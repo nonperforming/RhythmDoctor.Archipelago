@@ -26,14 +26,19 @@ internal static class Bindings
     { Level.ClassyH, new RegularStage(Act.Act3, 30, 31, 32) },
     { Level.DistantDuet, new RegularStage(Act.Act3, 33, 34, 35) },
     { Level.DistantDuetH, new RegularStage(Act.Act3, 36, 37, 38) },
+    { Level.Lesmis, new BossStage(Act.Act3, 39, null, 40) },
+    {
+      Level.MyLevel, // Rhythm Dogtor
+      new BossStage(Act.Act3, 41, null, 42)
+    },
     { Level.Lofi, new RegularStage(Act.Act2, 43, 44, 45) },
     { Level.CareLess, new RegularStage(Act.Act2, 46, 47, 48) },
     { Level.SVT, new RegularStage(Act.Act2, 49, 50, 51) },
     { Level.Unreachable, new RegularStage(Act.Act2, 52, 53, 54) },
     { Level.Smokin, new RegularStage(Act.Act2, 55, 56, 57) },
     { Level.Pomeranian, new RegularStage(Act.Act2, 58, 59, 60) },
-    { Level.SongOfTheSea, new RegularStage(Act.Act2, null, null, 61) },
-    { Level.SongOfTheSeaH, new RegularStage(Act.Act2, null, null, 62) },
+    { Level.SongOfTheSea, new RegularStage(Act.Act2, 171, 172, 61) },
+    { Level.SongOfTheSeaH, new RegularStage(Act.Act2, 173, 174, 62) },
     { Level.BeansHopper, new RegularStage(Act.Act2, 63, 64, 65) },
     { Level.Bitterness, new BossStage(Act.Act7, 66, 67, 68) },
     { Level.Heldbeats, new RegularStage(Act.Act4, 71, 72, 73) },
@@ -48,7 +53,7 @@ internal static class Bindings
     { Level.Injury, new RegularStage(Act.Act5, 100, 101, 102) },
     { Level.Freezeshot, new RegularStage(Act.Act5, 103, 104, 105) },
     { Level.FreezeshotH, new RegularStage(Act.Act5, 106, 107, 108) },
-    { Level.AthleteTherapy, new RegularStage(Act.Act5, null, null, 109) },
+    { Level.AthleteTherapy, new RegularStage(Act.Act5, 175, 176, 109) },
     { Level.StevensonsTango, new RegularStage(Act.Act5, 110, 111, 112) },
     { Level.HaileyDuet, new RegularStage(Act.Act6, 126, 127, 128) },
     { Level.EdegaRave, new RegularStage(Act.Act6, 129, 130, 131) },
@@ -69,11 +74,6 @@ internal static class Bindings
     { Level.PaigesReckoning, new BossStage(Act.Act6, 132, 133, 134) },
     { Level.Montage, new BossStage(Act.Act7, 138, 139, 140) },
     { Level.Montage2, new BossStage(Act.Act7, 141, 142, 143) },
-    { Level.Lesmis, new BossStage(Act.Act3, 39, null, 40) },
-    {
-      Level.MyLevel, // Rhythm Dogtor
-      new BossStage(Act.Act3, 41, null, 42)
-    },
   };
 
   /// <summary>
