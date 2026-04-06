@@ -186,6 +186,7 @@ internal static class ArchipelagoLoginPatch
     // csharpier-ignore-start
     Failure:
       Plugin.Logger.LogError("Login failed (Login)");
+      UnapplyPatchesPatch.TearDownClientPluginPatch();
       // ReSharper disable once ConstantConditionalAccessQualifier
       Plugin.Client?.Dispose();
       Plugin.Client = null!;
