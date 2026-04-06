@@ -73,23 +73,19 @@ internal static class RhythmDogtorLevelPatch
     scnGame.loadDogMode = true;
   }
 
-  [HarmonyPatch(
-    typeof(Persistence),
-    nameof(Persistence.SetLevelRank),
-    [typeof(string), typeof(Rank), typeof(bool), typeof(bool)]
-  )]
+  [HarmonyPatch(typeof(Rankscreen), nameof(Rankscreen.ShowAndSaveRank))]
   [HarmonyPrefix]
-  private static void SaveRhythmDogtorRankPatch(ref string level)
+  private static void SaveRhythmDogtorRankPatch(bool bossLevelFailed, Rankscreen __instance)
   {
-    if (scnGame.instance is null)
+    if (bossLevelFailed)
       return;
-    if (level != nameof(Level.Lesmis))
+    if (__instance.game.levelIdentifier != nameof(Level.Lesmis))
       return;
-    if (!scnGame.loadDogMode)
+    if (!__instance.game.currentLevel.dogMode)
       return;
 
-    Plugin.Logger.LogDebug("Saving Rhythm Dogtor rank...");
-    level = Bindings.RHYTHM_DOGTOR_LEVEL.ToString();
+    Plugin.Logger.LogInfo("Saving Rhythm Dogtor rank...");
+    Persistence.SetLevelRank(Bindings.RHYTHM_DOGTOR_LEVEL, __instance.game.currentLevel.GetRankFromMistakes());
   }
 
   /// <summary>
