@@ -152,7 +152,14 @@ internal static class ArchipelagoLoginPatch
     yield return new WaitUntil(() => login.IsCompleted);
 
     if (login.IsCanceled || login.IsFaulted)
+    {
+      string fault = login.IsFaulted
+        // ReSharper disable once NullableWarningSuppressionIsUsed
+        ? login.Exception!.ToString()
+        : "false";
+      Plugin.Logger.LogError($"Login has cancelled or faulted (cancel: {login.IsCanceled} / fault: {fault})");
       goto Failure;
+    }
 
     LoginResult loginResult = login.Result;
     switch (loginResult)
@@ -167,7 +174,10 @@ internal static class ArchipelagoLoginPatch
         Plugin.Logger.LogInfo("Heading to Level Select...");
         scnBase.GoToScene("scnLevelSelect");
         yield break;
-      case LoginFailure:
+      case LoginFailure fail:
+        Plugin.Logger.LogError(
+          $"Got LoginFailure: {string.Join(", ", fail.ErrorCodes)} / {string.Join(", ", fail.Errors)}"
+        );
         goto Failure;
     }
 
@@ -175,7 +185,7 @@ internal static class ArchipelagoLoginPatch
     yield break;
     // csharpier-ignore-start
     Failure:
-      Plugin.Logger.LogError("Login failed");
+      Plugin.Logger.LogError("Login failed (Login)");
       // ReSharper disable once ConstantConditionalAccessQualifier
       Plugin.Client?.Dispose();
       Plugin.Client = null!;

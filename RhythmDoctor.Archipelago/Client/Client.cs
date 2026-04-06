@@ -125,7 +125,7 @@ internal sealed class Client : IDisposable
     {
       case LoginFailure loginFailure:
       {
-        Plugin.Logger.LogError("Login failed");
+        Plugin.Logger.LogError("Login failed (Client)");
         for (int i = 0; i < loginFailure.Errors.Length; i++)
         {
           string error = loginFailure.Errors[i];
@@ -178,7 +178,9 @@ internal sealed class Client : IDisposable
         return loginResult;
       }
       default:
-        throw new Exception($"Unknown error: failed to connect to {name}");
+        string message = $"Unknown error: failed to connect to {name}";
+        Plugin.Logger.LogError(message);
+        throw new Exception(message);
     }
   }
 
@@ -371,7 +373,7 @@ internal sealed class Client : IDisposable
 
             if (act == Act.Act7)
             {
-              scnLevelSelect.instance.UnlockAbandonedWard();
+              scnLevelSelect.instance?.UnlockAbandonedWard();
             }
 
             foreach (Level bossLevel in bossLevels)
