@@ -251,7 +251,6 @@ public class DebugMenu : MonoBehaviour
           {
             scnLevelSelect.instance.UnlockEntrance(region);
           }
-          scnLevelSelect.instance.UnlockAbandonedWard();
         }
 
         if (GUI.Button(new Rect(30, 120, 300, 20), "Unlock level 3-1"))

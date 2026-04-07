@@ -4,7 +4,7 @@
     <AssemblyName>gg.archipelago.rhythmdoctor</AssemblyName>
     <TargetName>RhythmDoctor.Archipelago</TargetName>
     <Product>RhythmDoctor.Archipelago</Product>
-    <Version>0.6.6</Version>
+    <Version>0.6.7</Version>
     <LangVersion>latest</LangVersion>
     <RestoreAdditionalProjectSources>
       https://api.nuget.org/v3/index.json;

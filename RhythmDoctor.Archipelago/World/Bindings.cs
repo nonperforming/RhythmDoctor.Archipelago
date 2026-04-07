@@ -189,6 +189,11 @@ internal static class Bindings
     pair => pair.Value.StageAct
   );
 
+  internal static readonly Dictionary<Region, long> RegionToKeyID = KeyItemIdToWard.ToDictionary(
+    pair => pair.Value,
+    pair => pair.Key
+  );
+
   internal static readonly Dictionary<Act, IEnumerable<Level>> LevelsInAct = LevelToStage
     .GroupBy(pair => pair.Value.StageAct)
     .ToDictionary(grouping => grouping.Key, grouping => grouping.Select(c => c.Key));

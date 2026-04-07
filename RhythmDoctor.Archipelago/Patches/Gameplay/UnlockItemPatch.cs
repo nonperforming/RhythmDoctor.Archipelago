@@ -182,6 +182,11 @@ internal static class UnlockItemPatch
         foreach (Level level in Bindings.ActBoss[act])
         {
           Persistence.SetLevelRank(level, Rank.NotFinished, false, false);
+
+          if (level == Level.Montage)
+          {
+            __instance.UnlockEntrance(Region.RecordsRoom); // elevator
+          }
         }
       }
     }
@@ -300,17 +305,83 @@ internal static class UnlockItemPatch
         __instance.SetDifficultyArrowsVisible(false);
         __instance.sleveePaintSprite.SetActive(false);
       }
-      else if (selectableObject.id == scnLevelSelect.MainElevator && HasUnlockedBossSong(Act.Act7))
-      {
-        Plugin.Logger.LogInfo("Adding Finale to selected vertical destinations");
 
-        __instance.selectedVerticalDestinations.Add(
-          new scnLevelSelect.LevelSelectDestination(
-            scnLevelSelect.ExitVoid,
-            RDString.Get("levelSelect.finale"),
-            RDString.Get("levelSelect.GoToVoid.day")
-          )
+      if (selectableObject.id == scnLevelSelect.MainElevator)
+      {
+        Plugin.Logger.LogInfo("Handling elevator vertical destinations");
+
+        bool recordsRoomUnlocked = Plugin.Client.Session!.Items.AllItemsReceived.Any(item =>
+          item.ItemId == Bindings.RegionToKeyID[Region.RecordsRoom]
         );
+        Plugin.Logger.LogDebug($"Records Room unlocked: {recordsRoomUnlocked}");
+
+        // If we can access 7-X/7-X2, add the Abandoned Ward destination
+        if (HasUnlockedBossSong(Act.Act7))
+        {
+          // The game will attempt to unlock the Abandoned Ward if Bitter Times has been passed,
+          // so we don't need to do anything if this is the case.
+          // Otherwise, we will have to do it ourselves
+          if (!Level.Bitterness.Passed())
+          {
+            Plugin.Logger.LogDebug("Adding ExitVoid vertical destination");
+
+            // Add the destination...
+            __instance.selectedVerticalDestinations.Add(
+              new scnLevelSelect.LevelSelectDestination(
+                scnLevelSelect.ExitVoid,
+                RDString.Get("levelSelect.finale"),
+                RDString.Get("levelSelect.GoToVoid.day")
+              )
+            );
+          }
+
+          // The "Act 6" text is independent of the selected vertical destinations, so we need to handle it separately
+          if (!recordsRoomUnlocked)
+          {
+            Plugin.Logger.LogDebug("Records room not unlocked, modifying description text");
+            Plugin.Logger.LogDebug(__instance.description.text);
+            // Example English description:
+            // ---
+            // <color=#CCFF22>Act 6</color><color=#CCFF22> · </color><color=#6c802a>Finale</color>
+            //
+            // Records Room
+            // ---
+            //
+            // <color=#CCFF22> and <color=#6c802a> tags are added for selected and deselected destination respectively
+            // levelSelect.act6 -> 'Act 6'
+            // levelSelect.floorSeparatorString -> ' · ' (\u00B7)
+            // levelSelect.finale -> 'Finale'
+            // levelSelect.GoToRecordsRoom.day -> 'Records Room'
+            // levelSelect.GoToVoid.day -> '???'
+
+            // csharpier-ignore
+            __instance.description.text = __instance.description.text
+              .Replace($"<color=#CCFF22>{RDString.Get("levelSelect.act6")}</color><color=#CCFF22>{RDString.Get("levelSelect.floorSeparatorString")}", "")
+              .Replace("</color><color=#6c802a>", "<color=#CCFF22>")
+              .Replace(RDString.Get("levelSelect.GoToRecordsRoom.day"), RDString.Get("levelSelect.GoToVoid.day"));
+          }
+        }
+        else
+        {
+          // The game will attempt to unlock the Abandoned Ward if Bitter Times has been passed,
+          // so we need to remove it.
+          if (Level.Bitterness.Passed())
+          {
+            Plugin.Logger.LogDebug("Removing ExitVoid vertical destination");
+            __instance.selectedVerticalDestinations.RemoveAt(1);
+            // csharpier-ignore
+            __instance.description.text = __instance.description.text
+              .Replace($"{RDString.Get("levelSelect.floorSeparatorString")}</color><color=#6c802a>{RDString.Get("levelSelect.finale")}</color>", "");
+          }
+        }
+
+        // If we do not have the Records Room key, remove its vertical destination
+        if (!recordsRoomUnlocked)
+        {
+          __instance.selectedVerticalDestinations.RemoveAt(0);
+        }
+
+        __instance.SetDifficultyArrowsVisible(__instance.selectedVerticalDestinations.Count > 1);
       }
     }
   }

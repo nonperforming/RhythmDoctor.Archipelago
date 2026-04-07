@@ -373,7 +373,7 @@ internal sealed class Client : IDisposable
 
             if (act == Act.Act7)
             {
-              scnLevelSelect.instance?.UnlockAbandonedWard();
+              scnLevelSelect.instance?.UnlockEntrance(Region.RecordsRoom); // elevator
             }
 
             foreach (Level bossLevel in bossLevels)

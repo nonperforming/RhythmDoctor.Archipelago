@@ -97,27 +97,4 @@ internal static class scnLevelSelectExtensions
 
   internal static void LockEntrance(this scnLevelSelect @this, string entranceToLock) =>
     @this.LockEntrance(@this.FindSelectableEntity(entranceToLock));
-
-  /// <summary>
-  /// Add the Finale (<see cref="scnLevelSelect.ExitVoid"/>) vertical destination to <see cref="scnLevelSelect.selectedVerticalDestinations"/>.
-  /// </summary>
-  /// <remarks>To be able to access the elevator, you must unlock it using <see cref="scnLevelSelect.UnlockEntrance"/>.</remarks>
-  /// <param name="this"><see cref="scnLevelSelect"/> instance.</param>
-  internal static void UnlockAbandonedWard(this scnLevelSelect @this)
-  {
-    if (@this.selectedVerticalDestinations.Any((destination) => destination.title == scnLevelSelect.ExitVoid))
-    {
-      Plugin.Logger.LogWarning("ExitVoid already exists in selectedVerticalDestinations");
-      return;
-    }
-
-    Plugin.Logger.LogWarning("Adding ExitVoid to selectedVerticalDestinations");
-    @this.selectedVerticalDestinations.Add(
-      new scnLevelSelect.LevelSelectDestination(
-        scnLevelSelect.ExitVoid,
-        RDString.Get("levelSelect.finale"),
-        RDString.Get("levelSelect.GoToVoid.day")
-      )
-    );
-  }
 }
