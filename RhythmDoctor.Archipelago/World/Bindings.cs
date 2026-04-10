@@ -71,7 +71,7 @@ internal static class Bindings
     { Level.Boss2, new BossStage(Act.Act2, 69, null, 70) },
     { Level.InsomniacHard, new BossStage(Act.Act4, 95, null, 96) },
     { Level.AthleteFinale, new BossStage(Act.Act5, 123, 124, 125) },
-    { Level.PaigesReckoning, new BossStage(Act.Act6, 132, 133, 134) },
+    { Level.PaigesReckoning, new BossStage(Act.Act6, 132, null, 134) },
     { Level.Montage, new BossStage(Act.Act7, 138, 139, 140) },
     { Level.Montage2, new BossStage(Act.Act7, 141, 142, 143) },
   };
