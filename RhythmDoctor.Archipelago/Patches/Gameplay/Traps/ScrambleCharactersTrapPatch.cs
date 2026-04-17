@@ -2,6 +2,8 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 
 internal class ScrambleCharactersTrapPatch : ITrap
 {
+  // FIXME: Narration will break
+
   // ReSharper disable once NullableWarningSuppressionIsUsed
   private Harmony _harmony = null!;
 
@@ -11,10 +13,7 @@ internal class ScrambleCharactersTrapPatch : ITrap
   public string Name => name;
   public IEnumerable<Type> IncompatibleWithTraps => [typeof(ScrambleCharactersTrapPatch)];
 
-  // FIXME: There should be no reason why Helping Hands is incompatible
-  //        It appears theres more than 4 rows in a single room at a time, but we're handling MakeRow in level events.
-  public IEnumerable<Level> IncompatibleWithLevels =>
-    [Level.SongOfTheSea, Level.SongOfTheSeaH, Level.AthleteTherapy, Level.HelpingHands];
+  public IEnumerable<Level> IncompatibleWithLevels => [Level.SongOfTheSea, Level.SongOfTheSeaH, Level.AthleteTherapy];
 
   private static readonly IReadOnlyCollection<Character> _disallowedCharacters =
   [
@@ -40,7 +39,7 @@ internal class ScrambleCharactersTrapPatch : ITrap
   {
     Character[] characters = (Character[])Enum.GetValues(typeof(Character));
     Character[] randomizedOrder = (Character[])characters.Clone();
-    // Do not randomize these characters, as they will appear broken/as no character
+    // Do not scramble these characters, as they will appear broken/no character
     IReadOnlyList<Character> allowedCharacters = characters
       .Where(character => !_disallowedCharacters.Contains(character))
       .ToList();
@@ -69,10 +68,10 @@ internal class ScrambleCharactersTrapPatch : ITrap
       scrambled[originalCharacter] = randomizeTo;
     }
 
-    Plugin.Logger.LogDebug("[Scramble Characters] Randomized characters:");
+    Plugin.Logger.LogDebug($"[{nameof(ScrambleCharactersTrapPatch)}] Randomized characters:");
     foreach ((Character originalCharacter, Character randomizedCharacter) in scrambled)
     {
-      Plugin.Logger.LogDebug($"[Scramble Characters]  {originalCharacter} -> {randomizedCharacter}");
+      Plugin.Logger.LogDebug($"[{nameof(ScrambleCharactersTrapPatch)}]  {originalCharacter} -> {randomizedCharacter}");
     }
     _harmony.PatchAll(typeof(ActivePatch));
   }
@@ -82,10 +81,10 @@ internal class ScrambleCharactersTrapPatch : ITrap
     _harmony.UnpatchSelf();
   }
 
-  [HarmonyPatch(typeof(LevelBase))]
+  [HarmonyPatch]
   private static class ActivePatch
   {
-    [HarmonyPatch(nameof(LevelBase.DecodeLevelData))]
+    [HarmonyPatch(typeof(LevelBase), nameof(LevelBase.DecodeLevelData))]
     [HarmonyPostfix]
     private static void ModifyCharacterDataPatch(RDLevelData __result)
     {
@@ -100,7 +99,9 @@ internal class ScrambleCharactersTrapPatch : ITrap
             continue;
           }
 
-          Plugin.Logger.LogDebug($"[Scramble Characters] ChangeCharacter custom method: {callCustomMethod.methodName}");
+          Plugin.Logger.LogDebug(
+            $"[{nameof(ScrambleCharactersTrapPatch)}] ChangeCharacter custom method: {callCustomMethod.methodName}"
+          );
 
           string changeToString = callCustomMethod
             .methodName.Replace("ChangeCharacterSmooth(str:", "", StringComparison.Ordinal)
@@ -109,24 +110,34 @@ internal class ScrambleCharactersTrapPatch : ITrap
           Character changeTo = Enum.Parse<Character>(changeToString);
           Character randomized = scrambled[changeTo];
 
-          callCustomMethod.methodName.Replace(changeToString, randomized.ToString(), StringComparison.Ordinal);
-          Plugin.Logger.LogDebug($"[Scramble Characters] Character changed to: {randomized}");
-        }
-        else if (levelEvent is LevelEvent_ChangeCharacter changeCharacter)
-        {
-          Plugin.Logger.LogDebug($"[Scramble Characters] ChangeCharacter event: {changeCharacter.character}");
-          changeCharacter.character = scrambled[changeCharacter.character];
-          Plugin.Logger.LogDebug($"[Scramble Characters] Character changed to: {changeCharacter.character}");
-        }
-        else if (levelEvent is LevelEvent_MakeRow makeRow)
-        {
-          Plugin.Logger.LogDebug(
-            $"[Scramble Characters] MakeRow in level events: {makeRow.character} -> {scrambled[makeRow.character]}"
+          callCustomMethod.methodName = callCustomMethod.methodName.Replace(
+            changeToString,
+            randomized.ToString(),
+            StringComparison.Ordinal
           );
-          // Some levels such as X-0 Helping Hands use the MakeRow event manually
-          makeRow.character = scrambled[makeRow.character];
+          Plugin.Logger.LogDebug($"[{nameof(ScrambleCharactersTrapPatch)}] Character changed to: {randomized}");
         }
       }
+    }
+
+    [HarmonyPatch(typeof(scnGame), nameof(scnGame.MakeRow))]
+    [HarmonyPrefix]
+    private static void ModifyMakeRowPatch(ref Character character)
+    {
+      Plugin.Logger.LogDebug(
+        $"[{nameof(ScrambleCharactersTrapPatch)}] Modifying MakeRow method from {character} to {scrambled[character]}"
+      );
+      character = scrambled[character];
+    }
+
+    [HarmonyPatch(typeof(scrChar), nameof(scrChar.ChangeCharacter))]
+    [HarmonyPrefix]
+    private static void ModifyChangeCharacterPatch(ref Character newChar)
+    {
+      Plugin.Logger.LogDebug(
+        $"[{nameof(ScrambleCharactersTrapPatch)}] Modifying ChangeCharacter method from {newChar} to {scrambled[newChar]}"
+      );
+      newChar = scrambled[newChar];
     }
 
     [HarmonyPatch(typeof(RDInk), nameof(RDInk.ParsePortrait))]
