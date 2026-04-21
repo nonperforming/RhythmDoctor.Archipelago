@@ -66,7 +66,7 @@ internal static class UnlockItemPatch
       int index =
         __instance.selectableEntities.FindIndex((entity) => entity.gameObject.name == scnLevelSelect.BasementComputer)
         + 1;
-      artExercise.gamePosition = new Vector2(2535, 56); // a little bit left to the fireplace/boiler in Ian's office
+      artExercise.gamePosition = new Vector2(2480, 53); // in front of Ian's bookshelf/archive thing
       __instance.selectableEntities.Remove(artExercise);
       __instance.selectableEntities.Insert(index, artExercise);
 

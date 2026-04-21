@@ -67,6 +67,7 @@ internal static class Bindings
     { Level.The90sDecision, new RegularStage(Act.None, 162, 163, 164) },
     { Level.HelpingHands, new RegularStage(Act.None, 165, 166, 167) },
     { Level.ArtExercise, new RegularStage(Act.None, 168, 169, 170) },
+    { Level.Beatblock, new RegularStage(Act.None, 177, 178, 179) },
     { Level.OrientalInsomniac, new BossStage(Act.Act1, 19, null, 20) },
     { Level.Boss2, new BossStage(Act.Act2, 69, null, 70) },
     { Level.InsomniacHard, new BossStage(Act.Act4, 95, null, 96) },
@@ -130,6 +131,7 @@ internal static class Bindings
     { 47, Level.The90sDecision },
     { 48, Level.HelpingHands },
     { 49, Level.ArtExercise },
+    { 67, Level.Beatblock },
   };
 
   /// <summary>

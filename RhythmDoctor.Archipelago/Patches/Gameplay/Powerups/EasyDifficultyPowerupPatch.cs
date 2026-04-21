@@ -36,9 +36,9 @@ internal class EasyDifficultyPowerupPatch : ITrap
       __result = DefibMode.Easy;
     }
 
-    [HarmonyPatch(typeof(RDPauseMenu), nameof(RDPauseMenu.Update))]
+    [HarmonyPatch(typeof(PauseMenu), nameof(PauseMenu.Update))]
     [HarmonyPrefix]
-    private static void LockDifficultyPatch(ref RDPauseMenu __instance)
+    private static void LockDifficultyPatch(ref PauseMenu __instance)
     {
       foreach ((PauseModeName modeName, PauseMenuMode mode) in __instance.instantiatedModes)
       {
