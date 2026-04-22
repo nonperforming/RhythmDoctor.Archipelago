@@ -5,7 +5,7 @@ namespace RhythmDoctor.Archipelago.Interfaces;
 /// </summary>
 /// <seealso cref="TrapManager"/>
 /// <seealso cref="TrapManagerPatch"/>
-[Obsolete("Use IModifier instead", true)]
+[Obsolete("Use ArchipelagoModifier instead", true)]
 internal interface ITrap
 {
   /// <summary>

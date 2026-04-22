@@ -35,6 +35,7 @@ global using RhythmDoctor.Archipelago.Patches.Gameplay;
 global using RhythmDoctor.Archipelago.Patches.Gameplay.Powerups;
 global using RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 global using RhythmDoctor.Archipelago.Patches.Menu;
+global using RhythmDoctor.Archipelago.Patches.Shared;
 global using RhythmDoctor.Archipelago.World;
 global using RhythmDoctor.Archipelago.World.Data;
 

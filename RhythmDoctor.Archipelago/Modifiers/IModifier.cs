@@ -11,10 +11,25 @@ namespace RhythmDoctor.Archipelago.Modifiers;
 internal interface IModifier
 {
   /// <summary>
-  /// The name of the modifier.
+  /// The unique ID of this trap.
   /// </summary>
   [Pure]
-  string Name { get; }
+  string Uid { get; }
+  
+  /// <summary>
+  /// The localization key to find the name of the modifier under.
+  /// </summary>
+  [Pure]
+  string LocalizationKey { get; }
+
+  /// <summary>
+  /// Gets the localized name of the trap.
+  /// </summary>
+  /// <returns>Localized trap name.</returns>
+  string GetLocalizedName()
+  {
+    return RDString.Get(LocalizationKey);
+  }
   
   /// <summary>
   /// Compatibility attributes of the modifier.
@@ -27,7 +42,7 @@ internal interface IModifier
   /// This should include anything the modifier might change.
   /// </summary>
   [Pure]
-  ModifierCapability Capability { get; }
+  ModifierCapability[] Capabilities { get; }
 
   /// <summary>
   /// Run when the modifier is instantiated.
