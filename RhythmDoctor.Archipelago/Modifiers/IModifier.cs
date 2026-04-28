@@ -21,15 +21,6 @@ internal interface IModifier
   /// </summary>
   [Pure]
   string LocalizationKey { get; }
-
-  /// <summary>
-  /// Gets the localized name of the trap.
-  /// </summary>
-  /// <returns>Localized trap name.</returns>
-  string GetLocalizedName()
-  {
-    return RDString.Get(LocalizationKey);
-  }
   
   /// <summary>
   /// Compatibility attributes of the modifier.
@@ -44,6 +35,13 @@ internal interface IModifier
   [Pure]
   ModifierCapability[] Capabilities { get; }
 
+  /// <summary>
+  /// Gets the localized name of the trap.
+  /// </summary>
+  /// <returns>Localized trap name.</returns>
+  string GetLocalizedName()
+    => RDString.Get(LocalizationKey);
+  
   /// <summary>
   /// Run when the modifier is instantiated.
   /// For the lifetime of the game this will only be called once at most.

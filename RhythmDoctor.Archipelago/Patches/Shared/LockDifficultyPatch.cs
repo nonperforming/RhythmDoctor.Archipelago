@@ -33,4 +33,5 @@ internal static class LockDifficultyPatch
         }
       }
     }
+  }
 }

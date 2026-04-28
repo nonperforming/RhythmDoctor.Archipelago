@@ -1,11 +1,18 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay.Powerups;
 
-internal class EasyDifficultyPowerupPatch : ArchipelagoModifier<EasyDifficultyPowerupPatch>
+internal class EasyDifficultyPowerupPatch : ModifierPatch<EasyDifficultyPowerupPatch>, IModifier, IArchipelagoModifier
 {
-  public override string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.easydifficulty";
-  public override string LocalizationKey => "traps.archipelago.easyDifficultyPowerup";
+  public string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.easyDifficulty";
+  public string LocalizationKey => "mods.archipelago.easyDifficultyPowerup";
+  public ModifierCompatibility Compatibility
+    => ModifierCompatibilityBuilder.GetDefaultCompatibilityForMod(this);
+  public ModifierCapability[] Capabilities => [ModifierCapability.Difficulty];
 
+  public override Type[]? PreviewPatches => [];
   public override Type[]? ActivePatches => [typeof(ActivePatch), typeof(LockDifficultyPatch)];
+
+  public double GetScale(int num, out int consumed)
+    => Scales.BinaryScale(num, out consumed);
 
   [HarmonyPatch]
   private static class ActivePatch

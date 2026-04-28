@@ -1,6 +1,6 @@
-namespace RhythmDoctor.Archipelago.Modifiers;
+namespace RhythmDoctor.Archipelago.Modifiers.Archipelago;
 
-internal abstract class ArchipelagoModifier<T> : ModifierPatch<T>
+internal interface IArchipelagoModifier
 {
   /// <summary>
   /// Gets how the trap's strength should scale
@@ -8,5 +8,5 @@ internal abstract class ArchipelagoModifier<T> : ModifierPatch<T>
   /// </summary>
   /// <param name="num">Number of items we have for this trap.</param>
   /// <param name="consumed">Number of items that should be consumed for the strength given.</param>
-  internal abstract double GetScale(int num, out int consumed);
+  double GetScale(int num, out int consumed);
 }
