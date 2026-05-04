@@ -4,7 +4,7 @@ namespace RhythmDoctor.Archipelago;
 /// Archipelago client mod for Rhythm Doctor
 /// </summary>
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
-[BepInDependency(PulseLib.MyPluginInfo.PLUGIN_GUID)]
+[BepInDependency(PulseLib.MyPluginInfo.PLUGIN_GUID, PulseLib.MyPluginInfo.PLUGIN_VERSION)]
 [BepInProcess("Rhythm Doctor.exe")]
 public class Plugin : BaseUnityPlugin
 {
@@ -95,6 +95,50 @@ public class Plugin : BaseUnityPlugin
     ApplyPatches(PATCH_ID_ALWAYS_ACTIVE, AlwaysActivePatches);
 
     Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} loaded");
+  }
+
+  /// <summary>
+  /// Show update banner if necessary.
+  /// </summary>
+  private void Start()
+  {
+    // TODO: Find out some way to automate this.
+    //       Source generation or something?????
+    //       It would require we pull from game files though...
+    //       ...it wouldn't work on CI.
+    //       Probably write a script or something that just fetches the required resources and outputs a C# file.
+    Version builtForVersion = new("1.1.0");
+    Version thisVersion = new(Application.version);
+    if (Releases.releaseNumber < 42 || thisVersion < builtForVersion)
+    {
+      // https://patorjk.com/software/taag/#p=display&f=Future+Smooth&t=Please+update+your+game!!!
+      // csharpier-ignore-start
+      Logger.LogWarning( "================================================================================");
+      Logger.LogWarning(@"|   ╭─╮╷  ╭─╴╭─╮╭─╮╭─╴   ╷ ╷╭─╮╶┬╮╭─╮╶┬╴╭─╴   ╷ ╷╭─╮╷ ╷╭─╮   ╭─╴╭─╮╭┬╮╭─╴╷╷╷   |");
+      Logger.LogWarning(@"|   ├─╯│  ├╴ ├─┤╰─╮├╴    │ │├─╯ ││├─┤ │ ├╴    ╰┬╯│ ││ │├┬╯   │╶╮├─┤│││├╴ ╵╵╵   |");
+      Logger.LogWarning(@"|   ╵  ╰─╴╰─╴╵ ╵╰─╯╰─╴   ╰─╯╵  ╶┴╯╵ ╵ ╵ ╰─╴    ╵ ╰─╯╰─╯╵╰╴   ╰─╯╵ ╵╵ ╵╰─╴╵╵╵   |");
+      Logger.LogWarning( "================================================================================");
+      Logger.LogWarning($"This version of the mod (v{MyPluginInfo.PLUGIN_VERSION}) was built for: v{builtForVersion} (release 42, commit 578e672, date 2026/04/23 9:27 PM)");
+      Logger.LogWarning($"Your version is: v{Application.version} (release {Releases.releaseNumber}, commit {Releases.buildCommit}, date {Releases.buildDate})");
+      Logger.LogWarning( "================================================================================");
+      // csharpier-ignore-end
+    }
+    else if (Releases.releaseNumber > 42 || thisVersion > builtForVersion)
+    {
+      // csharpier-ignore-start
+      Logger.LogWarning( "=================================================================================");
+      Logger.LogWarning(@"|         ╭─╮╷  ╭─╴╭─╮╭─╮╭─╴   ╭─╮╭─╮╭─╴╭╮╷   ╭─╮╭╮╷   ╷╭─╮╭─╮╷ ╷╭─╴╷╷╷         |");
+      Logger.LogWarning(@"|         ├─╯│  ├╴ ├─┤╰─╮├╴    │ │├─╯├╴ │╰┤   ├─┤│╰┤   │╰─╮╰─╮│ │├╴ ╵╵╵         |");
+      Logger.LogWarning(@"|         ╵  ╰─╴╰─╴╵ ╵╰─╯╰─╴   ╰─╯╵  ╰─╴╵ ╵   ╵ ╵╵ ╵   ╵╰─╯╰─╯╰─╯╰─╴╵╵╵         |");
+      Logger.LogWarning( "=================================================================================");
+      Logger.LogWarning($"This version of the mod (v{MyPluginInfo.PLUGIN_VERSION}) was built for: v{builtForVersion} (release 42, commit 578e672, date 2026/04/23 9:27 PM)");
+      Logger.LogWarning($"Your version is: v{Application.version} (release {Releases.releaseNumber}, commit {Releases.buildCommit}, date {Releases.buildDate})");
+      Logger.LogWarning(null);
+      Logger.LogWarning( "First, please check that there is an updated version here: https://github.com/nonperforming/RhythmDoctor.Archipelago/releases. Remember to update Pulse (https://github.com/nonperforming/Pulse/releases) as well.");
+      Logger.LogWarning($"If there is no update yet, please open an issue at https://github.com/nonperforming/RhythmDoctor.Archipelago/issues/new?labels=\"plugin outdated\"&title=v{Application.version}+support&body=Release:+{Releases.releaseNumber}+/+Commit:+{Releases.buildCommit}+/+Date:+{Releases.buildDate}&assignees=nonperforming");
+      Logger.LogWarning( "=================================================================================");
+      // csharpier-ignore-end
+    }
   }
 
   private void Update()
