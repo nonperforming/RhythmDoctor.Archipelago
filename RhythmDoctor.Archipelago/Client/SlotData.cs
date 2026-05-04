@@ -43,6 +43,7 @@ internal readonly struct SlotData
     stickyTraps = ((JArray)slotData["sticky_traps"]).ToObject<List<string>>()!.ToArray();
     //stickyPowerups = ((JArray)slotData["sticky_powerups"]).ToObject<List<string>>()!.ToArray();
     deathLink = (long)slotData["death_link"] != 0;
+    perfectRankLocations = (bool)slotData["perfect_rank_locations"];
     Plugin.Logger.LogDebug(
       $"Created SlotData - End Goal {endGoal}, Boss Unlock Requirement {bossUnlockRequirement}, [{act1BossUnlockRequirement}, {act2BossUnlockRequirement}, {act3BossUnlockRequirement}, {act4BossUnlockRequirement}, {act5BossUnlockRequirement}, {act6BossUnlockRequirement}, {act7BossUnlockRequirement}] Death Link {deathLink}"
     );
@@ -58,6 +59,7 @@ internal readonly struct SlotData
   internal readonly long act6BossUnlockRequirement;
   internal readonly long act7BossUnlockRequirement;
   internal readonly string[] stickyTraps;
+  internal readonly bool perfectRankLocations;
 
   //internal readonly string[] stickyPowerups;
   internal readonly bool deathLink;
@@ -71,24 +73,16 @@ internal readonly struct SlotData
   /// <exception cref="ArgumentOutOfRangeException">If given act is not an act.</exception>
   internal long GetBossSongLevelClearRequirement(Act act)
   {
-    switch (act)
+    return act switch
     {
-      case Act.Act1:
-        return act1BossUnlockRequirement;
-      case Act.Act2:
-        return act2BossUnlockRequirement;
-      case Act.Act3:
-        return act3BossUnlockRequirement;
-      case Act.Act4:
-        return act4BossUnlockRequirement;
-      case Act.Act5:
-        return act5BossUnlockRequirement;
-      case Act.Act6:
-        return act6BossUnlockRequirement;
-      case Act.Act7:
-        return act7BossUnlockRequirement;
-      default:
-        throw new ArgumentOutOfRangeException(nameof(act), act, null);
-    }
+      Act.Act1 => act1BossUnlockRequirement,
+      Act.Act2 => act2BossUnlockRequirement,
+      Act.Act3 => act3BossUnlockRequirement,
+      Act.Act4 => act4BossUnlockRequirement,
+      Act.Act5 => act5BossUnlockRequirement,
+      Act.Act6 => act6BossUnlockRequirement,
+      Act.Act7 => act7BossUnlockRequirement,
+      _ => throw new ArgumentOutOfRangeException(nameof(act), act, null),
+    };
   }
 }
