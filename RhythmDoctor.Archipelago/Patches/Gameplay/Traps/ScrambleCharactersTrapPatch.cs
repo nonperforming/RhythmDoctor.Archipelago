@@ -150,7 +150,7 @@ internal class ScrambleCharactersTrapPatch : ITrap
         Character randomized = scrambled[toRandomize];
         string scrambledTo = randomized.ToString();
         Plugin.Logger.LogDebug($"[Scramble Characters] Modifying portrait from {toRandomize} to {scrambledTo}");
-        fullName = fullName.Replace(character, scrambledTo);
+        fullName = fullName.Replace(character, scrambledTo, StringComparison.Ordinal);
       }
     }
   }

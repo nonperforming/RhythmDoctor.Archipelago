@@ -356,9 +356,9 @@ internal static class UnlockItemPatch
 
             // csharpier-ignore
             __instance.description.text = __instance.description.text
-              .Replace($"<color=#CCFF22>{RDString.Get("levelSelect.act6")}</color><color=#CCFF22>{RDString.Get("levelSelect.floorSeparatorString")}", "")
-              .Replace("</color><color=#6c802a>", "<color=#CCFF22>")
-              .Replace(RDString.Get("levelSelect.GoToRecordsRoom.day"), RDString.Get("levelSelect.GoToVoid.day"));
+              .Replace($"<color=#CCFF22>{RDString.Get("levelSelect.act6")}</color><color=#CCFF22>{RDString.Get("levelSelect.floorSeparatorString")}", "", StringComparison.Ordinal)
+              .Replace("</color><color=#6c802a>", "<color=#CCFF22>", StringComparison.Ordinal)
+              .Replace(RDString.Get("levelSelect.GoToRecordsRoom.day"), RDString.Get("levelSelect.GoToVoid.day"), StringComparison.Ordinal);
           }
         }
         else

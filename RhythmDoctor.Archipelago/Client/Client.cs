@@ -522,7 +522,7 @@ internal sealed class Client : IDisposable
           desktop.stackerManager.hasLost = true;
           desktop.stackerManager.hiScoreText.text = RDString
             .Get("rhythmStacker.hiScore")
-            .Replace("[score]", desktop.stackerManager.highestScore.ToString());
+            .Replace("[score]", desktop.stackerManager.highestScore.ToString(), StringComparison.Ordinal);
           RDStringToUIText.Apply(desktop.stackerManager.hiScoreText);
           // TODO: Use game over text instead of high score text
           //  - this will require a patch to reset the text after Restart().
