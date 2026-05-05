@@ -8,6 +8,10 @@ global using Archipelago.MultiClient.Net.Models;
 global using BepInEx;
 global using BepInEx.Configuration;
 global using BepInEx.Logging;
+#if BEPINEX6
+global using BepInEx.Unity.Mono;
+#endif
+
 global using HarmonyLib;
 
 global using PulseLib;
