@@ -43,9 +43,9 @@ internal readonly struct SlotData
     stickyTraps = ((JArray)slotData["sticky_traps"]).ToObject<List<string>>()!.ToArray();
     //stickyPowerups = ((JArray)slotData["sticky_powerups"]).ToObject<List<string>>()!.ToArray();
     deathLink = (long)slotData["death_link"] != 0;
-    perfectRankLocations = (bool)slotData["perfect_rank_locations"];
+    perfectRankLocations = (long)slotData["perfect_rank_locations"] != 0;
     Plugin.Logger.LogDebug(
-      $"Created SlotData - End Goal {endGoal}, Boss Unlock Requirement {bossUnlockRequirement}, [{act1BossUnlockRequirement}, {act2BossUnlockRequirement}, {act3BossUnlockRequirement}, {act4BossUnlockRequirement}, {act5BossUnlockRequirement}, {act6BossUnlockRequirement}, {act7BossUnlockRequirement}] Death Link {deathLink}"
+      $"Created SlotData - End Goal {endGoal}, Boss Unlock Requirement {bossUnlockRequirement}, [{act1BossUnlockRequirement}, {act2BossUnlockRequirement}, {act3BossUnlockRequirement}, {act4BossUnlockRequirement}, {act5BossUnlockRequirement}, {act6BossUnlockRequirement}, {act7BossUnlockRequirement}] Death Link {deathLink}, Perfect Rank Locations {perfectRankLocations}"
     );
   }
 

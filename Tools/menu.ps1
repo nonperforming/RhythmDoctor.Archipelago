@@ -57,7 +57,7 @@ function Launch-RhythmDoctor
 
 function Build-Project
 {
-  return dotnet publish $ProjectPath --configuration Debug --output $BuildPath
+  return dotnet publish $ProjectPath --configuration Debug-BepInEx5 --output $BuildPath
 }
 
 function Clean-OldPluginFiles
