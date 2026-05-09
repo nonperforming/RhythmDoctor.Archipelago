@@ -11,21 +11,20 @@ internal static class ModifierRegistry
       // TODO: consider using custom exception
       throw new Exception("Trap already registered");
     }
-    
+
     Plugin.Logger.LogInfo($"[{nameof(ModifierRegistry)}] Registering trap {modifier.Uid}");
     _uidToModifier.Add(modifier.Uid, modifier);
   }
-  
-  internal static void Register(params IModifier[] modifiers)
-    => modifiers.Do(Register);
+
+  internal static void Register(params IModifier[] modifiers) => modifiers.Do(Register);
 
   internal static bool TryGetModifier(string uid, out IModifier modifier)
   {
     return _uidToModifier.TryGetValue(uid, out modifier);
   }
-  
+
   // /// <summary>
-  // /// 
+  // ///
   // /// </summary>
   // /// <param name="toAdd"></param>
   // /// <param name="other"></param>
@@ -44,10 +43,10 @@ internal static class ModifierRegistry
     //{
     //  return false;
     //}
-    
+
     if (toAdd.Compatibility.blacklistedLevels.Contains(level))
       return false;
-    
+
     // Group 'others' into strength and mod
     Dictionary<IModifier, int> strength = new();
     foreach (IModifier modifier in others)
@@ -61,7 +60,7 @@ internal static class ModifierRegistry
         strength[modifier] = 1;
       }
     }
-    
+
     foreach (IModifier other in others)
     {
       // Checking strength scales cheaper than the others so we do it first
@@ -69,16 +68,22 @@ internal static class ModifierRegistry
       // todo max
       //if (toAdd.Compatibility.maxStrength <= strength[other])
       //{
-      //  
+      //
       //}
-      
-      if (toAdd.Compatibility.blacklistedCapabilities.Any((ModifierCapability otherCompat)
-            => toAdd.Compatibility.blacklistedCapabilities.Contains(otherCompat)))
+
+      if (
+        toAdd.Compatibility.blacklistedCapabilities.Any(
+          (ModifierCapability otherCompat) => toAdd.Compatibility.blacklistedCapabilities.Contains(otherCompat)
+        )
+      )
         return false;
-      if (toAdd.Compatibility.blacklistedModifierUids is not null && toAdd.Compatibility.blacklistedModifierUids.Contains(other.Uid))
+      if (
+        toAdd.Compatibility.blacklistedModifierUids is not null
+        && toAdd.Compatibility.blacklistedModifierUids.Contains(other.Uid)
+      )
         return false;
     }
-    
+
     // All checks passed
     return true;
   }
