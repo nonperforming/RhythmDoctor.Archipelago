@@ -1,11 +1,11 @@
 namespace RhythmDoctor.Archipelago.Patches.Shared;
 
-[HarmonyPatch(typeof(RDPauseMenu), nameof(RDPauseMenu.Update))]
+[HarmonyPatch(typeof(PauseMenu), nameof(PauseMenu.Update))]
 internal static class LockDifficultyPatch
 {
   [HarmonyPatch]
   [HarmonyPrefix]
-  private static void Patch(ref RDPauseMenu __instance)
+  private static void Patch(ref PauseMenu __instance)
   {
     foreach ((PauseModeName modeName, PauseMenuMode mode) in __instance.instantiatedModes)
     {
@@ -24,10 +24,7 @@ internal static class LockDifficultyPatch
           content.canChangeContentValue = false;
           if (content.glitches == null)
           {
-            GameObject glitchEffect = UnityEngine.Object.Instantiate(
-              content.glitchesPrefab,
-              content.transform.parent
-            );
+            GameObject glitchEffect = UnityEngine.Object.Instantiate(content.glitchesPrefab, content.transform.parent);
             content.glitches = glitchEffect.GetComponentsInChildren<SpriteAnimation>();
           }
         }

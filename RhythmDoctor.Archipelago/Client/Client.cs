@@ -12,7 +12,7 @@ internal sealed class Client : IDisposable
   internal DeathLinkService? DeathLink;
 
   internal SlotData Slot;
-  internal TrapManager TrapManager;
+  internal Modifiers.ModifierManagerBase ModifierManager;
 
   #region Ready for items
   /// <summary>
@@ -67,7 +67,7 @@ internal sealed class Client : IDisposable
   public Client()
   {
     itemQueue = new Queue<ReceivedItemsHelper>();
-    TrapManager = new TrapManager();
+    ModifierManager = new ArchipelagoTrapManager();
   }
 
   /// <summary>
@@ -216,9 +216,9 @@ internal sealed class Client : IDisposable
       ITrap trap = (ITrap)Activator.CreateInstance(trapType);
       // ReSharper disable once NullableWarningSuppressionIsUsed
       Plugin.Client.Session!.DataStorage[Scope.Slot, trap.Name].Initialize(0);
-      Plugin.Client.TrapManager.ClearedTraps.Add(trap.Name, 0);
+      Plugin.Client.ModifierManager.ClearedTraps.Add(trap.Name, 0);
     }
-    Plugin.Client.TrapManager.AddStickyTraps(Plugin.Client.Slot.stickyTraps);
+    Plugin.Client.ModifierManager.AddStickyTraps(Plugin.Client.Slot.stickyTraps);
   }
 
   /// <summary>
@@ -417,7 +417,7 @@ internal sealed class Client : IDisposable
     else if (Bindings.TrapItemIdToLevel.TryGetValue(item.ItemId, out Type trap))
     {
       Plugin.Logger.LogInfo($"Adding trap item {item.ItemName} ({item.ItemId})");
-      TrapManager.AddTrap(trap);
+      ModifierManager.AddTrap(trap);
       return;
     }
     else if (Bindings.KeyItemIdToWard.TryGetValue(item.ItemId, out Region region))
@@ -589,6 +589,6 @@ internal sealed class Client : IDisposable
       }
       Plugin.Instance.StartCoroutine(DisconnectSession(Session));
     }
-    TrapManager.Dispose();
+    ModifierManager.Dispose();
   }
 }

@@ -7,4 +7,5 @@ internal enum ModifierCapability
   Difficulty,
   Speed,
   Hitsounds,
+  HeartStrength,
 }

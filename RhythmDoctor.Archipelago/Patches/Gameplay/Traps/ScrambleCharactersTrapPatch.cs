@@ -1,19 +1,23 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 
-internal class ScrambleCharactersTrapPatch : ITrap
+// FIXME: Narration will break
+internal class ScrambleCharactersTrapPatch : ModifierPatch<ScrambleCharactersTrapPatch>, IModifier, IArchipelagoModifier
 {
-  // FIXME: Narration will break
+  public string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.scrambleCharacters";
+  public string LocalizationKey => "mods.archipelago.trap.scrambleCharacters";
+  public ModifierCompatibility Compatibility =>
+    ModifierCompatibilityBuilder
+      .GetDefaultBuilderForMod(this)
+      .AddBlacklistedLevels(LevelExtensions.AllIntermissionLevels)
+      .Build();
+  public ModifierCapability[] Capabilities => [ModifierCapability.Characters];
 
-  // ReSharper disable once NullableWarningSuppressionIsUsed
-  private Harmony _harmony = null!;
+  public override Type[] PreviewPatches => [];
+  public override Type[] ActivePatches => [typeof(ActivePatch)];
 
-  private static Dictionary<Character, Character> scrambled = new();
+  public float GetScale(int num, out int consumed) => Scales.BinaryScale(num, out consumed);
 
-  public static string name = "Scramble Characters";
-  public string Name => name;
-  public IEnumerable<Type> IncompatibleWithTraps => [typeof(ScrambleCharactersTrapPatch)];
-
-  public IEnumerable<Level> IncompatibleWithLevels => [Level.SongOfTheSea, Level.SongOfTheSeaH, Level.AthleteTherapy];
+  private static readonly Dictionary<Character, Character> scrambled = new();
 
   private static readonly IReadOnlyCollection<Character> _disallowedCharacters =
   [
@@ -30,13 +34,10 @@ internal class ScrambleCharactersTrapPatch : ITrap
     Character.Weightlifter,
   ];
 
-  public void InQueue()
+  public override void Active(float strength)
   {
-    _harmony = new Harmony($"{Plugin.PATCH_ID_TRAP}.{nameof(ScrambleCharactersTrapPatch)}");
-  }
+    base.Active(strength);
 
-  public void Active()
-  {
     Character[] characters = (Character[])Enum.GetValues(typeof(Character));
     Character[] randomizedOrder = (Character[])characters.Clone();
     // Do not scramble these characters, as they will appear broken/no character
@@ -73,12 +74,6 @@ internal class ScrambleCharactersTrapPatch : ITrap
     {
       Plugin.Logger.LogDebug($"[{nameof(ScrambleCharactersTrapPatch)}]  {originalCharacter} -> {randomizedCharacter}");
     }
-    _harmony.PatchAll(typeof(ActivePatch));
-  }
-
-  public void ActiveEnd()
-  {
-    _harmony.UnpatchSelf();
   }
 
   [HarmonyPatch]

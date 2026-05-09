@@ -18,10 +18,10 @@ public class DebugMenu : MonoBehaviour
   private ActivatedGUI _activatedGUI;
 
   /// <remarks>
-  /// Unlike the <see cref="Client"/>'s <see cref="Client.TrapManager"/>, traps from this Trap Manager will not be
+  /// Unlike the <see cref="Client"/>'s <see cref="Client.ModifierManager"/>, traps from this Trap Manager will not be
   /// automatically deleted.
   /// </remarks>
-  internal TrapManager TrapManager = new();
+  internal ArchipelagoTrapManager ArchipelagoTrapManager = new();
 
   private void Start()
   {
@@ -104,69 +104,69 @@ public class DebugMenu : MonoBehaviour
         GUI.Box(new Rect(10, 10, 330, 890), "Rhythm Doctor Archipelago Patches Debug");
         if (GUI.Button(new Rect(30, 30, 300, 20), "Discard active traps"))
         {
-          TrapManager.ClearActiveTraps(false);
+          ArchipelagoTrapManager.ClearActiveTraps(false);
         }
         if (GUI.Button(new Rect(30, 60, 300, 20), "Discard all traps immediately"))
         {
-          TrapManager.ClearActiveTraps(false);
-          TrapManager.Traps.Clear();
+          ArchipelagoTrapManager.ClearActiveTraps(false);
+          ArchipelagoTrapManager.Traps.Clear();
         }
         if (GUI.Button(new Rect(30, 90, 300, 20), "Add Chilli Speed Trap"))
         {
           Notify("Adding ChilliSpeedTrap patch");
-          TrapManager.AddTrap(new ChilliSpeedTrapPatch(), true);
+          ArchipelagoTrapManager.AddTrap(new ChilliSpeedTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 120, 300, 20), "Add Ice Speed Trap"))
         {
           Notify("Adding IceSpeedTrap patch");
-          TrapManager.AddTrap(new IceSpeedTrapPatch(), true);
+          ArchipelagoTrapManager.AddTrap(new IceSpeedTrapPatch(), true);
         }
 
         if (GUI.Button(new Rect(30, 150, 300, 20), "Add Strong Heart Powerup"))
         {
           Notify("Adding StrongHeartPowerup patch");
-          TrapManager.AddTrap(new StrongHeartPowerupPatch(), true);
+          ArchipelagoTrapManager.AddTrap(new StrongHeartPowerupPatch(), true);
         }
         if (GUI.Button(new Rect(30, 180, 300, 20), "Add Fragile Heart Powerup"))
         {
           Notify("Adding FragileSpeedTrap patch");
-          TrapManager.AddTrap(new FragileHeartTrapPatch(), true);
+          ArchipelagoTrapManager.AddTrap(new FragileHeartTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 210, 300, 20), "Add Easy Mode Powerup"))
         {
           Notify("Adding EasyModePowerup patch");
-          TrapManager.AddTrap(new EasyDifficultyPowerupPatch(), true);
+          ArchipelagoTrapManager.AddTrap(new EasyDifficultyPowerupPatch(), true);
         }
         if (GUI.Button(new Rect(30, 240, 300, 20), "Add Hard Mode Trap"))
         {
           Plugin.Logger.LogInfo("Adding HardModeTrap patch");
-          TrapManager.AddTrap(new HardDifficultyTrapPatch(), true);
+          ArchipelagoTrapManager.AddTrap(new HardDifficultyTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 270, 300, 20), "Add Ghost Tap Trap"))
         {
           Notify("Adding GhostTapTrap patch");
-          TrapManager.AddTrap(new GhostTapTrapPatch(), true);
+          ArchipelagoTrapManager.AddTrap(new GhostTapTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 300, 300, 20), "Add Scramble Characters Trap"))
         {
           Notify("Adding ScrambleCharactersTrap patch");
-          TrapManager.AddTrap(new ScrambleCharactersTrapPatch(), true);
+          ArchipelagoTrapManager.AddTrap(new ScrambleCharactersTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 330, 300, 20), "Add Scramble Beatsounds Trap"))
         {
           Notify("Adding ScrambleBeatsoundsTrap patch");
-          TrapManager.AddTrap(new ScrambleBeatsoundsTrapPatch(), true);
+          ArchipelagoTrapManager.AddTrap(new ScrambleBeatsoundsTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 360, 300, 20), "Add Scramble Hitsounds Trap"))
         {
           Notify("Adding ScrambleHitsoundsTrap patch");
-          TrapManager.AddTrap(new ScrambleHitsoundsTrapPatch(), true);
+          ArchipelagoTrapManager.AddTrap(new ScrambleHitsoundsTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 390, 300, 20), "Recreate TrapManager"))
         {
           Notify("Recreating TrapManager");
-          TrapManager.ClearActiveTraps(false);
-          TrapManager = new TrapManager();
+          ArchipelagoTrapManager.ClearActiveTraps(false);
+          ArchipelagoTrapManager = new ArchipelagoTrapManager();
         }
 
         if (GUI.Button(new Rect(30, 450, 300, 20), "Apply post-login patches"))
@@ -195,24 +195,24 @@ public class DebugMenu : MonoBehaviour
         if (GUI.Button(new Rect(30, 570, 300, 20), "Push all traps to Active"))
         {
           Notify("Pushing all traps to Active");
-          TrapManager.ApplyApplicableTraps(Level.None);
-          TrapManager.PromotePreviewTrapsToActiveTraps();
+          ArchipelagoTrapManager.ApplyApplicableTraps(Level.None);
+          ArchipelagoTrapManager.PromotePreviewTrapsToActiveTraps();
         }
 
         string traps = "";
-        foreach (ITrap trap in TrapManager.Traps)
+        foreach (ITrap trap in ArchipelagoTrapManager.Traps)
         {
           traps += $"{trap.Name} ";
         }
 
         string trapsPreview = "";
-        foreach ((_, ITrap trap) in TrapManager._previewTraps)
+        foreach ((_, ITrap trap) in ArchipelagoTrapManager._previewTraps)
         {
           trapsPreview += $"{trap.Name} ";
         }
 
         string trapsActive = "";
-        foreach ((_, ITrap trap) in TrapManager._activeTraps)
+        foreach ((_, ITrap trap) in ArchipelagoTrapManager._activeTraps)
         {
           trapsActive += $"{trap.Name} ";
         }

@@ -1,12 +1,13 @@
 namespace RhythmDoctor.Archipelago.Modifiers;
 
-internal abstract class ModifierPatch<T> where T : IModifier
+internal abstract class ModifierPatch<T>
+  where T : IModifier
 {
   internal Harmony _previewHarmony;
   internal Harmony _activeHarmony;
-  
-  public abstract Type[]? PreviewPatches { get; }
-  public abstract Type[]? ActivePatches { get; }
+
+  public abstract Type[] PreviewPatches { get; }
+  public abstract Type[] ActivePatches { get; }
 
   public virtual void Initialize()
   {
@@ -14,11 +15,8 @@ internal abstract class ModifierPatch<T> where T : IModifier
     _activeHarmony = new($"{Plugin.PATCH_ID_TRAP}.{nameof(T)}.active");
   }
 
-  public virtual void Preview(int strength)
+  public virtual void Preview(float strength)
   {
-    if (PreviewPatches is null)
-      return;
-    
     foreach (Type previewPatch in PreviewPatches)
     {
       _previewHarmony.PatchAll(previewPatch);
@@ -30,11 +28,8 @@ internal abstract class ModifierPatch<T> where T : IModifier
     _previewHarmony.UnpatchSelf();
   }
 
-  public virtual void Active(int strength)
+  public virtual void Active(float strength)
   {
-    if (ActivePatches is null)
-      return;
-    
     foreach (Type activePatch in ActivePatches)
     {
       _activeHarmony.PatchAll(activePatch);

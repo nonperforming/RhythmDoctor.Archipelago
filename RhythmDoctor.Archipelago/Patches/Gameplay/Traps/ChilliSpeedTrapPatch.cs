@@ -1,38 +1,19 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 
-internal class ChilliSpeedTrapPatch : ITrap
+internal class ChilliSpeedTrapPatch : ModifierPatch<ChilliSpeedTrapPatch>, IModifier, IArchipelagoModifier
 {
-  // ReSharper disable once NullableWarningSuppressionIsUsed
-  private Harmony _harmony = null!;
+  public string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.chilliSpeed";
+  public string LocalizationKey => "mods.archipelago.trap.chilliSpeed";
+  public ModifierCompatibility Compatibility => ModifierCompatibilityBuilder.GetDefaultCompatibilityForMod(this);
+  public ModifierCapability[] Capabilities => [ModifierCapability.Speed];
 
-  public string Name => "Chilli Speed";
-  public IEnumerable<Type> IncompatibleWithTraps => [typeof(ChilliSpeedTrapPatch), typeof(IceSpeedTrapPatch)];
+  public override Type[] PreviewPatches => [typeof(PreviewPatch)];
+  public override Type[] ActivePatches => [];
 
-  public void InQueue()
-  {
-    _harmony = new Harmony($"{Plugin.PATCH_ID_TRAP}.{nameof(ChilliSpeedTrapPatch)}");
-  }
-
-  public void PreviewLevel()
-  {
-    _harmony.PatchAll(typeof(Patch));
-  }
-
-  public void PreviewLevelEnd()
-  {
-    _harmony.UnpatchSelf();
-  }
-
-  // Intentionally left blank
-  public void Active() { }
-
-  public void ActiveEnd()
-  {
-    _harmony.UnpatchSelf();
-  }
+  public float GetScale(int num, out int consumed) => Scales.BinaryScale(num, out consumed);
 
   [HarmonyPatch(typeof(HeartMonitor))]
-  private static class Patch
+  private static class PreviewPatch
   {
     [HarmonyPatch(nameof(HeartMonitor.Update))]
     [HarmonyPrefix]

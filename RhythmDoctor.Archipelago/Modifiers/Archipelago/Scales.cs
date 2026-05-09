@@ -3,7 +3,7 @@ namespace RhythmDoctor.Archipelago.Modifiers.Archipelago;
 // TODO: This should be inherited.........
 internal static class Scales
 {
-  internal static double BinaryScale(int num, out int consumed)
+  internal static float BinaryScale(int num, out int consumed)
   {
     if (num >= 1)
     {

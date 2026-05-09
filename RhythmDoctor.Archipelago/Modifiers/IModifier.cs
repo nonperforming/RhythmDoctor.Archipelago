@@ -15,19 +15,19 @@ internal interface IModifier
   /// </summary>
   [Pure]
   string Uid { get; }
-  
+
   /// <summary>
   /// The localization key to find the name of the modifier under.
   /// </summary>
   [Pure]
   string LocalizationKey { get; }
-  
+
   /// <summary>
   /// Compatibility attributes of the modifier.
   /// </summary>
   [Pure]
   ModifierCompatibility Compatibility { get; }
-  
+
   /// <summary>
   /// Capabilities of the modifier.
   /// This should include anything the modifier might change.
@@ -39,9 +39,8 @@ internal interface IModifier
   /// Gets the localized name of the trap.
   /// </summary>
   /// <returns>Localized trap name.</returns>
-  string GetLocalizedName()
-    => RDString.Get(LocalizationKey);
-  
+  string GetLocalizedName() => RDString.Get(LocalizationKey);
+
   /// <summary>
   /// Run when the modifier is instantiated.
   /// For the lifetime of the game this will only be called once at most.
@@ -52,7 +51,7 @@ internal interface IModifier
   /// Run when a compatible level is selected (still in menu).
   /// </summary>
   /// <param name="strength">Modifier strength being applied to the level.</param>
-  internal void Preview(int strength);
+  internal void Preview(float strength);
 
   /// <summary>
   /// Run when a compatible level is unselected.
@@ -63,8 +62,8 @@ internal interface IModifier
   /// Run just before transitioning to a compatible level.
   /// </summary>
   /// <param name="strength">Modifier strength being applied to the level.</param>
-  internal void Active(int strength);
-  
+  internal void Active(float strength);
+
   /// <summary>
   /// Run just before exiting a compatible level.
   /// </summary>

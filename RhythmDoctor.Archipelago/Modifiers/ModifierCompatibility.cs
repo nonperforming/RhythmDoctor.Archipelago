@@ -7,4 +7,10 @@ namespace RhythmDoctor.Archipelago.Modifiers;
 // and explicit
 // prefer blocking capabilities over mods
 
-internal record struct ModifierCompatibility(Level[]? blacklistedLevels, ModifierCapability[]? blacklistedCapabilities, double minStrength, double maxStrength, string[]? blacklistedModifierUids = null);
+internal record struct ModifierCompatibility(
+  Level[] blacklistedLevels,
+  ModifierCapability[] blacklistedCapabilities,
+  double minStrength,
+  double maxStrength,
+  string[] blacklistedModifierUids
+);

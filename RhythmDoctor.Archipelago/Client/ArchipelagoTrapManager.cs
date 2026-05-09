@@ -1,8 +1,8 @@
 namespace RhythmDoctor.Archipelago.Client;
 
-internal sealed class TrapManager : IDisposable
+internal sealed class ArchipelagoTrapManager : ModifierManagerBase, IDisposable
 {
-  public TrapManager(Dictionary<string, int>? clearedTraps = null)
+  public ArchipelagoTrapManager(Dictionary<string, int>? clearedTraps = null)
   {
     Events.Instance.LevelDeselected += OnLevelDeselected;
     ClearedTraps = clearedTraps ?? new Dictionary<string, int>();
@@ -27,7 +27,7 @@ internal sealed class TrapManager : IDisposable
   /// <summary>
   /// Ordered array of traps that were applied to the level, by the lowest index to the highest index.
   /// Cleared by <see cref="ClearLocationPatch"/> after a location is cleared,
-  /// or used by <see cref="TrapManagerPatch.RestoreActiveTrapsOnAbandonPatch"/> to restore active traps back to the
+  /// or used by <see cref="ModifierManagerPatch.RestoreActiveTrapsOnAbandonPatch"/> to restore active traps back to the
   /// main <see cref="Traps"/> queue if no location was cleared.
   /// </summary>
   /// <remarks>
@@ -37,7 +37,7 @@ internal sealed class TrapManager : IDisposable
   /// (0, <see cref="ChilliSpeedTrapPatch"/>) -> Before <see cref="ChilliSpeedTrapPatch"/> was active, it was at
   /// position 0 of <see cref="Traps"/>.
   /// (5, <see cref="GhostTapTrapPatch"/>) -> Before <see cref="GhostTapTrapPatch"/> was active, it was at
-  /// position 0 of <see cref="Traps"/>.
+  /// position 5 of <see cref="Traps"/>.
   /// </example>
   /// <seealso cref="_previewTraps"/>
 #if DEBUG
@@ -156,7 +156,7 @@ internal sealed class TrapManager : IDisposable
 
   internal bool IsTrapActive(string trapName)
   {
-    foreach ((int _, ITrap trap) in Plugin.Client.TrapManager._activeTraps)
+    foreach ((int _, ITrap trap) in Plugin.Client.ModifierManager._activeTraps)
     {
       if (trap.Name == trapName)
       {

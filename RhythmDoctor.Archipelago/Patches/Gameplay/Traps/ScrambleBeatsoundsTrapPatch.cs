@@ -1,23 +1,27 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 
-internal class ScrambleBeatsoundsTrapPatch : ITrap
+internal class ScrambleBeatsoundsTrapPatch : ModifierPatch<ScrambleBeatsoundsTrapPatch>, IModifier, IArchipelagoModifier
 {
-  // ReSharper disable once NullableWarningSuppressionIsUsed
-  private Harmony _harmony = null!;
+  public string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.hardDifficulty";
+  public string LocalizationKey => "mods.archipelago.trap.hardDifficulty";
+  public ModifierCompatibility Compatibility =>
+    ModifierCompatibilityBuilder
+      .GetDefaultBuilderForMod(this)
+      .AddBlacklistedLevels(LevelExtensions.AllIntermissionLevels)
+      .Build();
+  public ModifierCapability[] Capabilities => [ModifierCapability.Beatsounds];
 
-  private static Dictionary<SoundEffect, SoundEffect> scrambled = new();
+  public override Type[] PreviewPatches => [];
+  public override Type[] ActivePatches => [typeof(ActivePatch)];
 
-  public string Name => "Scramble Beatsounds";
-  public IEnumerable<Type> IncompatibleWithTraps => [typeof(ScrambleBeatsoundsTrapPatch)];
-  public IEnumerable<Level> IncompatibleWithLevels => [Level.SongOfTheSea, Level.SongOfTheSeaH, Level.AthleteTherapy];
+  public float GetScale(int num, out int consumed) => Scales.BinaryScale(num, out consumed);
 
-  public void InQueue()
+  private static readonly Dictionary<SoundEffect, SoundEffect> scrambled = new();
+
+  public override void Active(float strength)
   {
-    _harmony = new Harmony($"{Plugin.PATCH_ID_TRAP}.{nameof(ScrambleBeatsoundsTrapPatch)}");
-  }
+    base.Active(strength);
 
-  public void Active()
-  {
     SoundEffect[] randomizedOrder = (SoundEffect[])RDEditorConstants.BeatSounds.Clone();
 
     Plugin.Random.Shuffle(randomizedOrder);
@@ -45,16 +49,10 @@ internal class ScrambleBeatsoundsTrapPatch : ITrap
     {
       Plugin.Logger.LogDebug($"  {originalBeatsound} -> {randomizedBeatsound}");
     }
-    _harmony.PatchAll(typeof(Patch));
-  }
-
-  public void ActiveEnd()
-  {
-    _harmony.UnpatchSelf();
   }
 
   [HarmonyPatch(typeof(LevelBase))]
-  private static class Patch
+  private static class ActivePatch
   {
     [HarmonyPatch(nameof(LevelBase.DecodeLevelData))]
     [HarmonyPostfix]
