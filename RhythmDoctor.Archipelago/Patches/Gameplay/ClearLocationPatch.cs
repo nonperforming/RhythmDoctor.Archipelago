@@ -258,21 +258,14 @@ internal static class ClearLocationPatch
     else if (Plugin.Client.Slot.endGoal != SlotData.EndGoal.HelpingHands)
     {
       bool clearedAll = true;
-      Rank minimumRank;
-      switch (Plugin.Client.Slot.endGoal)
+      Rank minimumRank = Plugin.Client.Slot.endGoal switch
       {
-        case SlotData.EndGoal.PerfectAll:
-          minimumRank = Rank.S;
-          break;
-        case SlotData.EndGoal.ARankAll:
-          minimumRank = Rank.A;
-          break;
-        case SlotData.EndGoal.BRankAll:
-          minimumRank = Rank.B;
-          break;
-        default:
-          throw new ArgumentOutOfRangeException($"End Goal ({Plugin.Client.Slot.endGoal}) not valid value.");
-      }
+        SlotData.EndGoal.PerfectAll => Rank.S,
+        SlotData.EndGoal.ARankAll => Rank.A,
+        SlotData.EndGoal.BRankAll => Rank.B,
+        _ => throw new ArgumentOutOfRangeException($"End Goal ({Plugin.Client.Slot.endGoal}) not valid value."),
+      };
+
       foreach (Level otherLevel in Bindings.Levels)
       {
         Rank otherRank = Persistence.GetLevelRank(otherLevel);
