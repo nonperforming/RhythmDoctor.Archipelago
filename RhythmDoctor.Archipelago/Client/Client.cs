@@ -84,6 +84,7 @@ internal sealed class Client : IDisposable
     Session.MessageLog.OnMessageReceived += MessageReceived;
     Session.Items.ItemReceived += ItemReceived;
     Session.DataStorage[Scope.Slot, Persistence.PaigeStaysKey].OnValueChanged += ReplicatePaigeStays;
+    Session.DataStorage[Scope.Slot, Persistence.IanDesktopLoginKey].OnValueChanged += ReplicateIansDesktopUnlocked;
 
     return Session;
   }
@@ -192,24 +193,9 @@ internal sealed class Client : IDisposable
     }
     // TODO: Check if session exists but is invalid
 
-    // Setup DataStorage and TrapManager.ClearedTraps, Sticky Traps, initial Paige stays state (this can change!)
-    // Manual implementation of asynchronous DataStorageElement.Initialize() here to avoid timeout errors
-    bool? paigeStays = await Plugin
-      .Client.Session!.DataStorage[Scope.Slot, Persistence.PaigeStaysKey]
-      .GetAsync<bool?>();
-
-    if (!paigeStays.HasValue)
-    {
-      bool value = Plugin.Random.Next() % 2 == 1;
-      Plugin.Client.Session!.DataStorage[Scope.Slot, Persistence.PaigeStaysKey] = value;
-      Plugin.Logger.LogInfo($"Set initial {Persistence.PaigeStaysKey} state to {value}");
-      Persistence.SetPaigeEnding(value);
-    }
-    else
-    {
-      Plugin.Logger.LogInfo($"Found {Persistence.PaigeStaysKey} state: {paigeStays.Value}");
-      Persistence.SetPaigeEnding(paigeStays.Value);
-    }
+    // Setup DataStorage and TrapManager.ClearedTraps, Sticky Traps,
+    // initial Paige stays (this can change!)/Ian's desktop (etc) state
+    await StateReplicationPatch.InitializeSync();
 
     foreach (Type trapType in Bindings.Traps)
     {
@@ -549,6 +535,12 @@ internal sealed class Client : IDisposable
     Plugin.Logger.LogInfo($"[Replication] Paige stays {oldValue}->{newValue}");
     Persistence.SetPaigeEnding(newValue.ToObject<bool>());
   }
+
+  private void ReplicateIansDesktopUnlocked(JToken oldValue, JToken newValue, Dictionary<string, JToken> _)
+  {
+    Plugin.Logger.LogInfo($"[Replication] Ian's desktop unlocked {oldValue}->{newValue}");
+    Persistence.SetIanDesktopLogin(newValue.ToObject<bool>());
+  }
   #endregion
 
   internal void SendDeathLink()
@@ -582,6 +574,7 @@ internal sealed class Client : IDisposable
       Session.MessageLog.OnMessageReceived -= MessageReceived;
       Session.Items.ItemReceived -= ItemReceived;
       Session.DataStorage[Scope.Slot, Persistence.PaigeStaysKey].OnValueChanged -= ReplicatePaigeStays;
+      Session.DataStorage[Scope.Slot, Persistence.IanDesktopLoginKey].OnValueChanged -= ReplicateIansDesktopUnlocked;
 
       if (DeathLink != null)
       {
