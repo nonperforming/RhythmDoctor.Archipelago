@@ -237,6 +237,7 @@ internal static class UnlockItemPatch
   {
     CodeMatcher matcher = new(instructions);
 
+    // TODO: convert to using CodeMatcher.Repeat
     List<CodeInstruction> instructionList = matcher.Instructions();
     for (int i = 0; i < instructionList.Count; i++)
     {
@@ -282,108 +283,123 @@ internal static class UnlockItemPatch
     return matcher.InstructionEnumeration();
   }
 
+  /// <summary>
+  /// Yeet the existing logic for adding vertical destinations and inject our own.
+  /// </summary>
+  /// <param name="instructions">Original method IL instructions</param>
+  /// <returns>Modified IL instructions</returns>
   [HarmonyPatch(nameof(scnLevelSelect.ShowRanksText))]
-  [HarmonyPostfix]
-  private static void UnlockVerticalDestinationsPatch(int index, scnLevelSelect __instance)
+  [HarmonyTranspiler]
+  private static IEnumerable<CodeInstruction> CustomPopulateSelectedVerticalDestinationsPatch(
+    IEnumerable<CodeInstruction> instructions
+  )
   {
-    if (__instance.selectableEntities[index] is SelectableObject selectableObject)
-    {
-      if (
-        selectableObject.id == scnLevelSelect.BasementComputer
-        // ReSharper disable once NullableWarningSuppressionIsUsed
-        && Plugin.Client.Session!.Items.AllItemsReceived.All(item => item.ItemId != Bindings.SLEEVE_PAINT_ITEM_ID)
+    int match = 0;
+    return new CodeMatcher(instructions)
+      .MatchForward(
+        true,
+        new CodeMatch(
+          OpCodes.Stfld,
+          AccessTools.Field(typeof(scnLevelSelect), nameof(scnLevelSelect.selectedVerticalDestinations))
+        )
       )
+      .Repeat(codeMatcher =>
       {
-        Plugin.Logger.LogInfo("Hiding Sleeve Paint option");
-
-        // Remove Sleeve Paint option and force Ian's Desktop to be selected.
-        __instance.selectedVerticalDestinations.RemoveAt(0);
-        __instance.selectedVerticalIndex = 0;
-        scnLevelSelect.LevelSelectDestination levelSelectDestination = __instance.selectedVerticalDestinations[0];
-        __instance.description.text =
-          levelSelectDestination.title + "\n<color=#6AF2F0>" + levelSelectDestination.subtitle + "</color>";
-        __instance.SetDifficultyArrowsVisible(false);
-        __instance.sleveePaintSprite.SetActive(false);
-      }
-
-      if (selectableObject.id == scnLevelSelect.MainElevator)
-      {
-        Plugin.Logger.LogInfo("Handling elevator vertical destinations");
-
-        bool recordsRoomUnlocked = Plugin.Client.Session!.Items.AllItemsReceived.Any(item =>
-          item.ItemId == Bindings.RegionToKeyID[Region.RecordsRoom]
-        );
-        Plugin.Logger.LogDebug($"Records Room unlocked: {recordsRoomUnlocked}");
-
-        // If we can access 7-X/7-X2, add the Abandoned Ward destination
-        if (HasUnlockedBossSong(Act.Act7))
+        codeMatcher.Advance(1); // move past Stfld statement
+        switch (match)
         {
-          // The game will attempt to unlock the Abandoned Ward if Bitter Times has been passed,
-          // so we don't need to do anything if this is the case.
-          // Otherwise, we will have to do it ourselves
-          if (!Level.Bitterness.Passed())
-          {
-            Plugin.Logger.LogDebug("Adding ExitVoid vertical destination");
+          // BasementComputer
+          case 0:
+            codeMatcher.Insert(
+              Transpilers.EmitDelegate<Action>(() =>
+              {
+                Plugin.Logger.LogInfo("Setting Ian's laptop vertical destinations");
+                scnLevelSelect.instance.selectedVerticalDestinations =
+                  new List<scnLevelSelect.LevelSelectDestination>();
+                if (
+                  // ReSharper disable once NullableWarningSuppressionIsUsed
+                  Plugin.Client.Session!.Items.AllItemsReceived.Any(item =>
+                    item.ItemId == Bindings.SLEEVE_PAINT_ITEM_ID
+                  )
+                )
+                {
+                  Plugin.Logger.LogInfo("Adding sleevePaint");
+                  scnLevelSelect.instance.selectedVerticalDestinations.Add(
+                    new scnLevelSelect.LevelSelectDestination(
+                      "sleevePaint",
+                      RDString.Get("levelSelect.SleevePaint"),
+                      RDString.Get("levelSelect.SleevePaint.details")
+                    )
+                  );
+                }
 
-            // Add the destination...
-            __instance.selectedVerticalDestinations.Add(
-              new scnLevelSelect.LevelSelectDestination(
-                scnLevelSelect.ExitVoid,
-                RDString.Get("levelSelect.finale"),
-                RDString.Get("levelSelect.GoToVoid.day")
-              )
+                Plugin.Logger.LogInfo("Adding IanDesktop");
+                scnLevelSelect.instance.selectedVerticalDestinations.Add(
+                  new scnLevelSelect.LevelSelectDestination(
+                    "IanDesktop",
+                    RDString.Get("levelSelect.IanDesktop"),
+                    RDString.Get($"levelSelect.IanDesktop.details.{((!Persistence.GetIanDesktopLogin()) ? 1 : 2)}")
+                  )
+                );
+              })
             );
-          }
+            break;
+          // MainElevator
+          case 1:
+            codeMatcher.Insert(
+              Transpilers.EmitDelegate<Action>(() =>
+              {
+                Plugin.Logger.LogInfo("Setting main elevator vertical destinations");
+                scnLevelSelect.instance.selectedVerticalDestinations =
+                  new List<scnLevelSelect.LevelSelectDestination>();
+                if (
+                  // ReSharper disable once NullableWarningSuppressionIsUsed
+                  Plugin.Client.Session!.Items.AllItemsReceived.Any(item =>
+                    item.ItemId == Bindings.RegionToKeyID[Region.RecordsRoom]
+                  )
+                )
+                {
+                  Plugin.Logger.LogInfo($"Adding {scnLevelSelect.ExitRecordsRoom}");
+                  scnLevelSelect.instance.selectedVerticalDestinations.Add(
+                    new scnLevelSelect.LevelSelectDestination(
+                      scnLevelSelect.ExitRecordsRoom,
+                      RDString.Get("levelSelect.act6"),
+                      RDString.Get("levelSelect.GoToRecordsRoom.day")
+                    )
+                  );
+                }
 
-          // The "Act 6" text is independent of the selected vertical destinations, so we need to handle it separately
-          if (!recordsRoomUnlocked)
-          {
-            Plugin.Logger.LogDebug("Records room not unlocked, modifying description text");
-            Plugin.Logger.LogDebug(__instance.description.text);
-            // Example English description:
-            // ---
-            // <color=#CCFF22>Act 6</color><color=#CCFF22> · </color><color=#6c802a>Finale</color>
-            //
-            // Records Room
-            // ---
-            //
-            // <color=#CCFF22> and <color=#6c802a> tags are added for selected and deselected destination respectively
-            // levelSelect.act6 -> 'Act 6'
-            // levelSelect.floorSeparatorString -> ' · ' (\u00B7)
-            // levelSelect.finale -> 'Finale'
-            // levelSelect.GoToRecordsRoom.day -> 'Records Room'
-            // levelSelect.GoToVoid.day -> '???'
-
-            // csharpier-ignore
-            __instance.description.text = __instance.description.text
-              .Replace($"<color=#CCFF22>{RDString.Get("levelSelect.act6")}</color><color=#CCFF22>{RDString.Get("levelSelect.floorSeparatorString")}", "", StringComparison.Ordinal)
-              .Replace("</color><color=#6c802a>", "<color=#CCFF22>", StringComparison.Ordinal)
-              .Replace(RDString.Get("levelSelect.GoToRecordsRoom.day"), RDString.Get("levelSelect.GoToVoid.day"), StringComparison.Ordinal);
-          }
+                if (HasUnlockedBossSong(Act.Act7))
+                {
+                  Plugin.Logger.LogInfo($"Adding {scnLevelSelect.ExitVoid}");
+                  scnLevelSelect.instance.selectedVerticalDestinations.Add(
+                    new scnLevelSelect.LevelSelectDestination(
+                      scnLevelSelect.ExitVoid,
+                      RDString.Get("levelSelect.finale"),
+                      RDString.Get("levelSelect.GoToVoid.day")
+                    )
+                  );
+                }
+              })
+            );
+            break;
+          default:
+            Plugin.Logger.LogWarning("Matched more than two vertical destinations - plugin may need update!!");
+            break;
         }
-        else
-        {
-          // The game will attempt to unlock the Abandoned Ward if Bitter Times has been passed,
-          // so we need to remove it.
-          if (Level.Bitterness.Passed())
-          {
-            Plugin.Logger.LogDebug("Removing ExitVoid vertical destination");
-            __instance.selectedVerticalDestinations.RemoveAt(1);
-            // csharpier-ignore
-            __instance.description.text = __instance.description.text
-              .Replace($"{RDString.Get("levelSelect.floorSeparatorString")}</color><color=#6c802a>{RDString.Get("levelSelect.finale")}</color>", "");
-          }
-        }
-
-        // If we do not have the Records Room key, remove its vertical destination
-        if (!recordsRoomUnlocked)
-        {
-          __instance.selectedVerticalDestinations.RemoveAt(0);
-        }
-
-        __instance.SetDifficultyArrowsVisible(__instance.selectedVerticalDestinations.Count > 1);
-      }
-    }
+        match++;
+      })
+      .Start()
+      .MatchForward(
+        true,
+        new CodeMatch(OpCodes.Ldc_I4_S, (sbyte)48),
+        new CodeMatch(OpCodes.Call, AccessTools.Method(typeof(RDUtils), nameof(RDUtils.Passed))),
+        new CodeMatch(OpCodes.Brfalse)
+      )
+      .ThrowIfInvalid("Couldn't find Level.Bitterness.Passed()")
+      .InsertAndAdvance(new CodeInstruction(OpCodes.Pop)) // consume the bool on stack
+      .SetOpcodeAndAdvance(OpCodes.Br) // replacing Brfalse, but keeping operand
+      .InstructionEnumeration();
   }
 
   [HarmonyPatch(nameof(scnLevelSelect.UpdateCharacters))]
