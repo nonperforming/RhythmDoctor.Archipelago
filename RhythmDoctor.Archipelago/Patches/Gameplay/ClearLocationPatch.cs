@@ -277,7 +277,7 @@ internal static class ClearLocationPatch
       {
         Rank otherRank = Persistence.GetLevelRank(otherLevel);
         // If we aren't above the minimum rank, bail.
-        if (minimumRank <= otherRank.ToNormal())
+        if (minimumRank > otherRank.ToNormal())
         {
           clearedAll = false;
           break;
