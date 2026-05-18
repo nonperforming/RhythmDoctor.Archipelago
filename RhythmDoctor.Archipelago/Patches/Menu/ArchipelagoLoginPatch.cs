@@ -161,8 +161,7 @@ internal static class ArchipelagoLoginPatch
       goto Failure;
     }
 
-    LoginResult loginResult = login.Result;
-    switch (loginResult)
+    switch (login.Result)
     {
       case LoginSuccessful:
         Plugin.Logger.LogInfo("Logged in!");
@@ -171,8 +170,14 @@ internal static class ArchipelagoLoginPatch
 
         UnpatchMenuPatch();
 
+        // Wait for setup...
+        while (!Plugin.Client.Setup)
+        {
+          yield return new WaitForSecondsRealtime(1);
+        }
+
         Plugin.Logger.LogInfo("Heading to Level Select...");
-        scnBase.GoToScene("scnLevelSelect");
+        scnBase.GoToScene(GC.SceneLevelSelect);
         yield break;
       case LoginFailure fail:
         Plugin.Logger.LogError(

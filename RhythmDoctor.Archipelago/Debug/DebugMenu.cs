@@ -114,53 +114,53 @@ public class DebugMenu : MonoBehaviour
         if (GUI.Button(new Rect(30, 90, 300, 20), "Add Chilli Speed Trap"))
         {
           Notify("Adding ChilliSpeedTrap patch");
-          TrapManager.AddTrap(new ChilliSpeedTrapPatch(), true);
+          _ = TrapManager.AddTrap(new ChilliSpeedTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 120, 300, 20), "Add Ice Speed Trap"))
         {
           Notify("Adding IceSpeedTrap patch");
-          TrapManager.AddTrap(new IceSpeedTrapPatch(), true);
+          _ = TrapManager.AddTrap(new IceSpeedTrapPatch(), true);
         }
 
         if (GUI.Button(new Rect(30, 150, 300, 20), "Add Strong Heart Powerup"))
         {
           Notify("Adding StrongHeartPowerup patch");
-          TrapManager.AddTrap(new StrongHeartPowerupPatch(), true);
+          _ = TrapManager.AddTrap(new StrongHeartPowerupPatch(), true);
         }
         if (GUI.Button(new Rect(30, 180, 300, 20), "Add Fragile Heart Powerup"))
         {
           Notify("Adding FragileSpeedTrap patch");
-          TrapManager.AddTrap(new FragileHeartTrapPatch(), true);
+          _ = TrapManager.AddTrap(new FragileHeartTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 210, 300, 20), "Add Easy Mode Powerup"))
         {
           Notify("Adding EasyModePowerup patch");
-          TrapManager.AddTrap(new EasyDifficultyPowerupPatch(), true);
+          _ = TrapManager.AddTrap(new EasyDifficultyPowerupPatch(), true);
         }
         if (GUI.Button(new Rect(30, 240, 300, 20), "Add Hard Mode Trap"))
         {
           Plugin.Logger.LogInfo("Adding HardModeTrap patch");
-          TrapManager.AddTrap(new HardDifficultyTrapPatch(), true);
+          _ = TrapManager.AddTrap(new HardDifficultyTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 270, 300, 20), "Add Ghost Tap Trap"))
         {
           Notify("Adding GhostTapTrap patch");
-          TrapManager.AddTrap(new GhostTapTrapPatch(), true);
+          _ = TrapManager.AddTrap(new GhostTapTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 300, 300, 20), "Add Scramble Characters Trap"))
         {
           Notify("Adding ScrambleCharactersTrap patch");
-          TrapManager.AddTrap(new ScrambleCharactersTrapPatch(), true);
+          _ = TrapManager.AddTrap(new ScrambleCharactersTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 330, 300, 20), "Add Scramble Beatsounds Trap"))
         {
           Notify("Adding ScrambleBeatsoundsTrap patch");
-          TrapManager.AddTrap(new ScrambleBeatsoundsTrapPatch(), true);
+          _ = TrapManager.AddTrap(new ScrambleBeatsoundsTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 360, 300, 20), "Add Scramble Hitsounds Trap"))
         {
           Notify("Adding ScrambleHitsoundsTrap patch");
-          TrapManager.AddTrap(new ScrambleHitsoundsTrapPatch(), true);
+          _ = TrapManager.AddTrap(new ScrambleHitsoundsTrapPatch(), true);
         }
         if (GUI.Button(new Rect(30, 390, 300, 20), "Recreate TrapManager"))
         {

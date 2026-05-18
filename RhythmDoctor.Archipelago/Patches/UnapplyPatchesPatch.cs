@@ -28,7 +28,8 @@ internal static class UnapplyPatchesPatch
       Plugin.Logger.LogDebug("Not in main menu, could not load slot data");
     }
 
-    Plugin.Client.Dispose();
+    // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+    Plugin.Client?.Dispose();
     // ReSharper disable once NullableWarningSuppressionIsUsed
     Plugin.Client = null!;
   }

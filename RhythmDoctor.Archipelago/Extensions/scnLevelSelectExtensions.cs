@@ -20,10 +20,6 @@ internal static class scnLevelSelectExtensions
   /// <summary>
   /// Unlock a ward's entrance.
   /// </summary>
-  /// <remarks>
-  /// Unlocking the <see cref="Region.RecordsRoom"/> will unlock the elevator to the records room only,
-  /// not the Abandoned Ward. For this purpose, use <see cref="UnlockAbandonedWard"/>.
-  /// </remarks>
   /// <param name="this"><see cref="scnLevelSelect"/> instance.</param>
   /// <param name="regionToUnlock">The region to unlock.</param>
   internal static void UnlockEntrance(this scnLevelSelect @this, Region regionToUnlock)
@@ -57,7 +53,7 @@ internal static class scnLevelSelectExtensions
 #pragma warning restore RCS1069
       default:
         Plugin.Logger.LogWarning(
-          $"Trying to unlock {regionToUnlock} but it doesn't have an implementation/it is the Main Ward"
+          $"Trying to unlock {regionToUnlock} but it doesn't have an implementation/it is the Main Ward/Records Room"
         );
         return;
     }

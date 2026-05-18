@@ -4,7 +4,7 @@
     <AssemblyName>gg.archipelago.rhythmdoctor</AssemblyName>
     <TargetName>RhythmDoctor.Archipelago</TargetName>
     <Product>RhythmDoctor.Archipelago</Product>
-    <Version>0.6.11</Version>
+    <Version>0.6.12</Version>
     <LangVersion>latest</LangVersion>
     <RestoreAdditionalProjectSources>
       https://api.nuget.org/v3/index.json;
@@ -89,6 +89,10 @@
     />
     <!-- https://semver.org/#spec-item-4: Major version zero (0.y.z) is for initial development. Anything MAY change at any time. The public API SHOULD NOT be considered stable. -->
     <PackageReference Include="Nitrox.Discovery.MSBuild" Version="0.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="PolySharp" Version="1.15.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

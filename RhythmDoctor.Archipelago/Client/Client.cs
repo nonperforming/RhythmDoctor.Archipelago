@@ -1,4 +1,3 @@
-using Archipelago.MultiClient.Net.Packets;
 using Newtonsoft.Json.Linq;
 
 namespace RhythmDoctor.Archipelago.Client;
@@ -12,37 +11,17 @@ internal sealed class Client : IDisposable
   internal DeathLinkService? DeathLink;
 
   internal SlotData Slot;
-  internal TrapManager TrapManager;
+  internal readonly TrapManager TrapManager;
 
-  #region Ready for items
-  /// <summary>
-  /// Whether to process items or not.
-  /// Items received when this is false will be put in <see cref="itemQueue"/>
-  /// </summary>
-  /// <seealso cref="itemQueue"/>
-  private bool ReadyForItems
-  {
-    get;
-    set
-    {
-      field = value;
-      if (value)
-      {
-        Plugin.Logger.LogInfo("Processing all queued items");
-        foreach (ReceivedItemsHelper item in itemQueue!)
-        {
-          ProcessItem(item, true);
-        }
-        itemQueue = null;
-      }
-    }
-  }
+  // ReSharper disable once NullableWarningSuppressionIsUsed
+  private string _name = null!;
+  private string? _password;
+  private bool _connected;
+  private bool _appliedPatches;
+  private int _itemsProcessed;
+  private readonly CancellationTokenSource _cancellationTokenSource;
 
-  /// <summary>
-  /// Item queue for items received while we were not <see cref="ReadyForItems"/>.
-  /// </summary>
-  private Queue<ReceivedItemsHelper>? itemQueue;
-  #endregion
+  internal bool Setup => _itemsProcessed == 0;
 
   private static readonly string[] DeathLinkMessages =
   [
@@ -66,8 +45,8 @@ internal sealed class Client : IDisposable
   /// </summary>
   public Client()
   {
-    itemQueue = new Queue<ReceivedItemsHelper>();
     TrapManager = new TrapManager();
+    _cancellationTokenSource = new CancellationTokenSource();
   }
 
   /// <summary>
@@ -79,14 +58,67 @@ internal sealed class Client : IDisposable
   {
     Plugin.Logger.LogInfo($"Creating Archipelago session to {server}");
     Session = ArchipelagoSessionFactory.CreateSession(server);
+    _connected = true;
 
     Plugin.Logger.LogDebug("Binding events");
-    Session.MessageLog.OnMessageReceived += MessageReceived;
+    Session.Socket.ErrorReceived += (
+      (__exception, __message) => Plugin.Logger.LogError($"[{nameof(Client)}] Socket error {__exception} - {__message}")
+    );
+    Session.Socket.SocketClosed += (__reason => _ = AttemptReconnect(__reason));
+    Session.MessageLog.OnMessageReceived += (
+      __message => Plugin.Logger.LogInfo($"[{nameof(Client)}] Received message \"{__message}\"")
+    );
     Session.Items.ItemReceived += ItemReceived;
     Session.DataStorage[Scope.Slot, Persistence.PaigeStaysKey].OnValueChanged += ReplicatePaigeStays;
     Session.DataStorage[Scope.Slot, Persistence.IanDesktopLoginKey].OnValueChanged += ReplicateIansDesktopUnlocked;
 
     return Session;
+  }
+
+  private async Task AttemptReconnect(string disconnectReason)
+  {
+    int tries = 0;
+    int maxTries = Configuration.GetAutoReconnectMaxRetries();
+
+    Plugin.Logger.LogWarning($"[{nameof(Client)}] Disconnected from Archipelago: {disconnectReason}");
+
+    while (true)
+    {
+      _connected = false;
+      if (tries >= maxTries)
+      {
+        Plugin.Logger.LogFatal(
+          $"[{nameof(Client)}] Reached max retries of {maxTries}. "
+            + "Considering situation unsalvagable and returning to main menu..."
+        );
+        // ReSharper disable once NullableWarningSuppressionIsUsed
+        Plugin.Client = null!;
+        Dispose();
+        scnBase.GoToMainMenu(); // caught by UnapplyPatchesPatch
+      }
+
+      Plugin.Logger.LogWarning($"[{nameof(Client)}] Attempting to reconnect (try {tries}/{maxTries})");
+
+      try
+      {
+        LoginResult result = await Task.Run(() => Connect(_name, _password), _cancellationTokenSource.Token);
+        if (result is LoginSuccessful)
+          break;
+        else if (result is LoginFailure)
+          Plugin.Logger.LogError($"[{nameof(Client)}] Failed to reconnect: try {tries}/{maxTries}");
+        else
+          Plugin.Logger.LogError($"[{nameof(Client)}] Failed to reconnect - unknown error: try {tries}/{maxTries}");
+      }
+      catch (Exception exception)
+      {
+        Plugin.Logger.LogError($"[{nameof(Client)}] Failed to reconnect - {exception}: try {tries}/{maxTries}");
+      }
+
+      tries++;
+    }
+
+    _connected = true;
+    Plugin.Logger.LogWarning($"[{nameof(Client)}] Reconnected!");
   }
 
   /// <summary>
@@ -95,37 +127,41 @@ internal sealed class Client : IDisposable
   /// <remarks>
   /// This method does not load the Level Select.
   /// </remarks>
-  /// <param name="name">Slot name to connect under</param>
-  /// <param name="password">Password of the room</param>
-  /// <exception cref="NullReferenceException">Session is null</exception>
-  /// <exception cref="Exception">Login failure</exception>
+  /// <param name="name">Slot name to connect under.</param>
+  /// <param name="password">Password of the room.</param>
+  /// <exception cref="NullReferenceException">Session is null.</exception>
+  /// <exception cref="Exception">Login failure.</exception>
   private async Task<LoginResult> Connect(string name, string? password = null)
   {
-    if (Session == null)
-    {
+    if (Session is null)
       throw new NullReferenceException("Session is null");
-    }
+
+    _name = name;
+    _password = password;
 
     Plugin.Logger.LogInfo("Attempting to connect");
-    RoomInfoPacket _ = await Session.ConnectAsync();
+    _ = await Task.Run(Session.ConnectAsync, _cancellationTokenSource.Token);
     Plugin.Logger.LogInfo("Connected");
 
     Plugin.Logger.LogInfo("Attempting to login");
-    LoginResult loginResult = await Session.LoginAsync(
-      "Rhythm Doctor",
-      name,
-      ItemsHandlingFlags.AllItems,
-      new Version("0.6.7"),
-      null, // DeathLink is managed by DeathLinkService
-      null, // Randomly generated
-      password
+    LoginResult loginResult = await Task.Run(
+      () =>
+        Session.LoginAsync(
+          "Rhythm Doctor",
+          name,
+          _appliedPatches ? ItemsHandlingFlags.RemoteItems : ItemsHandlingFlags.AllItems,
+          new Version("0.6.7"),
+          null, // DeathLink is managed by DeathLinkService
+          null, // Randomly generated
+          password
+        ),
+      _cancellationTokenSource.Token
     );
     Plugin.Logger.LogInfo("Logged in");
 
     switch (loginResult)
     {
       case LoginFailure loginFailure:
-      {
         Plugin.Logger.LogError("Login failed (Client)");
         for (int i = 0; i < loginFailure.Errors.Length; i++)
         {
@@ -136,14 +172,19 @@ internal sealed class Client : IDisposable
         }
 
         return loginResult;
-      }
       case LoginSuccessful loginSuccessful:
-      {
+        _connected = true;
         Plugin.Logger.LogInfo(
           $"Successfully logged into {loginSuccessful.Slot}/{name} as {Session.ConnectionInfo.Uuid}"
         );
 
-        Configuration.DeathLinkConfig deathLink = await Configuration.GetDeathLink();
+        if (_appliedPatches)
+          return loginResult;
+
+        Configuration.DeathLinkConfig deathLink = await Task.Run(
+          Configuration.GetDeathLink,
+          _cancellationTokenSource.Token
+        );
         Slot = new SlotData(loginSuccessful.SlotData);
         if (
           (deathLink == Configuration.DeathLinkConfig.FollowSlot && Slot.deathLink)
@@ -158,6 +199,7 @@ internal sealed class Client : IDisposable
 
         Persistence.currentSlotIndex = 0; // Slot 1
         Plugin.ApplyGameplayPatches();
+        _appliedPatches = true;
 
         // Scary!!!!!!!!!!!
         // Hopefully if we got here without any exceptions SavingPatch should be applied,
@@ -176,8 +218,8 @@ internal sealed class Client : IDisposable
           Persistence.SetLevelRank(level, Rank.NotAvailable, true);
         }
 
+        _connected = true;
         return loginResult;
-      }
       default:
         string message = $"Unknown error: failed to connect to {name}";
         Plugin.Logger.LogError(message);
@@ -187,15 +229,13 @@ internal sealed class Client : IDisposable
 
   private async Task PrepareSlot()
   {
-    if (Session == null)
-    {
+    if (Session is null)
       throw new NullReferenceException("Session is null");
-    }
     // TODO: Check if session exists but is invalid
 
     // Setup DataStorage and TrapManager.ClearedTraps, Sticky Traps,
     // initial Paige stays (this can change!)/Ian's desktop (etc) state
-    await StateReplicationPatch.InitializeSync();
+    await Task.Run(StateReplicationPatch.InitializeSync, _cancellationTokenSource.Token);
 
     foreach (Type trapType in Bindings.Traps)
     {
@@ -216,42 +256,71 @@ internal sealed class Client : IDisposable
   internal async Task<LoginResult> CreateSessionAndConnect(string server, string name, string? password = null)
   {
     CreateSession(server);
-    LoginResult loginResult = await Connect(name, password);
+    LoginResult loginResult = await Task.Run(() => Connect(name, password), _cancellationTokenSource.Token);
     if (!loginResult.Successful)
       return loginResult;
 
-    await PrepareSlot();
-    ReadyForItems = true;
-
+    await Task.Run(PrepareSlot, _cancellationTokenSource.Token);
     return loginResult;
   }
 
-  private void MessageReceived(LogMessage message)
+  private void ItemReceived(ReceivedItemsHelper helper) =>
+    Task.Run(async () => await ProcessItem(helper), _cancellationTokenSource.Token);
+
+  private async Task ProcessItem(ReceivedItemsHelper helper)
   {
-    Plugin.Logger.LogInfo($"Received message \"{message}\"");
-  }
-
-  private void ItemReceived(ReceivedItemsHelper helper) => ProcessItem(helper);
-
-  private void ProcessItem(ReceivedItemsHelper helper, bool wasQueued = false)
-  {
-    ItemInfo item;
-
-    // Ensure the save is prepared before we attempt to load our existing items.
-    if (!ReadyForItems)
+    bool IsReady(ItemInfo item)
     {
-      item = helper.PeekItem();
-      Plugin.Logger.LogInfo($"Enqueued item {item.ItemName} ({item.ItemId} from {item.ItemGame})");
-      itemQueue!.Enqueue(helper);
-      return;
+      if (scnBase.instance is scnCLS)
+        return false;
+      if (_appliedPatches)
+        return true;
+
+      // Process traps as early as possible...
+      if (Bindings.TrapItemIdToLevel.Keys.Contains(item.ItemId))
+        return true;
+
+      // TODO: Based on login progress, allow more items to be accepted (i.e. levels)
+      // Levels require slot setup.
+
+      return false;
     }
 
-    item = helper.DequeueItem();
+    bool queued = false;
+
+    // Wait if we aren't connected - i.e. disconnection just after we get received item packet
+    if (!_connected)
+    {
+      Plugin.Logger.LogWarning($"[{nameof(Client)}] Client not connected, waiting...");
+      _itemsProcessed++; // FIXME: different way to implement this please
+      while (!_connected)
+      {
+        await Task.Delay(1000, _cancellationTokenSource.Token);
+      }
+      Plugin.Logger.LogWarning($"[{nameof(Client)}] Client connected, continuing...");
+    }
+
+    ItemInfo item = helper.DequeueItem();
+
+    // Ensure the save is prepared before we attempt to load our existing items.
+    if (!IsReady(item))
+    {
+      // FIXME: This is terrible and should be done in a different way
+      queued = true;
+      Plugin.Logger.LogDebug($"[{nameof(Client)}] Not ready, waiting...");
+      while (!IsReady(item))
+      {
+        await Task.Delay(1000, _cancellationTokenSource.Token);
+      }
+      Plugin.Logger.LogDebug($"[{nameof(Client)}] Ready, continuing...");
+    }
+
     if (item.ItemGame != Bindings.GAME)
     {
       Plugin.Logger.LogDebug(
         $"Ignoring item {item.ItemName} ({item.ItemId} from {item.ItemGame}), as it is not for our world"
       );
+      _itemsProcessed--;
       return;
     }
 
@@ -260,7 +329,7 @@ internal sealed class Client : IDisposable
     {
       Plugin.Logger.LogInfo($"[{nameof(Client)}] Unlocking stage item {item.ItemName} ({item.ItemId}, {level})");
 
-      if (wasQueued)
+      if (queued)
       {
         Plugin.Logger.LogInfo($"Attempting to get rank from locations cleared for {level}");
 
@@ -317,6 +386,7 @@ internal sealed class Client : IDisposable
               // We haven't cleared the level yet.
               Plugin.Logger.LogInfo("Couldn't find any location");
               Persistence.SetLevelRank(level, Rank.NotFinished, false, false);
+              _itemsProcessed--;
               return;
             }
           }
@@ -345,6 +415,7 @@ internal sealed class Client : IDisposable
               // We haven't cleared the level yet.
               Plugin.Logger.LogInfo("Couldn't find any location");
               Persistence.SetLevelRank(level, Rank.NotFinished, false, false);
+              _itemsProcessed--;
               return;
             }
           }
@@ -398,18 +469,20 @@ internal sealed class Client : IDisposable
       {
         Persistence.SetLevelRank(level, Rank.NotFinished, false, false);
       }
+      _itemsProcessed--;
       return;
     }
-    else if (Bindings.TrapItemIdToLevel.TryGetValue(item.ItemId, out Type trap))
+    if (Bindings.TrapItemIdToLevel.TryGetValue(item.ItemId, out Type trap))
     {
       Plugin.Logger.LogInfo($"Adding trap item {item.ItemName} ({item.ItemId})");
-      TrapManager.AddTrap(trap);
+      await TrapManager.AddTrap(trap);
+      _itemsProcessed--;
       return;
     }
-    else if (Bindings.KeyItemIdToWard.TryGetValue(item.ItemId, out Region region))
+    if (Bindings.KeyItemIdToWard.TryGetValue(item.ItemId, out Region region))
     {
       // We also do this in UnlockItemPatch,
-      // but regions are able to be unlocked cleanly while in level select.
+      // but regions must also be able to be unlocked while in level select.
       if (scnBase.instance is scnLevelSelect)
       {
         Plugin.Logger.LogInfo($"Unlocking entrance {region}");
@@ -418,6 +491,7 @@ internal sealed class Client : IDisposable
       else
       {
         Plugin.Logger.LogInfo("Got region key, but not in level select so ignoring");
+        _itemsProcessed--;
         return;
       }
     }
@@ -430,16 +504,19 @@ internal sealed class Client : IDisposable
       Plugin.ToExecuteOnMainThread.Enqueue(() =>
       {
         // Reload our actual Sleeve Paint.
+        Plugin.Logger.LogInfo($"[{nameof(Client)}] Reloading Sleeve Paint");
         Persistence.p1Skin.Reload();
         Persistence.p2Skin.Reload();
       });
 
+      _itemsProcessed--;
       return;
     }
     // ReSharper restore NullableWarningSuppressionIsUsed
 
     // TODO: implement else case for filler like A Bit of Rhythm
     Plugin.Logger.LogError($"Got item {item.ItemName} ({item.ItemId} from {item.ItemGame}) but couldn't handle it");
+    _itemsProcessed--;
   }
 
   private void DeathLinkReceived(DeathLink deathLink)
@@ -554,7 +631,7 @@ internal sealed class Client : IDisposable
     SendDeathLink(deathLink);
   }
 
-  internal void SendDeathLink(DeathLink deathLink)
+  private void SendDeathLink(DeathLink deathLink)
   {
     Plugin.Client.DeathLink?.SendDeathLink(deathLink);
     Plugin.Logger.LogInfo($"Sent death link: \"{deathLink.Cause}\"");
@@ -569,17 +646,11 @@ internal sealed class Client : IDisposable
       yield return new WaitUntil(() => disconnect.IsCompleted);
     }
 
-    if (Session != null)
-    {
-      Session.MessageLog.OnMessageReceived -= MessageReceived;
-      Session.Items.ItemReceived -= ItemReceived;
-      Session.DataStorage[Scope.Slot, Persistence.PaigeStaysKey].OnValueChanged -= ReplicatePaigeStays;
-      Session.DataStorage[Scope.Slot, Persistence.IanDesktopLoginKey].OnValueChanged -= ReplicateIansDesktopUnlocked;
+    _cancellationTokenSource.Cancel();
+    _cancellationTokenSource.Dispose();
 
-      if (DeathLink != null)
-      {
-        DeathLink.OnDeathLinkReceived -= DeathLinkReceived;
-      }
+    if (Session is not null)
+    {
       Plugin.Instance.StartCoroutine(DisconnectSession(Session));
     }
     TrapManager.Dispose();
