@@ -23,7 +23,7 @@ internal static class DeathLinkPatch
     if (__instance.rowMisses < __instance.game.currentLevel.missesToCrackHeart)
       return;
 
-    Plugin.Logger.LogDebug("Sending CrackAdvance death");
+    Plugin.Logger.LogInfo("Sending CrackAdvance death");
     enabled = false;
     Plugin.Client.SendDeathLink();
   }
@@ -36,7 +36,7 @@ internal static class DeathLinkPatch
       return;
 
     // TODO: We could have character-specific fail lines here?
-    Plugin.Logger.LogDebug("Sending FailLevel death");
+    Plugin.Logger.LogInfo("Sending FailLevel death");
     enabled = false;
     Plugin.Client.SendDeathLink();
   }
@@ -52,7 +52,7 @@ internal static class DeathLinkPatch
     if (__instance.levelIdentifier == "Montage") // 7-X, fake/forced game over
       return;
 
-    Plugin.Logger.LogDebug("Sending FailLevelLite death");
+    Plugin.Logger.LogInfo("Sending FailLevelLite death");
 
     enabled = false;
     Plugin.Client.SendDeathLink();
@@ -70,7 +70,7 @@ internal static class DeathLinkPatch
       && scnGame.instance.currentLevel.i1 < 30 // as per logic shown in Bar 45, Beat 1, Row 5 to get B rank
     )
     {
-      Plugin.Logger.LogDebug("Sending Beans Hopper death");
+      Plugin.Logger.LogInfo("Sending Beans Hopper death");
       enabled = false;
       // TODO: Some kind of visual indication that you failed Beans would be nice
       Plugin.Client.SendDeathLink();
