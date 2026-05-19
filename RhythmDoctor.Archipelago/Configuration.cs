@@ -11,12 +11,9 @@ internal static class Configuration
 
   // ReSharper disable NullableWarningSuppressionIsUsed
   private static ConfigEntry<DeathLinkConfig> _deathLink = null!;
-
-  // ReSharper disable NullableWarningSuppressionIsUsed
   private static ConfigEntry<int> _autoReconnectMaxRetries = null!;
-
-  // ReSharper disable NullableWarningSuppressionIsUsed
   private static ConfigEntry<int> _remoteTrapClearsTimeout = null!;
+  private static ConfigEntry<int> _slotToUse = null!;
 
   // ReSharper restore NullableWarningSuppressionIsUsed
 
@@ -48,6 +45,8 @@ internal static class Configuration
       "How long to wait in milliseconds until getting remote trap clear status times out "
         + "and defaults to 0/last known good value."
     );
+
+    _slotToUse = config.Bind("zzzDebugDoNotTouchUnlessAsked", "SlotToUse", 0, "Slot to use for Archipelago.");
   }
 
   internal static async Task<DeathLinkConfig> GetDeathLink()
@@ -58,6 +57,11 @@ internal static class Configuration
 
     return await Plugin.Client.Session.DataStorage.GetRaceModeAsync() ? DeathLinkConfig.FollowSlot : _deathLink.Value;
   }
+
+  /// <summary>
+  /// Get the slot index to use for Archipelago.
+  /// </summary>
+  internal static int GetSlotToUse() => _slotToUse.Value;
 
   internal static int GetAutoReconnectMaxRetries() => _autoReconnectMaxRetries.Value;
 

@@ -13,13 +13,13 @@ internal static class UnapplyPatchesPatch
     Plugin.Logger.LogInfo("Tearing down client plugin");
     Plugin.UnapplyGameplayPatches();
 
-    // Reload data - we wipe Slot 1 in ArchipelagoLoginPatch, and we do **NOT** want to lose it.
+    // Reload data - we wipe Slot 1 (by default) in ArchipelagoLoginPatch, and we do **NOT** want to lose it.
     Persistence.Load();
     // In the case we somehow skip scnBase.GoToMainMenu (maybe some other plugin) we need to reload slot 1's data,
     //  as otherwise the Main Menu option will still show our Archipelago slot.
     try
     {
-      scnMenu.instance.slots[0].LoadSlotData();
+      scnMenu.instance.slots[Configuration.GetSlotToUse()].LoadSlotData();
       Plugin.Logger.LogDebug("Reloaded slot data");
     }
     catch (NullReferenceException)

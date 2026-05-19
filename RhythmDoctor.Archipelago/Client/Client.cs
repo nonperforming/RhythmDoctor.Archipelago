@@ -197,7 +197,7 @@ internal sealed class Client : IDisposable
           DeathLink.OnDeathLinkReceived += DeathLinkReceived;
         }
 
-        Persistence.currentSlotIndex = 0; // Slot 1
+        Persistence.currentSlotIndex = Configuration.GetSlotToUse();
         Plugin.ApplyGameplayPatches();
         _appliedPatches = true;
 
@@ -205,7 +205,7 @@ internal sealed class Client : IDisposable
         // Hopefully if we got here without any exceptions SavingPatch should be applied,
         //  so we shouldn't lose our first slot in the case of a crash.
         // When we are quitting, the original data should be reloaded by UnapplyPatchesPatch.
-        Persistence.slotPrefs[0].dict.Clear();
+        Persistence.slotPrefs[Configuration.GetSlotToUse()].dict.Clear();
 
         // Let LockSleevePaintPatch set the Sleeve Paint to Slot 1's default
         Persistence.p1Skin.Reload();
