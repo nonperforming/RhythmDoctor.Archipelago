@@ -1,0 +1,39 @@
+#navbar {
+  height: 3;
+  align: center top;
+
+  Button {
+    width: 1fr;
+    height: 3;
+  }
+  Button#settings {
+    width: 10; /* len("settings") = 8, 8 + 2 */
+  }
+}
+
+ContentSwitcher {
+  border: round $primary;
+  height: 1fr;
+
+  Vertical.menu-category {
+    Button {
+      width: 1fr;
+      height: 1fr;
+    }
+  }
+
+  Vertical#log {
+    TextArea {
+      height: 1fr;
+    }
+
+    Button#clear {
+      height: 3;
+    }
+  }
+}
+
+Footer {
+  height: 1;
+  align: left bottom;
+}

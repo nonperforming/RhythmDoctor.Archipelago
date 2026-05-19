@@ -1,0 +1,5 @@
+#!/usr/bin/env -S just --justfile
+
+run:
+  #!/bin/sh
+  .venv/bin/textual run app.py
