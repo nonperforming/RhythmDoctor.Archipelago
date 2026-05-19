@@ -27,7 +27,7 @@ internal static class ClearLocationPatch
     if (!Enum.TryParse(scnGame.internalIdentifier, out Level level))
     {
       Plugin.Logger.LogError($"Couldn't find Level. Level identifier: {scnGame.internalIdentifier}");
-      Plugin.Client.TrapManager.ClearActiveTraps(false);
+      Plugin.ClientOld.TrapManager.ClearActiveTraps(false);
       return;
     }
 
@@ -75,7 +75,7 @@ internal static class ClearLocationPatch
       return;
     }
     // TODO: Show what item we have sent out somehow.
-    Plugin.Client.Session.Locations.CompleteLocationChecks(
+    Plugin.ClientOld.Session.Locations.CompleteLocationChecks(
       Bindings.RhythmWeightlifterStageToLocationID[RhythmWeightlifter.scnRhythmWeightlifter.gameInstance.LevelIndex]
     );
   }
@@ -95,7 +95,7 @@ internal static class ClearLocationPatch
       Rank rank = scnGame.instance.currentLevel.GetRankFromMistakes();
       IEnumerable<long> ids = GetStageLocationIDsToClear(GetCurrentLevel(), rank);
       long[] newLocations = ids.Where(id =>
-          !Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id) || JustSentLocations.Contains(id)
+          !Plugin.ClientOld.Session.Locations.AllLocationsChecked.Contains(id) || JustSentLocations.Contains(id)
         )
         .ToArray();
 
@@ -170,7 +170,7 @@ internal static class ClearLocationPatch
   [HarmonyPostfix]
   private static void MiracleDefibrillatorClearLocationPatch(Level_Montage __instance)
   {
-    bool hasScrambledCharacter = Plugin.Client.TrapManager.IsTrapActive(ScrambleCharactersTrapPatch.name);
+    bool hasScrambledCharacter = Plugin.ClientOld.TrapManager.IsTrapActive(ScrambleCharactersTrapPatch.name);
 
     // We need to calculate the level's rank manually...
     int rank;
@@ -199,7 +199,7 @@ internal static class ClearLocationPatch
     else
     {
       long[] newLocations = ids.Where(id =>
-          !Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id) || JustSentLocations.Contains(id)
+          !Plugin.ClientOld.Session.Locations.AllLocationsChecked.Contains(id) || JustSentLocations.Contains(id)
         )
         .ToArray();
       Plugin.Logger.LogDebug($"IDs: {string.Join(", ", ids)} (of which {string.Join(", ", newLocations)} are new)");
@@ -241,7 +241,7 @@ internal static class ClearLocationPatch
 #endif
     if (bossLevelFailed)
     {
-      Plugin.Client.TrapManager.ClearActiveTraps(false);
+      Plugin.ClientOld.TrapManager.ClearActiveTraps(false);
       return [];
     }
 
@@ -249,21 +249,21 @@ internal static class ClearLocationPatch
 
     // Check if we fulfill the End Goal requirements
 #pragma warning disable Harmony003
-    if (Plugin.Client.Slot.endGoal == SlotData.EndGoal.HelpingHands && level == Level.HelpingHands && rank.passed)
+    if (Plugin.ClientOld.Slot.endGoal == SlotData.EndGoal.HelpingHands && level == Level.HelpingHands && rank.passed)
 #pragma warning restore Harmony003
     {
       Plugin.Logger.LogInfo("Setting goal achieved - Helping Hands");
-      Plugin.Client.Session.SetGoalAchieved();
+      Plugin.ClientOld.Session.SetGoalAchieved();
     }
-    else if (Plugin.Client.Slot.endGoal != SlotData.EndGoal.HelpingHands)
+    else if (Plugin.ClientOld.Slot.endGoal != SlotData.EndGoal.HelpingHands)
     {
       bool clearedAll = true;
-      Rank minimumRank = Plugin.Client.Slot.endGoal switch
+      Rank minimumRank = Plugin.ClientOld.Slot.endGoal switch
       {
         SlotData.EndGoal.PerfectAll => Rank.S,
         SlotData.EndGoal.ARankAll => Rank.A,
         SlotData.EndGoal.BRankAll => Rank.B,
-        _ => throw new ArgumentOutOfRangeException($"End Goal ({Plugin.Client.Slot.endGoal}) not valid value."),
+        _ => throw new ArgumentOutOfRangeException($"End Goal ({Plugin.ClientOld.Slot.endGoal}) not valid value."),
       };
 
       foreach (Level otherLevel in Bindings.Levels)
@@ -280,20 +280,20 @@ internal static class ClearLocationPatch
       if (clearedAll)
       {
         Plugin.Logger.LogInfo("Setting goal achieved - Cleared all");
-        Plugin.Client.Session.SetGoalAchieved();
+        Plugin.ClientOld.Session.SetGoalAchieved();
       }
     }
 
-    bool clearedNewLocation = ids.Any(id => !Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id));
+    bool clearedNewLocation = ids.Any(id => !Plugin.ClientOld.Session.Locations.AllLocationsChecked.Contains(id));
     if (clearedNewLocation)
     {
-      JustSentLocations = ids.Where(id => !Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id)).ToArray();
-      Task.Run(() => Plugin.Client.Session.Locations.CompleteLocationChecksAsync(ids.ToArray()));
-      Plugin.Client.TrapManager.ClearActiveTraps(false);
+      JustSentLocations = ids.Where(id => !Plugin.ClientOld.Session.Locations.AllLocationsChecked.Contains(id)).ToArray();
+      Task.Run(() => Plugin.ClientOld.Session.Locations.CompleteLocationChecksAsync(ids.ToArray()));
+      Plugin.ClientOld.TrapManager.ClearActiveTraps(false);
     }
     else
     {
-      Plugin.Client.TrapManager.ClearActiveTraps(true);
+      Plugin.ClientOld.TrapManager.ClearActiveTraps(true);
     }
 
     return ids;
@@ -303,7 +303,7 @@ internal static class ClearLocationPatch
   {
     Plugin.Logger.LogInfo($"Scouting location checks for ids {string.Join(", ", ids)}... (try {retries})");
     Task<Dictionary<long, ScoutedItemInfo>> scout = Task.Run(() =>
-      Plugin.Client.Session.Locations.ScoutLocationsAsync(HintCreationPolicy.None, ids)
+      Plugin.ClientOld.Session.Locations.ScoutLocationsAsync(HintCreationPolicy.None, ids)
     );
     yield return new WaitUntil(() => scout.IsCompleted);
     Plugin.Logger.LogInfo("Completed scouting");
@@ -329,7 +329,7 @@ internal static class ClearLocationPatch
     if (!Enum.TryParse(scnGame.internalIdentifier, out Level level))
     {
       Plugin.Logger.LogError($"Couldn't find Level. Level identifier: {scnGame.internalIdentifier}");
-      Plugin.Client.TrapManager.ClearActiveTraps(false);
+      Plugin.ClientOld.TrapManager.ClearActiveTraps(false);
       throw new ArgumentOutOfRangeException($"Couldn't find level {scnGame.internalIdentifier}");
     }
 

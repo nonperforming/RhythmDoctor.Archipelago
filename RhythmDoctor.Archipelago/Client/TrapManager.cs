@@ -116,7 +116,7 @@ internal sealed class TrapManager : IDisposable
           Plugin.Logger.LogInfo($"[{nameof(TrapManager)}] Got semaphore, checking DataStorage for {trapName}...");
 
           // https://stackoverflow.com/a/11191070
-          Task<int> getTrapClearsRemote = Plugin.Client.Session!.DataStorage[Scope.Slot, trapName].GetAsync<int>();
+          Task<int> getTrapClearsRemote = Plugin.ClientOld.Session!.DataStorage[Scope.Slot, trapName].GetAsync<int>();
           if (
             await Task.WhenAny(getTrapClearsRemote, Task.Delay(Configuration.GetRemoteTrapClearsTimeout()))
             == getTrapClearsRemote
@@ -208,7 +208,7 @@ internal sealed class TrapManager : IDisposable
 
   internal bool IsTrapActive(string trapName)
   {
-    foreach ((int _, ITrap trap) in Plugin.Client.TrapManager._activeTraps)
+    foreach ((int _, ITrap trap) in Plugin.ClientOld.TrapManager._activeTraps)
     {
       if (trap.Name == trapName)
       {
@@ -387,7 +387,7 @@ internal sealed class TrapManager : IDisposable
       if (!returnToQueue && index != -1)
       {
         ClearedTraps[trap.Name]++;
-        Plugin.Client.Session!.DataStorage[Scope.Slot, trap.Name] = ClearedTraps[trap.Name];
+        Plugin.ClientOld.Session!.DataStorage[Scope.Slot, trap.Name] = ClearedTraps[trap.Name];
       }
     }
 

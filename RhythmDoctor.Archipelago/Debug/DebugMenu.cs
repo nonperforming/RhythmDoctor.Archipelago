@@ -18,7 +18,7 @@ public class DebugMenu : MonoBehaviour
   private ActivatedGUI _activatedGUI;
 
   /// <remarks>
-  /// Unlike the <see cref="Client"/>'s <see cref="Client.TrapManager"/>, traps from this Trap Manager will not be
+  /// Unlike the <see cref="ClientOld"/>'s <see cref="ClientOld.TrapManager"/>, traps from this Trap Manager will not be
   /// automatically deleted.
   /// </remarks>
   internal TrapManager TrapManager = new();
@@ -189,7 +189,7 @@ public class DebugMenu : MonoBehaviour
         if (GUI.Button(new Rect(30, 540, 300, 20), "Create Client class"))
         {
           Notify("Creating empty Client");
-          Plugin.Client = new Client.Client();
+          Plugin.ClientOld = new Client.ClientOld();
         }
 
         if (GUI.Button(new Rect(30, 570, 300, 20), "Push all traps to Active"))

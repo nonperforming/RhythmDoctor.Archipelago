@@ -21,7 +21,7 @@ internal static class UnlockItemPatch
 
     bool hasBasementKey = false;
     // ReSharper disable once NullableWarningSuppressionIsUsed
-    foreach (ItemInfo item in Plugin.Client.Session!.Items.AllItemsReceived)
+    foreach (ItemInfo item in Plugin.ClientOld.Session!.Items.AllItemsReceived)
     {
       Plugin.Logger.LogDebug($"Processing item {item.ItemName} ({item.ItemId})");
       if (Bindings.KeyItemIdToWard.TryGetValue(item.ItemId, out Region region))
@@ -55,7 +55,7 @@ internal static class UnlockItemPatch
     Plugin.Logger.LogInfo("Moving 1-CNY");
     __instance.FindSelectableEntity("1-CNY").gamePosition.x = -564;
 
-    if (Plugin.Client.Slot.endGoal == SlotData.EndGoal.HelpingHands)
+    if (Plugin.ClientOld.Slot.endGoal == SlotData.EndGoal.HelpingHands)
     {
       // Moving X-1 - Art Exercise to the basement if end goal is X-0 - Helping Hands
       Plugin.Logger.LogInfo("Moving X-1 to the basement");
@@ -318,7 +318,7 @@ internal static class UnlockItemPatch
                   new List<scnLevelSelect.LevelSelectDestination>();
                 if (
                   // ReSharper disable once NullableWarningSuppressionIsUsed
-                  Plugin.Client.Session!.Items.AllItemsReceived.Any(item =>
+                  Plugin.ClientOld.Session!.Items.AllItemsReceived.Any(item =>
                     item.ItemId == Bindings.SLEEVE_PAINT_ITEM_ID
                   )
                 )
@@ -354,7 +354,7 @@ internal static class UnlockItemPatch
                   new List<scnLevelSelect.LevelSelectDestination>();
                 if (
                   // ReSharper disable once NullableWarningSuppressionIsUsed
-                  Plugin.Client.Session!.Items.AllItemsReceived.Any(item =>
+                  Plugin.ClientOld.Session!.Items.AllItemsReceived.Any(item =>
                     item.ItemId == Bindings.RegionToKeyID[Region.RecordsRoom]
                   )
                 )
@@ -479,7 +479,7 @@ internal static class UnlockItemPatch
         continue;
       }
 
-      int minimumRank = Plugin.Client.Slot.bossUnlockRequirement switch
+      int minimumRank = Plugin.ClientOld.Slot.bossUnlockRequirement switch
       {
         SlotData.BossUnlockRequirement.ARankAll => Rank.A,
         SlotData.BossUnlockRequirement.Perfect => Rank.S,
@@ -493,7 +493,7 @@ internal static class UnlockItemPatch
       {
         clearedInAct++;
 
-        long clearRequirement = Plugin.Client.Slot.GetBossSongLevelClearRequirement(act);
+        long clearRequirement = Plugin.ClientOld.Slot.GetBossSongLevelClearRequirement(act);
         if (clearedInAct >= clearRequirement)
         {
           Plugin.Logger.LogInfo($"Unlocking {act} boss ({clearRequirement} requirement, rank {minimumRank})");

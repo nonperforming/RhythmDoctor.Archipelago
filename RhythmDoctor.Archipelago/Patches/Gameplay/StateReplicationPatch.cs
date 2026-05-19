@@ -2,28 +2,28 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 
 using Newtonsoft.Json.Linq;
 
-/// <seealso cref="Client"/>
+/// <seealso cref="ClientOld"/>
 [HarmonyPatch(typeof(Persistence))]
 internal static class StateReplicationPatch
 {
   // FIXME: Make async and retry on failure!!
 
-  /// <seealso cref="Client.ReplicatePaigeStays"/>
+  /// <seealso cref="ClientOld.ReplicatePaigeStays"/>
   [HarmonyPatch(nameof(Persistence.SetPaigeEnding))]
   [HarmonyPostfix]
   private static void ReplicatePaigeStaysPatch(bool paigeStays)
   {
     Plugin.Logger.LogInfo($"Replicating {Persistence.PaigeStaysKey} to {paigeStays}");
-    Plugin.Client.Session!.DataStorage[Scope.Slot, Persistence.PaigeStaysKey] = paigeStays;
+    Plugin.ClientOld.Session!.DataStorage[Scope.Slot, Persistence.PaigeStaysKey] = paigeStays;
   }
 
-  /// <seealso cref="Client.ReplicateIansDesktopUnlocked"/>
+  /// <seealso cref="ClientOld.ReplicateIansDesktopUnlocked"/>
   [HarmonyPatch(nameof(Persistence.SetIanDesktopLogin))]
   [HarmonyPostfix]
   private static void ReplicateIansDesktopUnlockedPatch(bool ianDesktopLogin)
   {
     Plugin.Logger.LogInfo($"Replicating {Persistence.IanDesktopLoginKey} to {ianDesktopLogin}");
-    Plugin.Client.Session!.DataStorage[Scope.Slot, Persistence.IanDesktopLoginKey] = ianDesktopLogin;
+    Plugin.ClientOld.Session!.DataStorage[Scope.Slot, Persistence.IanDesktopLoginKey] = ianDesktopLogin;
   }
 
   internal static async Task InitializeSync()
@@ -33,7 +33,7 @@ internal static class StateReplicationPatch
       // Manual implementation of asynchronous DataStorageElement.Initialize() here to avoid timeout errors
       // TODO: retry multiple times if we timeout
       // cannot use T? as runtime will fail with 'Can not convert Null to T.'
-      JToken valueRaw = await Plugin.Client.Session!.DataStorage[Scope.Slot, key].GetAsync();
+      JToken valueRaw = await Plugin.ClientOld.Session!.DataStorage[Scope.Slot, key].GetAsync();
 
       if (valueRaw.Type != JTokenType.Null && valueRaw.Type != JTokenType.Undefined)
       {
@@ -56,7 +56,7 @@ internal static class StateReplicationPatch
       () =>
       {
         bool initialPaigeStaysValue = Plugin.Random.Next() % 2 == 1;
-        Plugin.Client.Session!.DataStorage[Scope.Slot, Persistence.PaigeStaysKey] = initialPaigeStaysValue;
+        Plugin.ClientOld.Session!.DataStorage[Scope.Slot, Persistence.PaigeStaysKey] = initialPaigeStaysValue;
         return initialPaigeStaysValue;
       }
     );
@@ -65,7 +65,7 @@ internal static class StateReplicationPatch
       Persistence.SetIanDesktopLogin,
       () =>
       {
-        Plugin.Client.Session!.DataStorage[Scope.Slot, Persistence.IanDesktopLoginKey] = false;
+        Plugin.ClientOld.Session!.DataStorage[Scope.Slot, Persistence.IanDesktopLoginKey] = false;
         return false;
       }
     );

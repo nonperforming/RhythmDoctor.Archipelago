@@ -17,7 +17,7 @@ internal static class DeathLinkPatch
   [HarmonyPostfix]
   private static void SendDeathLinkOnCrackedHeartPatch(RowEntity __instance)
   {
-    if (Plugin.Client.DeathLink == null || !enabled)
+    if (Plugin.ClientOld.DeathLink == null || !enabled)
       return;
 
     if (__instance.rowMisses < __instance.game.currentLevel.missesToCrackHeart)
@@ -25,7 +25,7 @@ internal static class DeathLinkPatch
 
     Plugin.Logger.LogInfo("Sending CrackAdvance death");
     enabled = false;
-    Plugin.Client.SendDeathLink();
+    Plugin.ClientOld.SendDeathLink();
   }
 
   [HarmonyPatch(typeof(scnGame), nameof(scnGame.FailLevel))]
@@ -38,7 +38,7 @@ internal static class DeathLinkPatch
     // TODO: We could have character-specific fail lines here?
     Plugin.Logger.LogInfo("Sending FailLevel death");
     enabled = false;
-    Plugin.Client.SendDeathLink();
+    Plugin.ClientOld.SendDeathLink();
   }
 
   // currently only used by 7-X/7-X2
@@ -55,7 +55,7 @@ internal static class DeathLinkPatch
     Plugin.Logger.LogInfo("Sending FailLevelLite death");
 
     enabled = false;
-    Plugin.Client.SendDeathLink();
+    Plugin.ClientOld.SendDeathLink();
   }
 
   [HarmonyPatch(typeof(LevelBase), nameof(LevelBase.RunTag))]
@@ -73,7 +73,7 @@ internal static class DeathLinkPatch
       Plugin.Logger.LogInfo("Sending Beans Hopper death");
       enabled = false;
       // TODO: Some kind of visual indication that you failed Beans would be nice
-      Plugin.Client.SendDeathLink();
+      Plugin.ClientOld.SendDeathLink();
     }
   }
 }

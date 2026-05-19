@@ -16,7 +16,7 @@ internal class StrongHeartPowerupPatch : ITrap
     // 0 < 2 True (able to add one Strong Heart trap, 0.5x mistake weight)
     // 1 < 2 True (able to add another Strong Heart trap, 0.25x mistake weight)
     // 2 < 2 False (do not add more Strong Heart traps)
-    return Plugin.Client.TrapManager.Traps.OfType<StrongHeartPowerupPatch>().Count() < 2;
+    return Plugin.ClientOld.TrapManager.Traps.OfType<StrongHeartPowerupPatch>().Count() < 2;
   }
 
   public void InQueue()

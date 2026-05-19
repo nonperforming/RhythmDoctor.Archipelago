@@ -17,7 +17,7 @@ internal class FragileHeartTrapPatch : ITrap
     // 0 < 2 True (able to add one Fragile Heart trap, 2x mistake weight)
     // 1 < 2 True (able to add another Fragile Heart trap, 4x mistake weight)
     // 2 < 2 False (do not add more Fragile Heart traps)
-    return Plugin.Client.TrapManager.Traps.OfType<FragileHeartTrapPatch>().Count() < 2;
+    return Plugin.ClientOld.TrapManager.Traps.OfType<FragileHeartTrapPatch>().Count() < 2;
   }
 
   public void InQueue()

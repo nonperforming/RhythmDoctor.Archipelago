@@ -5,7 +5,8 @@ namespace RhythmDoctor.Archipelago.Client;
 /// <summary>
 /// Archipelago client
 /// </summary>
-internal sealed class Client : IDisposable
+[Obsolete("Use new Client", true)]
+internal sealed class ClientOld : IDisposable
 {
   internal ArchipelagoSession? Session;
   internal DeathLinkService? DeathLink;
@@ -43,7 +44,7 @@ internal sealed class Client : IDisposable
   /// <summary>
   /// Create an Archipelago client.
   /// </summary>
-  public Client()
+  public ClientOld()
   {
     TrapManager = new TrapManager();
     _cancellationTokenSource = new CancellationTokenSource();
@@ -62,11 +63,11 @@ internal sealed class Client : IDisposable
 
     Plugin.Logger.LogDebug("Binding events");
     Session.Socket.ErrorReceived += (
-      (__exception, __message) => Plugin.Logger.LogError($"[{nameof(Client)}] Socket error {__exception} - {__message}")
+      (__exception, __message) => Plugin.Logger.LogError($"[{nameof(ClientOld)}] Socket error {__exception} - {__message}")
     );
     Session.Socket.SocketClosed += (__reason => _ = AttemptReconnect(__reason));
     Session.MessageLog.OnMessageReceived += (
-      __message => Plugin.Logger.LogInfo($"[{nameof(Client)}] Received message \"{__message}\"")
+      __message => Plugin.Logger.LogInfo($"[{nameof(ClientOld)}] Received message \"{__message}\"")
     );
     Session.Items.ItemReceived += ItemReceived;
     Session.DataStorage[Scope.Slot, Persistence.PaigeStaysKey].OnValueChanged += ReplicatePaigeStays;
@@ -80,7 +81,7 @@ internal sealed class Client : IDisposable
     int tries = 0;
     int maxTries = Configuration.GetAutoReconnectMaxRetries();
 
-    Plugin.Logger.LogWarning($"[{nameof(Client)}] Disconnected from Archipelago: {disconnectReason}");
+    Plugin.Logger.LogWarning($"[{nameof(ClientOld)}] Disconnected from Archipelago: {disconnectReason}");
 
     while (true)
     {
@@ -88,16 +89,16 @@ internal sealed class Client : IDisposable
       if (tries >= maxTries)
       {
         Plugin.Logger.LogFatal(
-          $"[{nameof(Client)}] Reached max retries of {maxTries}. "
+          $"[{nameof(ClientOld)}] Reached max retries of {maxTries}. "
             + "Considering situation unsalvagable and returning to main menu..."
         );
         // ReSharper disable once NullableWarningSuppressionIsUsed
-        Plugin.Client = null!;
+        Plugin.ClientOld = null!;
         Dispose();
         scnBase.GoToMainMenu(); // caught by UnapplyPatchesPatch
       }
 
-      Plugin.Logger.LogWarning($"[{nameof(Client)}] Attempting to reconnect (try {tries}/{maxTries})");
+      Plugin.Logger.LogWarning($"[{nameof(ClientOld)}] Attempting to reconnect (try {tries}/{maxTries})");
 
       try
       {
@@ -105,20 +106,20 @@ internal sealed class Client : IDisposable
         if (result is LoginSuccessful)
           break;
         else if (result is LoginFailure)
-          Plugin.Logger.LogError($"[{nameof(Client)}] Failed to reconnect: try {tries}/{maxTries}");
+          Plugin.Logger.LogError($"[{nameof(ClientOld)}] Failed to reconnect: try {tries}/{maxTries}");
         else
-          Plugin.Logger.LogError($"[{nameof(Client)}] Failed to reconnect - unknown error: try {tries}/{maxTries}");
+          Plugin.Logger.LogError($"[{nameof(ClientOld)}] Failed to reconnect - unknown error: try {tries}/{maxTries}");
       }
       catch (Exception exception)
       {
-        Plugin.Logger.LogError($"[{nameof(Client)}] Failed to reconnect - {exception}: try {tries}/{maxTries}");
+        Plugin.Logger.LogError($"[{nameof(ClientOld)}] Failed to reconnect - {exception}: try {tries}/{maxTries}");
       }
 
       tries++;
     }
 
     _connected = true;
-    Plugin.Logger.LogWarning($"[{nameof(Client)}] Reconnected!");
+    Plugin.Logger.LogWarning($"[{nameof(ClientOld)}] Reconnected!");
   }
 
   /// <summary>
@@ -241,10 +242,10 @@ internal sealed class Client : IDisposable
     {
       ITrap trap = (ITrap)Activator.CreateInstance(trapType);
       // ReSharper disable once NullableWarningSuppressionIsUsed
-      Plugin.Client.Session!.DataStorage[Scope.Slot, trap.Name].Initialize(0);
-      Plugin.Client.TrapManager.ClearedTraps.Add(trap.Name, 0);
+      Plugin.ClientOld.Session!.DataStorage[Scope.Slot, trap.Name].Initialize(0);
+      Plugin.ClientOld.TrapManager.ClearedTraps.Add(trap.Name, 0);
     }
-    Plugin.Client.TrapManager.AddStickyTraps(Plugin.Client.Slot.stickyTraps);
+    Plugin.ClientOld.TrapManager.AddStickyTraps(Plugin.ClientOld.Slot.stickyTraps);
   }
 
   /// <summary>
@@ -291,13 +292,13 @@ internal sealed class Client : IDisposable
     // Wait if we aren't connected - i.e. disconnection just after we get received item packet
     if (!_connected)
     {
-      Plugin.Logger.LogWarning($"[{nameof(Client)}] Client not connected, waiting...");
+      Plugin.Logger.LogWarning($"[{nameof(ClientOld)}] Client not connected, waiting...");
       _itemsProcessed++; // FIXME: different way to implement this please
       while (!_connected)
       {
         await Task.Delay(1000, _cancellationTokenSource.Token);
       }
-      Plugin.Logger.LogWarning($"[{nameof(Client)}] Client connected, continuing...");
+      Plugin.Logger.LogWarning($"[{nameof(ClientOld)}] Client connected, continuing...");
     }
 
     ItemInfo item = helper.DequeueItem();
@@ -307,12 +308,12 @@ internal sealed class Client : IDisposable
     {
       // FIXME: This is terrible and should be done in a different way
       queued = true;
-      Plugin.Logger.LogDebug($"[{nameof(Client)}] Not ready, waiting...");
+      Plugin.Logger.LogDebug($"[{nameof(ClientOld)}] Not ready, waiting...");
       while (!IsReady(item))
       {
         await Task.Delay(1000, _cancellationTokenSource.Token);
       }
-      Plugin.Logger.LogDebug($"[{nameof(Client)}] Ready, continuing...");
+      Plugin.Logger.LogDebug($"[{nameof(ClientOld)}] Ready, continuing...");
     }
 
     if (item.ItemGame != Bindings.GAME)
@@ -327,7 +328,7 @@ internal sealed class Client : IDisposable
     // ReSharper disable NullableWarningSuppressionIsUsed
     if (Bindings.ItemIdToLevel.TryGetValue(item.ItemId, out Level level))
     {
-      Plugin.Logger.LogInfo($"[{nameof(Client)}] Unlocking stage item {item.ItemName} ({item.ItemId}, {level})");
+      Plugin.Logger.LogInfo($"[{nameof(ClientOld)}] Unlocking stage item {item.ItemName} ({item.ItemId}, {level})");
 
       if (queued)
       {
@@ -504,7 +505,7 @@ internal sealed class Client : IDisposable
       Plugin.ToExecuteOnMainThread.Enqueue(() =>
       {
         // Reload our actual Sleeve Paint.
-        Plugin.Logger.LogInfo($"[{nameof(Client)}] Reloading Sleeve Paint");
+        Plugin.Logger.LogInfo($"[{nameof(ClientOld)}] Reloading Sleeve Paint");
         Persistence.p1Skin.Reload();
         Persistence.p2Skin.Reload();
       });
@@ -633,7 +634,7 @@ internal sealed class Client : IDisposable
 
   private void SendDeathLink(DeathLink deathLink)
   {
-    Plugin.Client.DeathLink?.SendDeathLink(deathLink);
+    Plugin.ClientOld.DeathLink?.SendDeathLink(deathLink);
     Plugin.Logger.LogInfo($"Sent death link: \"{deathLink.Cause}\"");
   }
 

@@ -53,10 +53,10 @@ internal static class Configuration
   internal static async Task<DeathLinkConfig> GetDeathLink()
   {
     // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-    if (Plugin.Client is null || Plugin.Client.Session is null)
+    if (Plugin.ClientOld is null || Plugin.ClientOld.Session is null)
       return _deathLink.Value;
 
-    return await Plugin.Client.Session.DataStorage.GetRaceModeAsync() ? DeathLinkConfig.FollowSlot : _deathLink.Value;
+    return await Plugin.ClientOld.Session.DataStorage.GetRaceModeAsync() ? DeathLinkConfig.FollowSlot : _deathLink.Value;
   }
 
   internal static int GetAutoReconnectMaxRetries() => _autoReconnectMaxRetries.Value;

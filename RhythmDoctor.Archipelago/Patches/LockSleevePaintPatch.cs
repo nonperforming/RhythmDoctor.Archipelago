@@ -6,7 +6,7 @@ namespace RhythmDoctor.Archipelago.Patches;
 /// <remarks>
 /// This patch should be applied under the ID <see cref="Plugin.PATCH_ID_SLEEVE_PAINT"/>.
 /// </remarks>
-/// <seealso cref="Client.ProcessItem"/>
+/// <seealso cref="ClientOld.ProcessItem"/>
 [HarmonyPatch(typeof(ArmSkin))]
 internal static class LockSleevePaintPatch
 {

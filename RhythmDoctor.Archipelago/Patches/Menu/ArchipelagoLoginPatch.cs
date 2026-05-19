@@ -133,7 +133,7 @@ internal static class ArchipelagoLoginPatch
     {
       // No password given.
     }
-    Plugin.Logger.LogInfo($"URL: {url}, Slot Name: {name}");
+    Plugin.Logger.LogInfo($"URL: {url}, Slot name: {name}");
 
     if (url.IsNullOrWhiteSpace() || name.IsNullOrWhiteSpace())
     {
@@ -144,11 +144,11 @@ internal static class ArchipelagoLoginPatch
 
     // Attempt to log in with the information given.
     Plugin.Logger.LogInfo("Creating client");
-    Plugin.Client = new Client.Client();
+    Plugin.ClientOld = new Client.ClientOld();
 
     // Should be safe in this context
     // ReSharper disable AccessToDisposedClosure
-    Task<LoginResult> login = Task.Run(() => Plugin.Client.CreateSessionAndConnect(url, name, password));
+    Task<LoginResult> login = Task.Run(() => Plugin.ClientOld.CreateSessionAndConnect(url, name, password));
     yield return new WaitUntil(() => login.IsCompleted);
 
     if (login.IsCanceled || login.IsFaulted)
@@ -171,7 +171,7 @@ internal static class ArchipelagoLoginPatch
         UnpatchMenuPatch();
 
         // Wait for setup...
-        while (!Plugin.Client.Setup)
+        while (!Plugin.ClientOld.Setup)
         {
           yield return new WaitForSecondsRealtime(1);
         }
@@ -193,8 +193,8 @@ internal static class ArchipelagoLoginPatch
       Plugin.Logger.LogError("Login failed (Login)");
       UnapplyPatchesPatch.TearDownClientPluginPatch();
       // ReSharper disable once ConstantConditionalAccessQualifier
-      Plugin.Client?.Dispose();
-      Plugin.Client = null!;
+      Plugin.ClientOld?.Dispose();
+      Plugin.ClientOld = null!;
       BailOut:
         // Bail out
         __instance.CurrentContentName = LevelImporter.ContentName.LevelsInstalled;
