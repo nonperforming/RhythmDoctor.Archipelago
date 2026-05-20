@@ -56,7 +56,9 @@ internal static class Configuration
     if (Plugin.ClientOld is null || Plugin.ClientOld.Session is null)
       return _deathLink.Value;
 
-    return await Plugin.ClientOld.Session.DataStorage.GetRaceModeAsync() ? DeathLinkConfig.FollowSlot : _deathLink.Value;
+    return await Plugin.ClientOld.Session.DataStorage.GetRaceModeAsync()
+      ? DeathLinkConfig.FollowSlot
+      : _deathLink.Value;
   }
 
   internal static int GetAutoReconnectMaxRetries() => _autoReconnectMaxRetries.Value;

@@ -135,7 +135,7 @@ internal static class Bindings
   };
 
   /// <summary>
-  /// Trap and powerup item ID to corresponding <see cref="Level"/>
+  /// Trap and powerup item ID to corresponding <see cref="ITrap"/> <see cref="Type"/>.
   /// </summary>
   internal static readonly Dictionary<long, Type> TrapItemIdToLevel = new()
   {

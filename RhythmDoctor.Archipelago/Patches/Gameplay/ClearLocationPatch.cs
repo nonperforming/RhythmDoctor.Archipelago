@@ -287,7 +287,8 @@ internal static class ClearLocationPatch
     bool clearedNewLocation = ids.Any(id => !Plugin.ClientOld.Session.Locations.AllLocationsChecked.Contains(id));
     if (clearedNewLocation)
     {
-      JustSentLocations = ids.Where(id => !Plugin.ClientOld.Session.Locations.AllLocationsChecked.Contains(id)).ToArray();
+      JustSentLocations = ids.Where(id => !Plugin.ClientOld.Session.Locations.AllLocationsChecked.Contains(id))
+        .ToArray();
       Task.Run(() => Plugin.ClientOld.Session.Locations.CompleteLocationChecksAsync(ids.ToArray()));
       Plugin.ClientOld.TrapManager.ClearActiveTraps(false);
     }

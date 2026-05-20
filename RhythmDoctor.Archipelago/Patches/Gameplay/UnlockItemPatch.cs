@@ -1,42 +1,39 @@
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace RhythmDoctor.Archipelago.Patches.Gameplay;
-
-using System.Text.RegularExpressions;
 
 [HarmonyPatch(typeof(scnLevelSelect))]
 internal static class UnlockItemPatch
 {
   [HarmonyPatch(nameof(scnLevelSelect.LoadLevelData))]
   [HarmonyPostfix]
-  private static void UnlockEntitiesWithItemsPatch(scnLevelSelect __instance)
+  private static void UnlockBonusItemsPatch(scnLevelSelect __instance)
   {
     // TODO: Bit inefficient
 
     // This is a PostLogin patch, session is guaranteed to exist (assuming going through normal flow)
-    Plugin.Logger.LogInfo("Checking for extra unlocks");
+    Plugin.Logger.LogInfo($"[{nameof(UnlockItemPatch)}] Unlocking bonus items");
 
     // Unlocking regions and Sleeve Paint
-    Plugin.Logger.LogInfo("Checking for regions to unlock");
+    Plugin.Logger.LogInfo($"[{nameof(UnlockItemPatch)}] Checking for regions to unlock");
 
     bool hasBasementKey = false;
     // ReSharper disable once NullableWarningSuppressionIsUsed
-    foreach (ItemInfo item in Plugin.ClientOld.Session!.Items.AllItemsReceived)
+    foreach (ItemInfo item in Plugin.Client.Session!.Items.AllItemsReceived)
     {
-      Plugin.Logger.LogDebug($"Processing item {item.ItemName} ({item.ItemId})");
+      Plugin.Logger.LogDebug($"[{nameof(UnlockItemPatch)}] Processing item {item.ItemName} ({item.ItemId})");
       if (Bindings.KeyItemIdToWard.TryGetValue(item.ItemId, out Region region))
       {
         if (region == Region.Basement)
         {
           hasBasementKey = true;
         }
-        Plugin.Logger.LogInfo($"Unlocking entrance {region}");
+        Plugin.Logger.LogInfo($"[{nameof(UnlockItemPatch)}] Unlocking entrance {region}");
         scnLevelSelect.instance.UnlockEntrance(region);
       }
       else if (Bindings.ItemIdToLevel.TryGetValue(item.ItemId, out Level level))
       {
-        // Duplicated in Client, though sometimes it can appear to "drop" items (possibly issue with
-        //  being in a loading state/between scenes) which this should catch
         Plugin.Logger.LogInfo(
           $"[{nameof(UnlockItemPatch)}] Unlocking stage item {item.ItemName} ({item.ItemId}, {level})"
         );
@@ -46,7 +43,7 @@ internal static class UnlockItemPatch
 
     if (!hasBasementKey)
     {
-      Plugin.Logger.LogInfo("Locking basement");
+      Plugin.Logger.LogInfo($"[{nameof(UnlockItemPatch)}] Locking basement");
       __instance.LockEntrance(scnLevelSelect.GoToBasement);
     }
 
@@ -55,7 +52,7 @@ internal static class UnlockItemPatch
     Plugin.Logger.LogInfo("Moving 1-CNY");
     __instance.FindSelectableEntity("1-CNY").gamePosition.x = -564;
 
-    if (Plugin.ClientOld.Slot.endGoal == SlotData.EndGoal.HelpingHands)
+    if (Plugin.Client.SlotData.endGoal == SlotData.EndGoal.HelpingHands)
     {
       // Moving X-1 - Art Exercise to the basement if end goal is X-0 - Helping Hands
       Plugin.Logger.LogInfo("Moving X-1 to the basement");
@@ -64,24 +61,20 @@ internal static class UnlockItemPatch
       artExercise.group = scnLevelSelectExtensions.BASEMENT_AREA;
       // Set selection order to just after the basement computer. This is separate from world position.
       int index =
-        __instance.selectableEntities.FindIndex((entity) => entity.gameObject.name == scnLevelSelect.BasementComputer)
+        __instance.selectableEntities.FindIndex(entity => entity.gameObject.name == scnLevelSelect.BasementComputer)
         + 1;
       artExercise.gamePosition = new Vector2(2480, 53); // in front of Ian's bookshelf/archive thing
       __instance.selectableEntities.Remove(artExercise);
       __instance.selectableEntities.Insert(index, artExercise);
 
-      // Unlock the Art Room if we have all bosses completed.
+      // Unlock the Art Room (allow access to X-0 - Helping Hands) if we have all bosses completed.
       if (Bindings.ActBoss.Values.All(levels => levels.All(level => Persistence.GetLevelRank(level).passed)))
       {
-        Plugin.Logger.LogInfo("Unlocking Art Room and X-0 - Helping Hands");
+        Plugin.Logger.LogInfo($"[{nameof(UnlockItemPatch)}] Unlocking Art Room and X-0 - Helping Hands");
         __instance.UnlockEntrance(__instance.FindSelectableEntity(scnLevelSelect.GoToArtRoom));
         Persistence.SetLevelRank(Level.HelpingHands, Rank.NotFinished, false, false);
       }
     }
-
-    // Hiding Paige at the vending machine
-    // Even though we are skipping cutscenes for some reason Paige can show up at the vending machine
-    GameObject.Find("/Scene/Corridor/VendingMachinePaige").gameObject.SetActive(false);
 
     #region Unhiding levels
     // Show all Basement levels
@@ -95,16 +88,11 @@ internal static class UnlockItemPatch
       level.normalEnabled = true;
     }
 
-    // Show all bonus levels/make them selectable
-    __instance.GetSelectableEntity("2-B1").normalEnabled = true;
-    __instance.GetSelectableEntity("5-B1").normalEnabled = true;
-
     // Show all Act 3 levels before we unlock 3-1
     foreach (SelectableEntity level in __instance.selectableEntities.Where((entity) => entity.id.StartsWith("3-")))
     {
       level.normalEnabled = true;
-      if (level.id != "3-X")
-        level.hardEnabled = true;
+      level.hardEnabled = true;
     }
 
     // Show all Act 5 levels before we clear 5-1
@@ -117,83 +105,50 @@ internal static class UnlockItemPatch
     GameObject.Find("/Scene/Levels Container/Vertical Movement/5-2").SetActive(true);
     GameObject.Find("/Scene/Levels Container/Vertical Movement/5-3").SetActive(true);
     GameObject.Find("/Scene/Levels Container/Vertical Movement/5-X").SetActive(true);
-    // Unhiding timed levels 1-CNY and 1-BOO
-    SelectableEntity CNY = __instance.GetSelectableEntity("1-CNY");
-    CNY.normalEnabled = true;
-    CNY.gameObject.SetActive(true);
-    SelectableEntity BOO = __instance.GetSelectableEntity("1-BOO");
-    BOO.normalEnabled = true;
-    BOO.gameObject.SetActive(true);
-    // Unhiding MD-1 - for some reason MD-1 has an additional check for 3-X
-    __instance.GetSelectableEntity("MD-1").normalEnabled = true;
-    // Unhiding 1-XN
-    __instance.GetSelectableEntity("1-X").hardEnabled = true;
-    // Unhiding 2-X before we pass Song of the Sea
-    SelectableEntity TwoX = __instance.GetSelectableEntity("2-X");
-    TwoX.normalEnabled = true;
-    // Unhiding 2-XN before we pass Blurred
-    TwoX.hardEnabled = true;
-    // Unhiding 5-1N before we pass 5-1 (normally when we are out of dream)
-    SelectableEntity FiveOne = __instance.GetSelectableEntity("5-1");
-    FiveOne.normalEnabled = true;
-    FiveOne.hardEnabled = true;
-    // Unhiding Records Room levels before we pass 6-1
-    SelectableEntity[] recordRoomLevels =
+
+    // TODO: foreach over all of Pulse's available level enum and enable them based on if they have normal/hard level.
+    (SelectableEntity entity, bool? normalEnabled, bool? hardEnabled)[] toEnable =
     [
-      __instance.FindSelectableEntity("6-2"),
-      __instance.FindSelectableEntity("6-X"),
-      __instance.FindSelectableEntity("7-1"),
+      (__instance.GetSelectableEntity("1-CNY"), true, null), // timed level
+      (__instance.GetSelectableEntity("1-BOO"), true, null), // timed level
+      (__instance.GetSelectableEntity("2-B1"), true, null), // bonus level
+      (__instance.GetSelectableEntity("5-B1"), true, null), // bonus level
+      (__instance.GetSelectableEntity("5-1"), true, true), // 5-1N before 5-1
+      (__instance.GetSelectableEntity("6-1"), true, true), // record room levels before 6-1
+      (__instance.GetSelectableEntity("6-X"), true, true), // record room levels before 6-1
+      (__instance.GetSelectableEntity("7-1"), true, true), // record room levels before 6-1
+      (__instance.GetSelectableEntity("1-X"), null, true), // 1-XN
+      (__instance.GetSelectableEntity("2-X"), true, true), // 2-X before 2-4, 2-XN before 7-1
+      (__instance.GetSelectableEntity("7-X"), true, true),
+      (__instance.GetSelectableEntity("MD-1"), true, null), // MD-1 has additional check for 3-X
+      (__instance.GetSelectableEntity("X-0"), true, null), // MD-1 has additional check for 3-X
+      (__instance.GetSelectableEntity("X-1"), true, null), // MD-1 has additional check for 3-X
+      (__instance.GetSelectableEntity("VoidItem1"), true, null), // abandoned ward items
+      (__instance.GetSelectableEntity("VoidItem2"), true, null), // abandoned ward items
+      (__instance.GetSelectableEntity("VoidItem3"), true, null), // abandoned ward items
     ];
-    foreach (SelectableEntity recordRoomLevel in recordRoomLevels)
+    foreach ((SelectableEntity entity, bool? normalEnabled, bool? hardEnabled) in toEnable)
     {
-      recordRoomLevel.normalEnabled = true;
+      entity.normalEnabled = normalEnabled ?? entity.normalEnabled;
+      entity.hardEnabled = hardEnabled ?? entity.hardEnabled;
+      entity.gameObject.SetActive(true);
     }
+
     GameObject.Find("/Scene/Levels Container/Vertical Movement/6-2").SetActive(true);
-    // Unhiding Abandoned Ward items and 7-X, 7-X2 (if 7-X was passed)
-    __instance.GetSelectableEntity("VoidItem1").normalEnabled = true;
-    __instance.GetSelectableEntity("VoidItem2").normalEnabled = true;
-    __instance.GetSelectableEntity("VoidItem3").normalEnabled = true;
+    // Fixing Abandoned Ward items colours and unlocking 7-X2 (if 7-X was passed)
     __instance.abandonedWard.voidItems[0].color = new Color(1, 1, 1, 1);
     __instance.abandonedWard.voidItems[1].color = new Color(1, 1, 1, 1);
     __instance.abandonedWard.voidItems[2].color = new Color(1, 1, 1, 1);
-    __instance.GetSelectableEntity("7-X").normalEnabled = true;
     Persistence.SetLevelRank(Level.Montage, Rank.NotFinished);
     if (Persistence.GetLevelRank(Level.Montage).passed)
     {
       __instance.GetSelectableEntity("7-X2").normalEnabled = true;
       Persistence.SetLevelRank(Level.Montage2, Rank.NotFinished);
     }
-    // Unhiding X-0 before we pass the last released boss song
-    SelectableEntity X0 = __instance.GetSelectableEntity("X-0");
-    X0.normalEnabled = true;
-    X0.gameObject.SetActive(true);
-    // Unhiding X-1 before we pass the last released boss song
-    SelectableEntity X1 = __instance.GetSelectableEntity("X-1");
-    X1.normalEnabled = true;
-    X1.gameObject.SetActive(true);
     #endregion
-
-    // Unlock the boss if enough levels in its act has been completed
-    foreach (Act act in Enum.GetValues(typeof(Act)))
-    {
-      if (HasUnlockedBossSong(act))
-      {
-        Plugin.Logger.LogDebug($"Unlocking act {act}");
-        foreach (Level level in Bindings.ActBoss[act])
-        {
-          Persistence.SetLevelRank(level, Rank.NotFinished, false, false);
-
-          if (level == Level.Montage)
-          {
-            __instance.UnlockEntrance(Region.RecordsRoom); // elevator
-          }
-        }
-      }
-    }
   }
 
   [HarmonyPatch(nameof(scnLevelSelect.LoadLevelData))]
-  [HarmonyPatch(nameof(scnLevelSelect.LevelJustPassedSequenceCo))]
   [HarmonyTranspiler]
   private static IEnumerable<CodeInstruction> DoNotUnlockEntrancesPatch(IEnumerable<CodeInstruction> instructions)
   {
@@ -218,9 +173,13 @@ internal static class UnlockItemPatch
     return matcher.InstructionEnumeration();
   }
 
+  [HarmonyPatch(nameof(scnLevelSelect.UnlockNextNormalLevels))]
   [HarmonyPatch(nameof(scnLevelSelect.UnlockNightShiftLevel))]
+  [HarmonyPatch(nameof(scnLevelSelect.LevelJustPassedSequenceCo))]
+  [HarmonyPatch(nameof(scnLevelSelect.PlaceToPlaceTransitionCo))]
+  [HarmonyPatch(nameof(scnLevelSelect.PlaceToPlaceTransitionPart2Co))]
   [HarmonyPrefix]
-  private static void DoNotUnlockNightShiftLevelPatch(ref bool __runOriginal)
+  private static void DoNotUnlockLevelsOrPlayCutscenesPatch(ref bool __runOriginal)
   {
     __runOriginal = false;
   }
@@ -228,8 +187,8 @@ internal static class UnlockItemPatch
   /// <summary>
   /// Do not unlock levels while loading level data (i.e. collabs).
   /// </summary>
-  /// <param name="instructions">Original method IL instructions</param>
-  /// <returns>Modified IL instructions</returns>
+  /// <param name="instructions">Original method IL instructions.</param>
+  /// <returns>Modified IL instructions.</returns>
   [HarmonyPatch(nameof(scnLevelSelect.LoadLevelData))]
   [HarmonyPatch(nameof(scnLevelSelect.Awake))]
   [HarmonyTranspiler]
@@ -462,7 +421,35 @@ internal static class UnlockItemPatch
     }
   }
 
-  internal static bool HasUnlockedBossSong(Act act)
+  internal static void TryUnlockAllBossSongs()
+  {
+    Plugin.Logger.LogInfo($"[{nameof(UnlockItemPatch)}] Attempting to unlock all boss songs");
+    foreach (Act act in Enum.GetValues(typeof(Act)))
+    {
+      TryUnlockBossSong(act);
+    }
+  }
+
+  internal static bool TryUnlockBossSong(Act act)
+  {
+    Plugin.Logger.LogDebug($"[{nameof(UnlockItemPatch)}] Attempting to unlock {act}'s boss songs");
+    if (HasUnlockedBossSong(act))
+    {
+      Level[] levelBosses = Bindings.ActBoss[act];
+      Plugin.Logger.LogDebug($"[{nameof(UnlockItemPatch)}] Unlocked {act}'s boss song(s) [{levelBosses.Join()}]");
+
+      foreach (Level levelBoss in levelBosses)
+      {
+        Persistence.SetLevelRank(levelBoss, Rank.NotFinished);
+      }
+
+      return true;
+    }
+    Plugin.Logger.LogDebug($"[{nameof(UnlockItemPatch)}] Does not meet requirements to unlock {act}'s boss song for");
+    return false;
+  }
+
+  private static bool HasUnlockedBossSong(Act act)
   {
     if (act == Act.None)
     {

@@ -1,5 +1,7 @@
 namespace RhythmDoctor.Archipelago.Patches;
 
+// FIXME: Client rework, unpatch LockSleevePaintPatch and reapply actual sleeve paint
+
 /// <summary>
 /// Randomize the player's sleeve until they receive a Sleeve Paint item and unapply this patch.
 /// </summary>

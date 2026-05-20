@@ -63,7 +63,8 @@ internal sealed class ClientOld : IDisposable
 
     Plugin.Logger.LogDebug("Binding events");
     Session.Socket.ErrorReceived += (
-      (__exception, __message) => Plugin.Logger.LogError($"[{nameof(ClientOld)}] Socket error {__exception} - {__message}")
+      (__exception, __message) =>
+        Plugin.Logger.LogError($"[{nameof(ClientOld)}] Socket error {__exception} - {__message}")
     );
     Session.Socket.SocketClosed += (__reason => _ = AttemptReconnect(__reason));
     Session.MessageLog.OnMessageReceived += (
