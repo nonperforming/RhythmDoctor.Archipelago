@@ -237,7 +237,7 @@ internal sealed class ClientOld : IDisposable
 
     // Setup DataStorage and TrapManager.ClearedTraps, Sticky Traps,
     // initial Paige stays (this can change!)/Ian's desktop (etc) state
-    await Task.Run(StateReplicationPatch.InitializeSync, _cancellationTokenSource.Token);
+    await Task.Run(StoryModeStateReplicationPatch.InitializeSync, _cancellationTokenSource.Token);
 
     foreach (Type trapType in Bindings.Traps)
     {

@@ -1,6 +1,6 @@
 namespace RhythmDoctor.Archipelago.Client.Components;
 
-internal sealed class DeathLinkComponent
+internal sealed class DeathLinkClientComponent : IClientComponent
 {
   private readonly ArchipelagoSession Session;
   private DeathLinkService Service = null!;
@@ -30,7 +30,7 @@ internal sealed class DeathLinkComponent
     " couldn't count to 7",
   ];
 
-  internal DeathLinkComponent(ArchipelagoSession session, CancellationTokenSource cancellationTokenSource)
+  internal DeathLinkClientComponent(ArchipelagoSession session, CancellationTokenSource cancellationTokenSource)
   {
     Session = session;
     _cancellationTokenSource = cancellationTokenSource;
@@ -38,15 +38,16 @@ internal sealed class DeathLinkComponent
 
   internal async Task Enable()
   {
-    Plugin.Logger.LogInfo($"[{nameof(DeathLinkComponent)}] Enabling DeathLink...");
+    Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Enabling DeathLink...");
     await Task.Run(() =>
     {
       Service = Session.CreateDeathLinkService();
       Service.EnableDeathLink();
       Service.OnDeathLinkReceived += DeathLinkReceived;
     });
-    Plugin.Logger.LogInfo($"[{nameof(DeathLinkComponent)}] Enabled DeathLink!");
+    Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Enabled DeathLink!");
   }
+
 
   internal void SendDeathLink()
   {
@@ -61,14 +62,14 @@ internal sealed class DeathLinkComponent
 
   private void SendDeathLink(DeathLink deathLink)
   {
-    Plugin.Logger.LogInfo($"[{nameof(DeathLinkComponent)}] Sending death link: \"{deathLink.Cause}\"...");
+    Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Sending death link: \"{deathLink.Cause}\"...");
     Service.SendDeathLink(deathLink);
   }
 
   private void DeathLinkReceived(DeathLink deathLink)
   {
     Plugin.Logger.LogInfo(
-      $"[{nameof(DeathLinkComponent)}] DeathLink from {deathLink.Source} by \"{deathLink.Cause}\" at {deathLink.Timestamp}"
+      $"[{nameof(DeathLinkClientComponent)}] DeathLink from {deathLink.Source} by \"{deathLink.Cause}\" at {deathLink.Timestamp}"
     );
 
     if (!DeathLinkPatch.enabled)
@@ -80,7 +81,7 @@ internal sealed class DeathLinkComponent
     {
       if (scnGame.instance.levelIdentifier == nameof(Level.BeansHopper))
       {
-        Plugin.Logger.LogInfo($"[{nameof(DeathLinkComponent)}] Running tag 'miss'");
+        Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Running tag 'miss'");
 
         // While Beans Hopper does technically have hearts, they're not visible/relevant in this minigame.
         DeathLinkPatch.enabled = false;
@@ -92,7 +93,7 @@ internal sealed class DeathLinkComponent
       else
       {
         // Normal/boss level.
-        Plugin.Logger.LogInfo($"[{nameof(DeathLinkComponent)}] Breaking all hearts");
+        Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Breaking all hearts");
 
         scrConductor.PlayFeedback(GameSoundType.BigMistake, group: RDUtils.GetMixerGroup("MistakesParent"));
         scnGame.instance.FlashBorderFeedbackWithDuration(scnGame.BorderFeedbackType.Incorrect, 5f);
@@ -127,7 +128,7 @@ internal sealed class DeathLinkComponent
       {
         // Rhythm Stacker
         case 0:
-          Plugin.Logger.LogInfo($"[{nameof(DeathLinkComponent)}] Killing stacker");
+          Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Killing stacker");
           // from AddBlock()
           desktop.stackerManager.gameoverContainer.SetActive(true);
           desktop.stackerManager.hasLost = true;
@@ -143,7 +144,7 @@ internal sealed class DeathLinkComponent
           break;
         // tempres
         case 1:
-          Plugin.Logger.LogInfo($"[{nameof(DeathLinkComponent)}] Killing tempres");
+          Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Killing tempres");
           // TODO: Show person who killed them
           // FIXME: Technically this works but its a bit buggy, doesn't tween bars.
           //  Also doesn't account for login minigame.

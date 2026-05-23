@@ -1,10 +1,9 @@
-namespace RhythmDoctor.Archipelago.Patches.Gameplay;
+namespace RhythmDoctor.Archipelago.Patches.Gameplay.ClientAssistPatches;
 
 using Newtonsoft.Json.Linq;
 
-/// <seealso cref="ClientOld"/>
-[HarmonyPatch(typeof(Persistence))]
-internal static class StateReplicationPatch
+[HarmonyPatch(typeof(StoryModeReplicationClientComponent))]
+internal static class StoryModeStateReplicationPatch
 {
   // FIXME: Make async and retry on failure!!
 

@@ -11,8 +11,20 @@ internal sealed class Client : IDisposable, IAsyncDisposable
   internal SlotData SlotData { get; private set; }
 
   //internal ArchipelagoModManager ModManager { get; private set; }
-  internal DeathLinkComponent? DeathLinkComponent { get; private set; }
+  internal DeathLinkClientComponent? DeathLinkComponent { get; private set; }
+  internal IReplicationClientComponent? ReplicationComponent { get; private set; }
   internal ClientState State { get; private set; } = ClientState.NotReady;
+
+  internal IEnumerable<IClientComponent> ClientComponents
+  {
+    get
+    {
+      if (DeathLinkComponent != null)
+        yield return DeathLinkComponent;
+      if (ReplicationComponent != null)
+        yield return ReplicationComponent;
+    }
+  }
 
   internal ArchipelagoSession? Session { get; private set; }
 
@@ -23,18 +35,32 @@ internal sealed class Client : IDisposable, IAsyncDisposable
     LoginInformation = loginInformation;
   }
 
-  internal Task<ArchipelagoSession> CreateSession()
+  internal ArchipelagoSession CreateSession()
   {
+    static void BindEvents(ArchipelagoSession session)
+    {
+      session.Socket.ErrorReceived += (
+        (__exception, __message) =>
+          Plugin.Logger.LogError($"[{nameof(Client)}] Socket error {__exception} - {__message}")
+      );
+      session.Socket.SocketClosed += (__reason => _ = AttemptReconnect(__reason));
+      session.MessageLog.OnMessageReceived += (
+        __message => Plugin.Logger.LogInfo($"[{nameof(Client)}] Received message \"{__message}\"")
+      );
+      session.Items.ItemReceived += ItemReceived;
+      session.DataStorage[Scope.Slot, Persistence.PaigeStaysKey].OnValueChanged += ReplicatePaigeStays;
+      session.DataStorage[Scope.Slot, Persistence.IanDesktopLoginKey].OnValueChanged += ReplicateIansDesktopUnlocked;
+    }
+    
     ThrowIfNotReadyFor(ClientState.CreatingSession);
     State = ClientState.CreatingSession;
-    try { }
-    catch (Exception exception)
-    {
-      State = ClientState.Failed;
-      Plugin.Logger.LogError(exception);
-      throw;
-    }
+    Plugin.Logger.LogInfo($"[{nameof(Client)}] Creating Archipelago session to {LoginInformation.Uri}");
+    
+    Session = ArchipelagoSessionFactory.CreateSession(LoginInformation.Uri);
+    BindEvents(Session);
     State = ClientState.CreatedSession;
+    
+    return Session;
   }
 
   /// <summary>
@@ -45,11 +71,14 @@ internal sealed class Client : IDisposable, IAsyncDisposable
   /// <see cref="CreateSession"/> should be called prior to calling this.
   /// </remarks>
   /// <returns></returns>
-  internal Task<LoginResult> Login()
+  internal async Task<LoginResult> Login()
   {
     ThrowIfNotReadyFor(ClientState.LoggingIn);
 
     //if (State == )
+    // 
+    Plugin.Logger.LogInfo($"[{nameof(Client)}] Logging in...");
+    await Session.ConnectAsync();
 
     State = ClientState.LoggingIn;
 

@@ -2,8 +2,8 @@ namespace RhythmDoctor.Archipelago.Client;
 
 internal struct LoginInformation
 {
-  private readonly Mode Mode;
-  readonly Uri Uri;
-  readonly string SlotName;
-  readonly string? Password;
+  internal readonly Mode Mode;
+  internal readonly Uri Uri;
+  internal readonly string SlotName;
+  internal readonly string? Password;
 }

@@ -23,6 +23,7 @@ global using RDLevelEditor;
 global using RhythmDoctor.Archipelago;
 global using RhythmDoctor.Archipelago.Client;
 global using RhythmDoctor.Archipelago.Client.Components;
+global using RhythmDoctor.Archipelago.Client.Components.Interfaces;
 #if DEBUG
 global using RhythmDoctor.Archipelago.Debug;
 global using RhythmDoctor.Archipelago.Debug.Patches;
@@ -32,6 +33,7 @@ global using RhythmDoctor.Archipelago.Helpers;
 global using RhythmDoctor.Archipelago.Interfaces;
 global using RhythmDoctor.Archipelago.Patches;
 global using RhythmDoctor.Archipelago.Patches.Gameplay;
+global using RhythmDoctor.Archipelago.Patches.Gameplay.ClientAssistPatches;
 global using RhythmDoctor.Archipelago.Patches.Gameplay.Powerups;
 global using RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 global using RhythmDoctor.Archipelago.Patches.Menu;
