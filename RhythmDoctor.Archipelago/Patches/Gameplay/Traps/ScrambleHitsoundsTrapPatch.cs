@@ -1,30 +1,27 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 
-internal class ScrambleHitsoundsTrapPatch : ITrap
+internal class ScrambleHitsoundsTrapPatch : ModifierPatch<ScrambleHitsoundsTrapPatch>, IModifier, IArchipelagoModifier
 {
-  // ReSharper disable once NullableWarningSuppressionIsUsed
-  private Harmony _harmony = null!;
+  public string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.scrambleHitsounds";
+  public string LocalizationKey => "mods.archipelago.trap.scrambleHitsounds";
+  public ModifierCompatibility Compatibility =>
+    ModifierCompatibilityBuilder
+      .GetDefaultBuilderForMod(this)
+      .AddBlacklistedLevels(LevelExtensions.AllIntermissionLevels)
+      .AddBlacklistedLevels(Level.Bitterness) // TODO: Handle custom beatsounds properly and remove Bitterness from blacklist.
+      .Build();
+  public ModifierCapability[] Capabilities => [ModifierCapability.Characters];
+
+  public override Type[] PreviewPatches => [];
+  public override Type[] ActivePatches => [typeof(ActivePatch)];
+
+  public float GetScale(int num, out int consumed) => Scales.BinaryScale(num, out consumed);
 
   private static Dictionary<string, string> scrambled = new();
 
   // ReSharper disable once NullableWarningSuppressionIsUsed
-  // This will be populated in InQueue if need be.
-  private static string[] hitsounds = null!;
-
-  public string Name => "Scramble Hitsounds";
-  public IEnumerable<Type> IncompatibleWithTraps => [typeof(ScrambleHitsoundsTrapPatch)];
-
-  // FIXME: Handle custom beatsounds properly and remove Bitterness from blacklist.
-  public IEnumerable<Level> IncompatibleWithLevels =>
-    [Level.SongOfTheSea, Level.SongOfTheSeaH, Level.AthleteTherapy, Level.Bitterness];
-
-  public void InQueue()
-  {
-    // Although this method is marked for P1 the only difference is the order of the sound effects
-    // ReSharper disable once NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
-    hitsounds ??= LevelEvent_SetClapSounds.GetClapSoundsP1();
-    _harmony = new Harmony($"{Plugin.PATCH_ID_TRAP}.{nameof(ScrambleHitsoundsTrapPatch)}");
-  }
+  // Although this method is marked for P1 the only difference is the order of the sound effects
+  private static readonly string[] hitsounds = LevelEvent_SetClapSounds.GetClapSoundsP1();
 
   public void Active()
   {
@@ -42,12 +39,6 @@ internal class ScrambleHitsoundsTrapPatch : ITrap
     {
       Plugin.Logger.LogDebug($"[Scramble Hitsounds]  {originalHitsound} -> {randomizedHitsound}");
     }
-    _harmony.PatchAll(typeof(ActivePatch));
-  }
-
-  public void ActiveEnd()
-  {
-    _harmony.UnpatchSelf();
   }
 
   [HarmonyPatch(typeof(LevelBase))]

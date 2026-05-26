@@ -1,8 +1,8 @@
 namespace RhythmDoctor.Archipelago.Client;
 
-internal sealed class TrapManager : IDisposable
+internal sealed class ArchipelagoTrapManager : ModifierManagerBase, IDisposable
 {
-  public TrapManager(Dictionary<string, int>? clearedTraps = null)
+  public ArchipelagoTrapManager(Dictionary<string, int>? clearedTraps = null)
   {
     Events.Instance.LevelDeselected += OnLevelDeselected;
     ClearedTraps = clearedTraps ?? new Dictionary<string, int>();
@@ -28,7 +28,7 @@ internal sealed class TrapManager : IDisposable
   /// <summary>
   /// Ordered array of traps that were applied to the level, by the lowest index to the highest index.
   /// Cleared by <see cref="ClearLocationPatch"/> after a location is cleared,
-  /// or used by <see cref="TrapManagerPatch.RestoreActiveTrapsOnAbandonPatch"/> to restore active traps back to the
+  /// or used by <see cref="ModifierManagerPatch.RestoreActiveTrapsOnAbandonPatch"/> to restore active traps back to the
   /// main <see cref="Traps"/> queue if no location was cleared.
   /// </summary>
   /// <remarks>
@@ -38,7 +38,7 @@ internal sealed class TrapManager : IDisposable
   /// (0, <see cref="ChilliSpeedTrapPatch"/>) -> Before <see cref="ChilliSpeedTrapPatch"/> was active, it was at
   /// position 0 of <see cref="Traps"/>.
   /// (5, <see cref="GhostTapTrapPatch"/>) -> Before <see cref="GhostTapTrapPatch"/> was active, it was at
-  /// position 0 of <see cref="Traps"/>.
+  /// position 5 of <see cref="Traps"/>.
   /// </example>
   /// <seealso cref="_previewTraps"/>
 #if DEBUG
@@ -75,7 +75,7 @@ internal sealed class TrapManager : IDisposable
   /// <param name="type">The type of trap to create and add</param>
   internal async Task AddTrap(Type type)
   {
-    Plugin.Logger.LogInfo($"[{nameof(TrapManager)}] Creating {type.Name} trap from type");
+    Plugin.Logger.LogInfo($"[{nameof(ArchipelagoTrapManager)}] Creating {type.Name} trap from type");
     await AddTrap((ITrap)Activator.CreateInstance(type));
   }
 
@@ -95,7 +95,7 @@ internal sealed class TrapManager : IDisposable
       if (doNotCheckPriorClear)
         return false;
 
-      Plugin.Logger.LogInfo($"[{nameof(TrapManager)}] Checking if {trapName} has been cleared previously...");
+      Plugin.Logger.LogInfo($"[{nameof(ArchipelagoTrapManager)}] Checking if {trapName} has been cleared previously...");
 
       int local = ClearedTraps[trapName];
       _remoteTrapClearCache.TryGetValue(trapName, out int remoteCache);
@@ -103,17 +103,17 @@ internal sealed class TrapManager : IDisposable
       if (remoteCache != 0 && local <= remoteCache)
       {
         Plugin.Logger.LogDebug(
-          $"[{nameof(TrapManager)}] {trapName} already cleared: l:{local} <= c:{_remoteTrapClearCache[trapName]} && c != 0"
+          $"[{nameof(ArchipelagoTrapManager)}] {trapName} already cleared: l:{local} <= c:{_remoteTrapClearCache[trapName]} && c != 0"
         );
         return true;
       }
       else
       {
-        Plugin.Logger.LogInfo($"[{nameof(TrapManager)}] Waiting for semaphore to check DataStorage for {trapName}...");
+        Plugin.Logger.LogInfo($"[{nameof(ArchipelagoTrapManager)}] Waiting for semaphore to check DataStorage for {trapName}...");
         await _gettingTrapClearedSemaphore.WaitAsync();
         try
         {
-          Plugin.Logger.LogInfo($"[{nameof(TrapManager)}] Got semaphore, checking DataStorage for {trapName}...");
+          Plugin.Logger.LogInfo($"[{nameof(ArchipelagoTrapManager)}] Got semaphore, checking DataStorage for {trapName}...");
 
           // https://stackoverflow.com/a/11191070
           Task<int> getTrapClearsRemote = Plugin.ClientOld.Session!.DataStorage[Scope.Slot, trapName].GetAsync<int>();
@@ -130,7 +130,7 @@ internal sealed class TrapManager : IDisposable
           {
             // Timed out
             Plugin.Logger.LogError(
-              $"[{nameof(TrapManager)}] Getting {trapName} clear status timed out "
+              $"[{nameof(ArchipelagoTrapManager)}] Getting {trapName} clear status timed out "
                 + $"({Configuration.GetRemoteTrapClearsTimeout()}ms) - "
                 + $"setting {remoteCache} to last known good value or 0."
             );
@@ -141,12 +141,12 @@ internal sealed class TrapManager : IDisposable
           {
             _remoteTrapClearCache[trapName] = remoteCache;
             Plugin.Logger.LogDebug(
-              $"[{nameof(TrapManager)}] {trapName} already cleared: l:{local} <= r:{remoteCache} != 0 (updated cache)"
+              $"[{nameof(ArchipelagoTrapManager)}] {trapName} already cleared: l:{local} <= r:{remoteCache} != 0 (updated cache)"
             );
             return true;
           }
           Plugin.Logger.LogInfo(
-            $"[{nameof(TrapManager)}] {trapName} not cleared: l:{local} <= r:{remoteCache} != 0 (updated cache)"
+            $"[{nameof(ArchipelagoTrapManager)}] {trapName} not cleared: l:{local} <= r:{remoteCache} != 0 (updated cache)"
           );
         }
         catch (Exception exception)
@@ -155,18 +155,18 @@ internal sealed class TrapManager : IDisposable
         }
         finally
         {
-          Plugin.Logger.LogDebug($"[{nameof(TrapManager)}] Releasing semaphore (used for {trapName})");
+          Plugin.Logger.LogDebug($"[{nameof(ArchipelagoTrapManager)}] Releasing semaphore (used for {trapName})");
           _gettingTrapClearedSemaphore.Release();
         }
       }
 
-      Plugin.Logger.LogDebug($"[{nameof(TrapManager)}] {trapName} not cleared: l:{local} <= r:{remoteCache} != 0");
+      Plugin.Logger.LogDebug($"[{nameof(ArchipelagoTrapManager)}] {trapName} not cleared: l:{local} <= r:{remoteCache} != 0");
       return false;
     }
 
     if (await CheckIfTrapAlreadyCleared(trap.Name))
     {
-      Plugin.Logger.LogInfo($"[{nameof(TrapManager)}] Skipping {trap.Name} trap as it has been cleared previously");
+      Plugin.Logger.LogInfo($"[{nameof(ArchipelagoTrapManager)}] Skipping {trap.Name} trap as it has been cleared previously");
       ClearedTraps[trap.Name]++;
       return;
     }
@@ -199,7 +199,7 @@ internal sealed class TrapManager : IDisposable
 
     foreach (string trapName in traps)
     {
-      Plugin.Logger.LogDebug($"[{nameof(TrapManager)}] Adding sticky trap {trapName}");
+      Plugin.Logger.LogDebug($"[{nameof(ArchipelagoTrapManager)}] Adding sticky trap {trapName}");
       ITrap trap = GetTrapFromName(trapName);
       trap.InQueue();
       StickyTraps.Add(trap);
@@ -208,7 +208,7 @@ internal sealed class TrapManager : IDisposable
 
   internal bool IsTrapActive(string trapName)
   {
-    foreach ((int _, ITrap trap) in Plugin.ClientOld.TrapManager._activeTraps)
+    foreach ((int _, ITrap trap) in Plugin.Client.ModifierManager._activeTraps)
     {
       if (trap.Name == trapName)
       {
@@ -220,11 +220,11 @@ internal sealed class TrapManager : IDisposable
 
   private void ClearTrapsList(ref (int index, ITrap trap)[] trapList, bool returnToQueue)
   {
-    Plugin.Logger.LogInfo($"[{nameof(TrapManager)}] Clearing traps list (return to queue: {returnToQueue})");
+    Plugin.Logger.LogInfo($"[{nameof(ArchipelagoTrapManager)}] Clearing traps list (return to queue: {returnToQueue})");
 
     if (returnToQueue)
     {
-      Plugin.Logger.LogInfo($"[{nameof(TrapManager)}] Restoring {trapList.Length} traps back into the trap queue");
+      Plugin.Logger.LogInfo($"[{nameof(ArchipelagoTrapManager)}] Restoring {trapList.Length} traps back into the trap queue");
 
       foreach ((int index, ITrap trap) in trapList)
       {
@@ -373,11 +373,11 @@ internal sealed class TrapManager : IDisposable
   #region Active traps
   internal void ClearActiveTraps(bool returnToQueue)
   {
-    Plugin.Logger.LogInfo($"[{nameof(TrapManager)}] Clearing active traps (return to queue: {returnToQueue})");
+    Plugin.Logger.LogInfo($"[{nameof(ArchipelagoTrapManager)}] Clearing active traps (return to queue: {returnToQueue})");
 
     if (_activeTraps.Length == 0)
     {
-      Plugin.Logger.LogWarning($"[{nameof(TrapManager)}] There must be at least one active trap to clear.");
+      Plugin.Logger.LogWarning($"[{nameof(ArchipelagoTrapManager)}] There must be at least one active trap to clear.");
       return;
     }
 
@@ -403,7 +403,7 @@ internal sealed class TrapManager : IDisposable
     if (_previewTraps.Length == 0)
     {
       Plugin.Logger.LogWarning(
-        $"[{nameof(TrapManager)}] There must be at least one trap under preview traps to promote to to an active trap,"
+        $"[{nameof(ArchipelagoTrapManager)}] There must be at least one trap under preview traps to promote to to an active trap,"
           + "ignoring request to promote traps"
       );
       return;
@@ -411,7 +411,7 @@ internal sealed class TrapManager : IDisposable
     if (_activeTraps.Length != 0)
     {
       Plugin.Logger.LogError(
-        $"[{nameof(TrapManager)}] There must be no active traps currently applied. " + "Discarding old active traps."
+        $"[{nameof(ArchipelagoTrapManager)}] There must be no active traps currently applied. " + "Discarding old active traps."
       );
       ClearActiveTraps(false);
     }
@@ -420,7 +420,7 @@ internal sealed class TrapManager : IDisposable
     _previewTraps = [];
     foreach ((_, ITrap trap) in _activeTraps)
     {
-      Plugin.Logger.LogInfo($"[{nameof(TrapManager)}] Invoking active for {trap.Name}");
+      Plugin.Logger.LogInfo($"[{nameof(ArchipelagoTrapManager)}] Invoking active for {trap.Name}");
       trap.Active();
     }
   }
@@ -428,7 +428,7 @@ internal sealed class TrapManager : IDisposable
 
   public void Dispose()
   {
-    Plugin.Logger.LogInfo($"[{nameof(TrapManager)}] Disposing");
+    Plugin.Logger.LogInfo($"[{nameof(ArchipelagoTrapManager)}] Disposing");
 
     Events.Instance.LevelDeselected -= OnLevelDeselected;
 

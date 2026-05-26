@@ -3,8 +3,9 @@ namespace RhythmDoctor.Archipelago.Interfaces;
 /// <summary>
 /// Represents a trap or powerup.
 /// </summary>
-/// <seealso cref="TrapManager"/>
-/// <seealso cref="TrapManagerPatch"/>
+/// <seealso cref="ArchipelagoTrapManager"/>
+/// <seealso cref="ModifierManagerPatch"/>
+[Obsolete("Use ArchipelagoModifier instead", true)]
 internal interface ITrap
 {
   /// <summary>
@@ -43,7 +44,7 @@ internal interface ITrap
   /// <remarks>
   /// This method will be run regardless of whether it is compatible or not.
   /// </remarks>
-  /// <seealso cref="TrapManager"/>
+  /// <seealso cref="ArchipelagoTrapManager"/>
   internal void InQueue() { }
 
   /// <summary>

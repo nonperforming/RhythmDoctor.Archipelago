@@ -10,10 +10,11 @@ internal sealed class Client : IDisposable, IAsyncDisposable
   internal LoginInformation LoginInformation { get; private set; }
   internal SlotData SlotData { get; private set; }
 
-  //internal ArchipelagoModManager ModManager { get; private set; }
+  internal Modifiers.ModifierManagerBase ModifierManager { get; private set; };
   internal DeathLinkClientComponent? DeathLinkComponent { get; private set; }
   internal IReplicationClientComponent? ReplicationComponent { get; private set; }
   internal ClientState State { get; private set; } = ClientState.NotReady;
+  internal SlotData Slot;
 
   internal IEnumerable<IClientComponent> ClientComponents
   {
@@ -33,6 +34,7 @@ internal sealed class Client : IDisposable, IAsyncDisposable
   internal Client(LoginInformation loginInformation)
   {
     LoginInformation = loginInformation;
+    ModifierManager = new ArchipelagoTrapManager();
   }
 
   internal ArchipelagoSession CreateSession()
@@ -51,15 +53,15 @@ internal sealed class Client : IDisposable, IAsyncDisposable
       session.DataStorage[Scope.Slot, Persistence.PaigeStaysKey].OnValueChanged += ReplicatePaigeStays;
       session.DataStorage[Scope.Slot, Persistence.IanDesktopLoginKey].OnValueChanged += ReplicateIansDesktopUnlocked;
     }
-    
+
     ThrowIfNotReadyFor(ClientState.CreatingSession);
     State = ClientState.CreatingSession;
     Plugin.Logger.LogInfo($"[{nameof(Client)}] Creating Archipelago session to {LoginInformation.Uri}");
-    
+
     Session = ArchipelagoSessionFactory.CreateSession(LoginInformation.Uri);
     BindEvents(Session);
     State = ClientState.CreatedSession;
-    
+
     return Session;
   }
 
@@ -76,7 +78,7 @@ internal sealed class Client : IDisposable, IAsyncDisposable
     ThrowIfNotReadyFor(ClientState.LoggingIn);
 
     //if (State == )
-    // 
+    //
     Plugin.Logger.LogInfo($"[{nameof(Client)}] Logging in...");
     await Session.ConnectAsync();
 
@@ -102,7 +104,7 @@ internal sealed class Client : IDisposable, IAsyncDisposable
       Rank GetBestRankForStandardLevel()
       {
         Plugin.Logger.LogInfo($"[{nameof(Client)}] Handling level");
-        
+
         BaseStage levelStage = Bindings.LevelToStage[level];
         (Rank, long)[] stageLocationIds;
 
@@ -120,7 +122,7 @@ internal sealed class Client : IDisposable, IAsyncDisposable
           default:
             throw new InvalidOperationException("Can't get best rank for this type of Stage.");
         }
-        
+
         // Locations are always sent in the order of B-A-S ranks, so if we iterate in reverse we always
         //  will catch the highest rank first.
         for (int sentLocationsIndex = locations.Count - 1; sentLocationsIndex >= 0; sentLocationsIndex--)
@@ -135,7 +137,7 @@ internal sealed class Client : IDisposable, IAsyncDisposable
         }
         return Rank.NotFinished;
       }
-      
+
       // Level item, try to find prior rank...
       Plugin.Logger.LogInfo($"[{nameof(Client)}] Attempting to get rank from locations cleared for {level}");
       if (level == Level.RhythmWeightlifter)

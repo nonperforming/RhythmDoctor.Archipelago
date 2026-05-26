@@ -1,38 +1,42 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 
-internal class FragileHeartTrapPatch : ITrap
+internal class FragileHeartTrapPatch : ModifierPatch<FragileHeartTrapPatch>, IModifier, IArchipelagoModifier
 {
-  // ReSharper disable once NullableWarningSuppressionIsUsed
-  private Harmony _harmony = null!;
+  /// <summary>
+  /// By how much we should reduce mistake weight:
+  /// mistake weight = original mistake weight * strength,
+  /// where strength is 2*consumed
+  /// </summary>
+  private static float Strength;
 
-  public string Name => "Fragile Heart";
-  public IEnumerable<Type> IncompatibleWithTraps => [typeof(StrongHeartPowerupPatch)];
-  public IEnumerable<Level> IncompatibleWithLevels =>
-    LevelExtensions.AllBonusLevels.Concat(LevelExtensions.AllIntermissionLevels).Concat(LevelExtensions.AllBossLevels);
+  /// <summary>
+  /// How much traps we can consume in one usage.
+  /// </summary>
+  /// <seealso cref="Strength"/>
+  private const int MAX_CONSUMED = 2;
 
-#pragma warning disable RCS1168
-  public bool Compatible(Level _)
-#pragma warning restore RCS1168
+  public string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.fragileHeart";
+  public string LocalizationKey => "mods.archipelago.trap.fragileHeart";
+
+  // TODO: CACHE
+  public ModifierCompatibility Compatibility =>
+    ModifierCompatibilityBuilder.GetDefaultBuilderForMod(this).SetMaximumStrength(2).Build();
+  public ModifierCapability[] Capabilities => [ModifierCapability.HeartStrength];
+
+  public override Type[] PreviewPatches => [];
+  public override Type[] ActivePatches => [typeof(ActivePatch)];
+
+  public override void Active(float strength)
   {
-    // 0 < 2 True (able to add one Fragile Heart trap, 2x mistake weight)
-    // 1 < 2 True (able to add another Fragile Heart trap, 4x mistake weight)
-    // 2 < 2 False (do not add more Fragile Heart traps)
-    return Plugin.ClientOld.TrapManager.Traps.OfType<FragileHeartTrapPatch>().Count() < 2;
+    base.Active(strength);
+    Strength = strength;
   }
 
-  public void InQueue()
+  public float GetScale(int num, out int consumed)
   {
-    _harmony = new Harmony($"{Plugin.PATCH_ID_TRAP}.{nameof(FragileHeartTrapPatch)}");
-  }
-
-  public void Active()
-  {
-    _harmony.PatchAll(typeof(ActivePatch));
-  }
-
-  public void ActiveEnd()
-  {
-    _harmony.UnpatchSelf();
+    // this doesn't run if trap weight is 0/no traps in queue
+    consumed = Math.Clamp(num, 1, MAX_CONSUMED);
+    return num * (2 * consumed);
   }
 
   [HarmonyPatch(typeof(MistakesManager))]
@@ -40,9 +44,9 @@ internal class FragileHeartTrapPatch : ITrap
   {
     [HarmonyPatch(nameof(MistakesManager.AddMistake))]
     [HarmonyPrefix]
-    private static void DoubleMistakeWeightPatch(ref float weight)
+    private static void IncreaseMistakeWeightPatch(ref float weight)
     {
-      weight *= 2;
+      weight *= Strength;
     }
   }
 }

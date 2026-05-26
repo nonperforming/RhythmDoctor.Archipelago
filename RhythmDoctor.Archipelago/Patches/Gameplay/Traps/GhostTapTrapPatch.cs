@@ -1,29 +1,26 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 
-// Adapted from https://github.com/Mysthaps/MyseIfRDPatches/blob/master/GhostTapMiss.cs
-internal class GhostTapTrapPatch : ITrap
+/// <summary>
+/// Take damage from ghost taps.
+/// </summary>
+/// <remarks>Adapted from https://github.com/Mysthaps/MyseIfRDPatches/blob/master/GhostTapMiss.cs</remarks>
+internal class GhostTapTrapPatch : ModifierPatch<GhostTapTrapPatch>, IModifier, IArchipelagoModifier
 {
-  // ReSharper disable once NullableWarningSuppressionIsUsed
-  private Harmony _harmony = null!;
+  public string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.ghostTap";
+  public string LocalizationKey => "mods.archipelago.trap.ghostTap";
+  public ModifierCompatibility Compatibility =>
+    ModifierCompatibilityBuilder
+      .GetDefaultBuilderForMod(this)
+      .AddBlacklistedLevels(LevelExtensions.AllIntermissionLevels)
+      .Build();
+  public ModifierCapability[] Capabilities => [];
 
-  public string Name => "Ghost Tap";
-  public IEnumerable<Type> IncompatibleWithTraps => [typeof(GhostTapTrapPatch)];
+  public override Type[] PreviewPatches => [];
+  public override Type[] ActivePatches => [typeof(ActivePatch)];
 
-  public void InQueue()
-  {
-    _harmony = new Harmony($"{Plugin.PATCH_ID_TRAP}.{nameof(GhostTapTrapPatch)}");
-  }
+  public float GetScale(int num, out int consumed) => Scales.BinaryScale(num, out consumed);
 
-  public void Active()
-  {
-    _harmony.PatchAll(typeof(ActivePatch));
-  }
-
-  public void ActiveEnd()
-  {
-    _harmony.UnpatchSelf();
-  }
-
+  [HarmonyPatch]
   private static class ActivePatch
   {
     // ReSharper disable once RedundantDefaultMemberInitializer
@@ -34,9 +31,7 @@ internal class GhostTapTrapPatch : ITrap
     private static void DamageGhostInputPatch(RDPlayer player, bool keyPressed, scnGame __instance)
     {
       if (_endLevel)
-      {
         return;
-      }
 
       if (
         !keyPressed
@@ -44,9 +39,7 @@ internal class GhostTapTrapPatch : ITrap
         || __instance.levelIdentifier == nameof(Level.SongOfTheSea)
         || __instance.levelIdentifier == nameof(Level.SongOfTheSeaH)
       )
-      {
         return;
-      }
 
       scrConductor.PlayFeedback(
         GameSoundType.BigMistake,

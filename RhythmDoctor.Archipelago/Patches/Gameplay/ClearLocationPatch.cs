@@ -27,7 +27,7 @@ internal static class ClearLocationPatch
     if (!Enum.TryParse(scnGame.internalIdentifier, out Level level))
     {
       Plugin.Logger.LogError($"Couldn't find Level. Level identifier: {scnGame.internalIdentifier}");
-      Plugin.ClientOld.TrapManager.ClearActiveTraps(false);
+      Plugin.Client.ModifierManager.ClearActiveTraps(false);
       return;
     }
 
@@ -170,7 +170,7 @@ internal static class ClearLocationPatch
   [HarmonyPostfix]
   private static void MiracleDefibrillatorClearLocationPatch(Level_Montage __instance)
   {
-    bool hasScrambledCharacter = Plugin.ClientOld.TrapManager.IsTrapActive(ScrambleCharactersTrapPatch.name);
+    bool hasScrambledCharacter = Plugin.Client.ModifierManager.IsTrapActive(ScrambleCharactersTrapPatch.name);
 
     // We need to calculate the level's rank manually...
     int rank;
@@ -237,11 +237,11 @@ internal static class ClearLocationPatch
   {
 #if DEBUG
     // Discard Debug Menu traps regardless of result.
-    Plugin.DebugMenu.TrapManager.ClearActiveTraps(false);
+    Plugin.DebugMenu.ArchipelagoTrapManager.ClearActiveTraps(false);
 #endif
     if (bossLevelFailed)
     {
-      Plugin.ClientOld.TrapManager.ClearActiveTraps(false);
+      Plugin.Client.ModifierManager.ClearActiveTraps(false);
       return [];
     }
 
@@ -287,14 +287,13 @@ internal static class ClearLocationPatch
     bool clearedNewLocation = ids.Any(id => !Plugin.ClientOld.Session.Locations.AllLocationsChecked.Contains(id));
     if (clearedNewLocation)
     {
-      JustSentLocations = ids.Where(id => !Plugin.ClientOld.Session.Locations.AllLocationsChecked.Contains(id))
-        .ToArray();
-      Task.Run(() => Plugin.ClientOld.Session.Locations.CompleteLocationChecksAsync(ids.ToArray()));
-      Plugin.ClientOld.TrapManager.ClearActiveTraps(false);
+      JustSentLocations = ids.Where(id => !Plugin.Client.Session.Locations.AllLocationsChecked.Contains(id)).ToArray();
+      Task.Run(() => Plugin.Client.Session.Locations.CompleteLocationChecksAsync(ids.ToArray()));
+      Plugin.Client.ModifierManager.ClearActiveTraps(false);
     }
     else
     {
-      Plugin.ClientOld.TrapManager.ClearActiveTraps(true);
+      Plugin.Client.ModifierManager.ClearActiveTraps(true);
     }
 
     return ids;
@@ -330,7 +329,7 @@ internal static class ClearLocationPatch
     if (!Enum.TryParse(scnGame.internalIdentifier, out Level level))
     {
       Plugin.Logger.LogError($"Couldn't find Level. Level identifier: {scnGame.internalIdentifier}");
-      Plugin.ClientOld.TrapManager.ClearActiveTraps(false);
+      Plugin.Client.ModifierManager.ClearActiveTraps(false);
       throw new ArgumentOutOfRangeException($"Couldn't find level {scnGame.internalIdentifier}");
     }
 

@@ -66,6 +66,8 @@ public class Plugin : BaseUnityPlugin
     typeof(SkipCutscenePatch),
     typeof(SkipTutorialPatch),
     typeof(TrapManagerPatch),
+    typeof(StateReplicationPatch),
+    typeof(ModifierManagerPatch),
     typeof(UnlockItemPatch),
     typeof(WelcomeBackPatch),
     typeof(SavingPatch),

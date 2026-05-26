@@ -1,28 +1,16 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay.Powerups;
 
-internal class EasyDifficultyPowerupPatch : ITrap
+internal class EasyDifficultyPowerupPatch : ModifierPatch<EasyDifficultyPowerupPatch>, IModifier, IArchipelagoModifier
 {
-  // ReSharper disable once NullableWarningSuppressionIsUsed
-  private Harmony _harmony = null!;
+  public string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.easyDifficulty";
+  public string LocalizationKey => "mods.archipelago.powerup.easyDifficulty";
+  public ModifierCompatibility Compatibility => ModifierCompatibilityBuilder.GetDefaultCompatibilityForMod(this);
+  public ModifierCapability[] Capabilities => [ModifierCapability.Difficulty];
 
-  public string Name => "Easy Mode";
-  public IEnumerable<Type> IncompatibleWithTraps =>
-    [typeof(EasyDifficultyPowerupPatch), typeof(HardDifficultyTrapPatch)];
+  public override Type[] PreviewPatches => [];
+  public override Type[] ActivePatches => [typeof(ActivePatch), typeof(LockDifficultyPatch)];
 
-  public void InQueue()
-  {
-    _harmony = new Harmony($"{Plugin.PATCH_ID_TRAP}.{nameof(EasyDifficultyPowerupPatch)}");
-  }
-
-  public void Active()
-  {
-    _harmony.PatchAll(typeof(ActivePatch));
-  }
-
-  public void ActiveEnd()
-  {
-    _harmony.UnpatchSelf();
-  }
+  public float GetScale(int num, out int consumed) => Scales.BinaryScale(num, out consumed);
 
   [HarmonyPatch]
   private static class ActivePatch
@@ -34,38 +22,6 @@ internal class EasyDifficultyPowerupPatch : ITrap
     {
       __runOriginal = false;
       __result = DefibMode.Easy;
-    }
-
-    [HarmonyPatch(typeof(PauseMenu), nameof(PauseMenu.Update))]
-    [HarmonyPrefix]
-    private static void LockDifficultyPatch(ref PauseMenu __instance)
-    {
-      foreach ((PauseModeName modeName, PauseMenuMode mode) in __instance.instantiatedModes)
-      {
-        if (modeName is not PauseModeName.GameSettings)
-          continue;
-
-        foreach (PauseMenuMode.Category category in mode.categories)
-        {
-          foreach ((PauseContentName contentName, PauseModeContentArrows content) in category.contentArrowsDict)
-          {
-            if (contentName is not (PauseContentName.DefibrillatorP1 or PauseContentName.DefibrillatorP2))
-              continue;
-
-            // From Initialize()
-            Plugin.Logger.LogDebug($"Setting canChangeContentValue to false for {contentName}");
-            content.canChangeContentValue = false;
-            if (content.glitches == null)
-            {
-              GameObject glitchEffect = UnityEngine.Object.Instantiate(
-                content.glitchesPrefab,
-                content.transform.parent
-              );
-              content.glitches = glitchEffect.GetComponentsInChildren<SpriteAnimation>();
-            }
-          }
-        }
-      }
     }
   }
 }
