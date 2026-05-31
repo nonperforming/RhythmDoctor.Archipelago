@@ -2,19 +2,21 @@ using System.Collections.ObjectModel;
 
 namespace RhythmDoctor.Archipelago.Client;
 
+using global::Archipelago.MultiClient.Net.Packets;
+
 /// <summary>
-/// Archipelago client.
+/// Archipelago client for the story mode.
 /// </summary>
-internal sealed class Client : IDisposable, IAsyncDisposable
+internal sealed class StoryClient : IDisposable, IAsyncDisposable
 {
   internal LoginInformation LoginInformation { get; private set; }
   internal SlotData SlotData { get; private set; }
 
-  internal Modifiers.ModifierManagerBase ModifierManager { get; private set; };
+  internal ModifierManagerBase ModifierManager { get; private set; }
   internal DeathLinkClientComponent? DeathLinkComponent { get; private set; }
   internal IReplicationClientComponent? ReplicationComponent { get; private set; }
   internal ClientState State { get; private set; } = ClientState.NotReady;
-  internal SlotData Slot;
+  internal SlotData Slot { get; private set; }
 
   internal IEnumerable<IClientComponent> ClientComponents
   {
@@ -31,7 +33,7 @@ internal sealed class Client : IDisposable, IAsyncDisposable
 
   private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-  internal Client(LoginInformation loginInformation)
+  internal StoryClient(LoginInformation loginInformation)
   {
     LoginInformation = loginInformation;
     ModifierManager = new ArchipelagoTrapManager();
@@ -39,24 +41,29 @@ internal sealed class Client : IDisposable, IAsyncDisposable
 
   internal ArchipelagoSession CreateSession()
   {
-    static void BindEvents(ArchipelagoSession session)
+    void BindEvents(ArchipelagoSession session)
     {
       session.Socket.ErrorReceived += (
         (__exception, __message) =>
-          Plugin.Logger.LogError($"[{nameof(Client)}] Socket error {__exception} - {__message}")
+          Plugin.Logger.LogError($"[{nameof(StoryClient)}] Socket error {__exception} - {__message}")
       );
-      session.Socket.SocketClosed += (__reason => _ = AttemptReconnect(__reason));
+      // TODO: attempt reconnect on socket close.
+      //       Remember to process items we may have received from time of disconnection to reconnection
+      session.Socket.SocketClosed += (__reason =>
+      {
+        Plugin.Logger.LogFatal($"[{nameof(StoryClient)}] Archipelago client closed ({__reason}), returning to Main Menu...");
+        scnBase.GoToMainMenu();
+        Dispose();
+      });
       session.MessageLog.OnMessageReceived += (
-        __message => Plugin.Logger.LogInfo($"[{nameof(Client)}] Received message \"{__message}\"")
+        __message => Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Received message \"{__message}\"")
       );
-      session.Items.ItemReceived += ItemReceived;
-      session.DataStorage[Scope.Slot, Persistence.PaigeStaysKey].OnValueChanged += ReplicatePaigeStays;
-      session.DataStorage[Scope.Slot, Persistence.IanDesktopLoginKey].OnValueChanged += ReplicateIansDesktopUnlocked;
+      session.Items.ItemReceived += HandleItem;
     }
 
     ThrowIfNotReadyFor(ClientState.CreatingSession);
     State = ClientState.CreatingSession;
-    Plugin.Logger.LogInfo($"[{nameof(Client)}] Creating Archipelago session to {LoginInformation.Uri}");
+    Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Creating Archipelago session to {LoginInformation.Uri}");
 
     Session = ArchipelagoSessionFactory.CreateSession(LoginInformation.Uri);
     BindEvents(Session);
@@ -67,7 +74,7 @@ internal sealed class Client : IDisposable, IAsyncDisposable
 
   /// <summary>
   /// Log into the Archipelago server with the <see cref="LoginInformation"/>
-  /// given via <see cref="Client"/>'s constructor.
+  /// given via <see cref="StoryClient"/>'s constructor.
   /// </summary>
   /// <remarks>
   /// <see cref="CreateSession"/> should be called prior to calling this.
@@ -79,31 +86,35 @@ internal sealed class Client : IDisposable, IAsyncDisposable
 
     //if (State == )
     //
-    Plugin.Logger.LogInfo($"[{nameof(Client)}] Logging in...");
-    await Session.ConnectAsync();
+    Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Logging in...");
+    RoomInfoPacket roomInfo = await Session.ConnectAsync();
+    roomInfo.
 
     State = ClientState.LoggingIn;
 
     // Process all previously received items...
-    Plugin.Logger.LogInfo($"[{nameof(Client)}] Receiving items...");
+    Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Receiving items...");
     State = ClientState.ReceivingItems;
-    Parallel.ForEach(Session.Items.AllItemsReceived, itemInfo => HandleItem(itemInfo, true));
+    Parallel.ForEach(Session.Items.AllItemsReceived, HandleItem);
     UnlockItemPatch.TryUnlockAllBossSongs();
 
     State = ClientState.LoggedIn;
     return loginResult;
   }
 
+  // private void HandleItem(ReceivedItemsHelper helper)
+  //   => _ = Task.Run(() => HandleItem(helper.DequeueItem()));
+  
   /// <remarks>
   /// Levels (if not prior item) and entrances are handled in <see cref="UnlockItemPatch.UnlockBonusItemsPatch"/>.
   /// </remarks>
-  private Task HandleItem(ItemInfo itemInfo, bool priorItem = false)
+  private void HandleItem(ItemInfo itemInfo)
   {
     static void SetBestRank(ReadOnlyCollection<long> locations, Level level)
     {
       Rank GetBestRankForStandardLevel()
       {
-        Plugin.Logger.LogInfo($"[{nameof(Client)}] Handling level");
+        Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Handling level");
 
         BaseStage levelStage = Bindings.LevelToStage[level];
         (Rank, long)[] stageLocationIds;
@@ -139,10 +150,10 @@ internal sealed class Client : IDisposable, IAsyncDisposable
       }
 
       // Level item, try to find prior rank...
-      Plugin.Logger.LogInfo($"[{nameof(Client)}] Attempting to get rank from locations cleared for {level}");
+      Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Attempting to get rank from locations cleared for {level}");
       if (level == Level.RhythmWeightlifter)
       {
-        Plugin.Logger.LogInfo($"[{nameof(Client)}] Handling Rhythm Weightlifter");
+        Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Handling Rhythm Weightlifter");
 
         // Rhythm Weightlifter is a special case in that it has 10 stages inside its level.
         // As the stages can only be played sequentially, and we don't have any specific Rank locations,
@@ -155,11 +166,11 @@ internal sealed class Client : IDisposable, IAsyncDisposable
         if (stagesCleared == 0)
         {
           // We haven't cleared any stages yet.
-          Plugin.Logger.LogInfo($"[{nameof(Client)}] Couldn't find any Rhythm Weightlifter locations");
+          Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Couldn't find any Rhythm Weightlifter locations");
         }
         else
         {
-          Plugin.Logger.LogInfo($"[{nameof(Client)}] Unlocking Rhythm Weightlifter stages up to stage {stagesCleared}");
+          Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Unlocking Rhythm Weightlifter stages up to stage {stagesCleared}");
           Persistence.SetRhythmWeightlifterLastLevelUnlocked(stagesCleared);
         }
       }
@@ -169,11 +180,12 @@ internal sealed class Client : IDisposable, IAsyncDisposable
       }
     }
 
-    if (priorItem)
+    if (State == ClientState.ReceivingItems)
     {
       if (Bindings.ItemIdToLevel.TryGetValue(itemInfo.ItemId, out Level level))
         SetBestRank(Session!.Locations.AllLocationsChecked, level);
-      if (Bindings.TrapItemIdToLevel.TryGetValue(itemInfo.ItemId, out Type type))
+      if (Bindings.ModifierItemIdToModifierUid.TryGetValue(itemInfo.ItemId, out Type type))
+        ModifierManager
     }
   }
 
@@ -195,7 +207,7 @@ internal sealed class Client : IDisposable, IAsyncDisposable
       case ClientState.LoggingIn:
         if (Session is null)
         {
-          Plugin.Logger.LogError($"[{nameof(Client)}] Cannot log in without creating session beforehand");
+          Plugin.Logger.LogError($"[{nameof(StoryClient)}] Cannot log in without creating session beforehand");
           throw new InvalidOperationException("Cannot log in without creating session beforehand");
         }
         break;

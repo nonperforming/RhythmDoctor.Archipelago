@@ -279,7 +279,7 @@ internal sealed class ClientOld : IDisposable
         return true;
 
       // Process traps as early as possible...
-      if (Bindings.TrapItemIdToLevel.Keys.Contains(item.ItemId))
+      if (Bindings.ModifierItemIdToModifierUid.Keys.Contains(item.ItemId))
         return true;
 
       // TODO: Based on login progress, allow more items to be accepted (i.e. levels)
@@ -474,7 +474,7 @@ internal sealed class ClientOld : IDisposable
       _itemsProcessed--;
       return;
     }
-    if (Bindings.TrapItemIdToLevel.TryGetValue(item.ItemId, out Type trap))
+    if (Bindings.ModifierItemIdToModifierUid.TryGetValue(item.ItemId, out Type trap))
     {
       Plugin.Logger.LogInfo($"Adding trap item {item.ItemName} ({item.ItemId})");
       await TrapManager.AddTrap(trap);

@@ -20,7 +20,7 @@ internal static class UnlockItemPatch
 
     bool hasBasementKey = false;
     // ReSharper disable once NullableWarningSuppressionIsUsed
-    foreach (ItemInfo item in Plugin.Client.Session!.Items.AllItemsReceived)
+    foreach (ItemInfo item in Plugin.StoryClient.Session!.Items.AllItemsReceived)
     {
       Plugin.Logger.LogDebug($"[{nameof(UnlockItemPatch)}] Processing item {item.ItemName} ({item.ItemId})");
       if (Bindings.KeyItemIdToWard.TryGetValue(item.ItemId, out Region region))
@@ -52,7 +52,7 @@ internal static class UnlockItemPatch
     Plugin.Logger.LogInfo("Moving 1-CNY");
     __instance.FindSelectableEntity("1-CNY").gamePosition.x = -564;
 
-    if (Plugin.Client.SlotData.endGoal == SlotData.EndGoal.HelpingHands)
+    if (Plugin.StoryClient.SlotData.endGoal == SlotData.EndGoal.HelpingHands)
     {
       // Moving X-1 - Art Exercise to the basement if end goal is X-0 - Helping Hands
       Plugin.Logger.LogInfo("Moving X-1 to the basement");

@@ -8,7 +8,7 @@ internal static class Bindings
   internal const Level RHYTHM_DOGTOR_LEVEL = Level.MyLevel;
 
   /// <summary>
-  /// <see cref="Level"/> to corresponding <see cref="LevelBase"/>
+  /// <see cref="Level"/> to corresponding <see cref="LevelBase"/>.
   /// </summary>
   /// <seeAlso cref="RegularStage"/>
   /// <seeAlso cref="BossStage"/>
@@ -78,7 +78,7 @@ internal static class Bindings
   };
 
   /// <summary>
-  /// Level ID to corresponding <see cref="Level"/>
+  /// Level ID to corresponding <see cref="Level"/>.
   /// </summary>
   internal static readonly Dictionary<long, Level> ItemIdToLevel = new()
   {
@@ -135,24 +135,24 @@ internal static class Bindings
   };
 
   /// <summary>
-  /// Trap and powerup item ID to corresponding <see cref="ITrap"/> <see cref="Type"/>.
+  /// Modifier item ID to corresponding <see cref="IModifier"/>'s UID.
   /// </summary>
-  internal static readonly Dictionary<long, Type> TrapItemIdToLevel = new()
+  internal static readonly Dictionary<long, string> ModifierItemIdToModifierUid = new()
   {
-    { 60, typeof(FragileHeartTrapPatch) },
-    { 61, typeof(HardDifficultyTrapPatch) },
-    { 62, typeof(ScrambleCharactersTrapPatch) },
-    { 63, typeof(ScrambleBeatsoundsTrapPatch) },
-    { 64, typeof(ScrambleHitsoundsTrapPatch) },
-    { 65, typeof(ChilliSpeedTrapPatch) },
-    { 66, typeof(GhostTapTrapPatch) },
-    { 57, typeof(StrongHeartPowerupPatch) },
-    { 58, typeof(EasyDifficultyPowerupPatch) },
-    { 59, typeof(IceSpeedTrapPatch) },
+    { 60, "gg.archipelago.rhythmdoctor.mod.fragileHeart" },
+    { 61, "gg.archipelago.rhythmdoctor.mod.hardDifficulty" },
+    { 62, "gg.archipelago.rhythmdoctor.mod.scrambleCharacters" },
+    { 63, "gg.archipelago.rhythmdoctor.mod.hardDifficulty" },
+    { 64, "gg.archipelago.rhythmdoctor.mod.scrambleHitsounds" },
+    { 65, "gg.archipelago.rhythmdoctor.mod.chilliSpeed" },
+    { 66, "gg.archipelago.rhythmdoctor.mod.ghostTap" },
+    { 57, "gg.archipelago.rhythmdoctor.mod.strongHeart" },
+    { 58, "gg.archipelago.rhythmdoctor.mod.easyDifficulty" },
+    { 59, "gg.archipelago.rhythmdoctor.mod.iceSpeed" },
   };
 
   /// <summary>
-  /// Key item ID to corresponding <see cref="Region"/>
+  /// Key item ID to corresponding <see cref="Region"/>.
   /// </summary>
   internal static readonly Dictionary<long, Region> KeyItemIdToWard = new()
   {
@@ -182,7 +182,7 @@ internal static class Bindings
   ];
   #endregion
 
-  internal static readonly IReadOnlyCollection<Type> Traps = TrapItemIdToLevel.Values;
+  internal static readonly IReadOnlyCollection<Type> Traps = ModifierItemIdToModifierUid.Values;
 
   internal static readonly IReadOnlyCollection<Level> Levels = LevelToStage.Keys;
 

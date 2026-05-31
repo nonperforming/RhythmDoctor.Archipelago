@@ -4,5 +4,5 @@ internal interface IClientComponent
 {
   internal Task Enable(ArchipelagoSession session);
 
-  internal IEnumerable<Type> AssistPatches { get; }
+  internal IEnumerable<Type> AssistPatches => [];
 }

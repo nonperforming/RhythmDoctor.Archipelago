@@ -17,7 +17,7 @@ internal static class DeathLinkPatch
   [HarmonyPostfix]
   private static void SendDeathLinkOnCrackedHeartPatch(RowEntity __instance)
   {
-    if (Plugin.Client.DeathLinkComponent is null || !enabled)
+    if (Plugin.StoryClient.DeathLinkComponent is null || !enabled)
       return;
 
     if (__instance.rowMisses < __instance.game.currentLevel.missesToCrackHeart)
@@ -38,7 +38,7 @@ internal static class DeathLinkPatch
     // TODO: We could have character-specific fail lines here?
     Plugin.Logger.LogInfo($"[{nameof(DeathLinkPatch)}] Sending {nameof(scnGame.FailLevel)} death");
     enabled = false;
-    Plugin.Client.DeathLinkComponent?.SendDeathLink();
+    Plugin.StoryClient.DeathLinkComponent?.SendDeathLink();
   }
 
   // currently only used by 7-X/7-X2

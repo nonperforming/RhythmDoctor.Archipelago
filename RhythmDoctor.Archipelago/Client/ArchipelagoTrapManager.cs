@@ -208,7 +208,7 @@ internal sealed class ArchipelagoTrapManager : ModifierManagerBase, IDisposable
 
   internal bool IsTrapActive(string trapName)
   {
-    foreach ((int _, ITrap trap) in Plugin.Client.ModifierManager._activeTraps)
+    foreach ((int _, ITrap trap) in Plugin.StoryClient.ModifierManager._activeTraps)
     {
       if (trap.Name == trapName)
       {

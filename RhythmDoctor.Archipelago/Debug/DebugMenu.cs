@@ -18,7 +18,7 @@ public class DebugMenu : MonoBehaviour
   private ActivatedGUI _activatedGUI;
 
   /// <remarks>
-  /// Unlike the <see cref="Client"/>'s <see cref="Client.ModifierManager"/>, traps from this Trap Manager will not be
+  /// Unlike the <see cref="StoryClient"/>'s <see cref="StoryClient.ModifierManager"/>, traps from this Trap Manager will not be
   /// automatically deleted.
   /// </remarks>
   internal ArchipelagoTrapManager ArchipelagoTrapManager = new();
