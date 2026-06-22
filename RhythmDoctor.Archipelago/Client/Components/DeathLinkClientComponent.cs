@@ -2,7 +2,7 @@ namespace RhythmDoctor.Archipelago.Client.Components;
 
 internal sealed class DeathLinkClientComponent : IClientComponent
 {
-  private readonly ArchipelagoSession Session;
+  private ArchipelagoSession Session = null!;
   private DeathLinkService Service = null!;
 
   // TODO: would be nice to localize these.
@@ -28,15 +28,15 @@ internal sealed class DeathLinkClientComponent : IClientComponent
     " couldn't count to 7",
   ];
 
-  internal DeathLinkClientComponent(ArchipelagoSession session, CancellationTokenSource cancellationTokenSource)
+  internal DeathLinkClientComponent(CancellationTokenSource cancellationTokenSource)
   {
-    Session = session;
     _cancellationTokenSource = cancellationTokenSource;
   }
 
   public async Task Enable(ArchipelagoSession session)
   {
     Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Enabling DeathLink...");
+    Session = session;
     await Task.Run(() =>
     {
       Service = session.CreateDeathLinkService();
@@ -49,7 +49,7 @@ internal sealed class DeathLinkClientComponent : IClientComponent
   internal void SendDeathLink()
   {
     // ReSharper disable once NullableWarningSuppressionIsUsed
-    PlayerInfo player = Session!.Players.ActivePlayer;
+    PlayerInfo player = Session.Players.ActivePlayer;
 
     string message = player.Alias + Messages[Plugin.Random.Next(Messages.Length)];
 
@@ -74,81 +74,82 @@ internal sealed class DeathLinkClientComponent : IClientComponent
 
     string text = string.IsNullOrWhiteSpace(deathLink.Cause) ? $"{deathLink.Source} died" : deathLink.Cause;
 
-    if (scnGame.instance is not null)
+    switch (scnBase.instance)
     {
-      if (scnGame.instance.levelIdentifier == nameof(Level.BeansHopper))
-      {
-        Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Running tag 'miss'");
-
-        // While Beans Hopper does technically have hearts, they're not visible/relevant in this minigame.
-        DeathLinkPatch.enabled = false;
-        scnGame.instance.currentLevel.RunTag("miss");
-
-        // FIXME: Doesn't show - gets overwritten by score text.
-        //scnGame.instance.statusText.SetStatusText(text, Color.red, narrate: true);
-      }
-      else
-      {
-        // Normal/boss level.
-        Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Breaking all hearts");
-
-        scrConductor.PlayFeedback(GameSoundType.BigMistake, group: RDUtils.GetMixerGroup("MistakesParent"));
-        scnGame.instance.FlashBorderFeedbackWithDuration(scnGame.BorderFeedbackType.Incorrect, 5f);
-        scnGame.instance.ShakeAllHearts(duration: 1f, 8);
-        scnGame.instance.ShakeAllCharacters(duration: 1f, 8);
-        scnGame.instance.currentLevel.CrackAllHearts();
-        scnGame.instance.mistakesManager.mistakesCountP1 += 500;
-        scnGame.instance.mistakesManager.mistakesCountP2 += 500;
-        DeathLinkPatch.enabled = false;
-
-        if (scnGame.instance.currentLevel.shouldMakeHealthBar)
+      case scnGame game:
+        if (game.levelIdentifier == nameof(Level.BeansHopper))
         {
-          // TODO: If possible, use the last entity interacted with (missed/hit note)
+          Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Running tag 'miss'");
 
-          scnGame.instance.UpdatePlayerHealthBars();
-          if (!scnGame.instance.currentLevel.noBossFail)
-          {
-            scnGame.instance.FailLevel(scnGame.instance.rows[0].ent);
-          }
+          // While Beans Hopper does technically have hearts, they're not visible/relevant in this minigame.
+          DeathLinkPatch.enabled = false;
+          game.currentLevel.RunTag("miss");
+
+          // FIXME: Doesn't show - gets overwritten by score text.
+          //scnGame.instance.statusText.SetStatusText(text, Color.red, narrate: true);
         }
+        else
+        {
+          // Normal/boss level.
+          Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Breaking all hearts");
 
-        // We only show the status text after we (potentially game over) as it can overwrite its text
-        scnGame.instance.statusText.SetStatusText(text, Color.red, 10f, true, true);
-      }
-    }
-    else if (scnBase.instance is scnIanDesktop desktop)
-    {
-      if (desktop.state != scnIanDesktop.ComputerState.Desktop)
-        return;
+          scrConductor.PlayFeedback(GameSoundType.BigMistake, group: RDUtils.GetMixerGroup("MistakesParent"));
+          game.FlashBorderFeedbackWithDuration(scnGame.BorderFeedbackType.Incorrect, 5f);
+          game.ShakeAllHearts(duration: 1f, 8);
+          game.ShakeAllCharacters(duration: 1f, 8);
+          game.currentLevel.CrackAllHearts();
+          game.mistakesManager.mistakesCountP1 += 500;
+          game.mistakesManager.mistakesCountP2 += 500;
+          DeathLinkPatch.enabled = false;
 
-      switch (desktop.currentProgramIndex)
-      {
-        // Rhythm Stacker
-        case 0:
-          Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Killing stacker");
-          // from AddBlock()
-          desktop.stackerManager.gameoverContainer.SetActive(true);
-          desktop.stackerManager.hasLost = true;
-          desktop.stackerManager.hiScoreText.text = RDString
-            .Get("rhythmStacker.hiScore")
-            .Replace("[score]", desktop.stackerManager.highestScore.ToString(), StringComparison.Ordinal);
-          RDStringToUIText.Apply(desktop.stackerManager.hiScoreText);
-          // TODO: Use game over text instead of high score text
-          //  - this will require a patch to reset the text after Restart().
-          desktop.stackerManager.hiScoreText.text = text + "\n" + desktop.stackerManager.hiScoreText.text;
-          // TODO: Maybe sync high score with DataStorage?
-          desktop.stackerManager.PlaySound("sndDesktopJingleNeutral");
-          break;
-        // tempres
-        case 1:
-          Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Killing tempres");
-          // TODO: Show person who killed them
-          // FIXME: Technically this works but its a bit buggy, doesn't tween bars.
-          //  Also doesn't account for login minigame.
-          // Use a reverse transpiler to pull out the `if (freeplay)` block and invoke it here.
-          desktop.tempresManager.currentGameHasFinished = true;
-          break;
-      }
+          if (scnGame.instance.currentLevel.shouldMakeHealthBar)
+          {
+            // TODO: If possible, use the last entity interacted with (missed/hit note)
+
+            game.UpdatePlayerHealthBars();
+            if (!game.currentLevel.noBossFail)
+            {
+              game.FailLevel(game.rows[0].ent);
+            }
+          }
+
+          // We only show the status text after we (potentially game over) as it can overwrite its text
+          game.statusText.SetStatusText(text, Color.red, 10f, true, true);
+        }
+        break;
+      case scnIanDesktop desktop:
+        if (desktop.state != scnIanDesktop.ComputerState.Desktop)
+          return;
+
+        switch (desktop.currentProgramIndex)
+        {
+          // Rhythm Stacker
+          case 0:
+            Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Killing stacker");
+            // from AddBlock()
+            desktop.stackerManager.gameoverContainer.SetActive(true);
+            desktop.stackerManager.hasLost = true;
+            desktop.stackerManager.hiScoreText.text = RDString
+              .Get("rhythmStacker.hiScore")
+              .Replace("[score]", desktop.stackerManager.highestScore.ToString(), StringComparison.Ordinal);
+            RDStringToUIText.Apply(desktop.stackerManager.hiScoreText);
+            // TODO: Use game over text instead of high score text
+            //  - this will require a patch to reset the text after Restart().
+            desktop.stackerManager.hiScoreText.text = text + "\n" + desktop.stackerManager.hiScoreText.text;
+            // TODO: Maybe sync high score with DataStorage?
+            desktop.stackerManager.PlaySound("sndDesktopJingleNeutral");
+            break;
+          // tempres
+          case 1:
+            Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Killing tempres");
+            // TODO: Show person who killed them
+            // FIXME: Technically this works but its a bit buggy, doesn't tween bars.
+            //  Also doesn't account for login minigame.
+            // Use a reverse transpiler to pull out the `if (freeplay)` block and invoke it here.
+            desktop.tempresManager.currentGameHasFinished = true;
+            break;
+        }
+        break;
     }
   }
 }

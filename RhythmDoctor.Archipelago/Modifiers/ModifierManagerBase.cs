@@ -1,6 +1,6 @@
 namespace RhythmDoctor.Archipelago.Modifiers;
 
-internal abstract class ModifierManagerBase : IDisposable
+internal abstract class ModifierManagerBase :  IDisposable
 {
   private List<IModifier> _previewModifiers = new();
   private List<IModifier> _activeModifiers = new();

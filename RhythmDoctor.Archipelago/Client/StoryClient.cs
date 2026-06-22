@@ -4,17 +4,24 @@ namespace RhythmDoctor.Archipelago.Client;
 
 using global::Archipelago.MultiClient.Net.Packets;
 
+using System.Diagnostics.CodeAnalysis;
+
 /// <summary>
 /// Archipelago client for the story mode.
 /// </summary>
 internal sealed class StoryClient : IDisposable, IAsyncDisposable
 {
+  // Login information
   internal LoginInformation LoginInformation { get; private set; }
   internal SlotData SlotData { get; private set; }
 
-  internal ArchipelagoModifierManagerClientComponent ModifierManager { get; private set; }
+  // Components
+  internal IItemProcessor[] ItemProcessorComponents { get; private set; } = [];
+  internal ArchipelagoTrapManagerClientComponent? ModifierManagerComponent { get; private set; }
   internal DeathLinkClientComponent? DeathLinkComponent { get; private set; }
   internal IReplicationClientComponent? ReplicationComponent { get; private set; }
+
+  // State
   internal ClientState State { get; private set; } = ClientState.NotReady;
   internal SlotData Slot { get; private set; }
 
@@ -22,6 +29,10 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
   {
     get
     {
+      foreach (IItemProcessor itemProcessorComponent in ItemProcessorComponents)
+        yield return itemProcessorComponent;
+      if (ModifierManagerComponent != null)
+        yield return ModifierManagerComponent;
       if (DeathLinkComponent != null)
         yield return DeathLinkComponent;
       if (ReplicationComponent != null)
@@ -36,7 +47,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
   internal StoryClient(LoginInformation loginInformation)
   {
     LoginInformation = loginInformation;
-    ModifierManager = new ArchipelagoModifierManagerClientComponent();
+    ModifierManagerComponent = new ArchipelagoTrapManagerClientComponent();
   }
 
   internal ArchipelagoSession CreateSession()
@@ -58,7 +69,6 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
       session.MessageLog.OnMessageReceived += (
         __message => Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Received message \"{__message}\"")
       );
-      session.Items.ItemReceived += HandleItem;
     }
 
     ThrowIfNotReadyFor(ClientState.CreatingSession);
@@ -102,9 +112,28 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     return loginResult;
   }
 
-  private void HandleItem(ReceivedItemsHelper helper)
-    => HandleItem(helper.DequeueItem());
-  
+  /// <remarks>
+  /// Run just before loading Level Select.
+  /// </remarks>
+  internal void ProcessNewReceivedItems()
+  {
+    if (State != ClientState.Ready)
+      throw new InvalidOperationException("Not ready to process new items yet");
+
+    while (Session!.Items.Any())
+    {
+      ItemInfo itemInfo = Session!.Items.DequeueItem();
+      Plugin.Logger.LogDebug($"[{nameof(StoryClient)}] Processing item {itemInfo.ItemName} ({itemInfo.ItemId})");
+
+      foreach (IItemProcessor itemProcessorComponent in ItemProcessorComponents)
+      {
+        Plugin.Logger.LogDebug($"[{nameof(StoryClient)}] Processing item {itemInfo.ItemName} ({itemInfo.ItemId})");
+        if (itemProcessorComponent.HandleItem(itemInfo))
+          break;
+      }
+    }
+  }
+
   /// <remarks>
   /// Levels (if not prior item) and entrances are handled in <see cref="UnlockItemPatch.UnlockBonusItemsPatch"/>.
   /// </remarks>
@@ -189,7 +218,6 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
           ModifierManager
           break;
     }
-
   }
 
   private void ThrowIfNotReadyFor(ClientState? wantToGoToState = null)
