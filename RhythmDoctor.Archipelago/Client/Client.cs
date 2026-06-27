@@ -19,6 +19,8 @@ internal sealed class Client : IDisposable
   private bool _connected;
   private bool _appliedPatches;
   private int _itemsProcessed;
+
+  private bool _disposed = false;
   private readonly CancellationTokenSource _cancellationTokenSource;
 
   internal bool Setup => _itemsProcessed == 0;
@@ -77,6 +79,9 @@ internal sealed class Client : IDisposable
 
   private async Task AttemptReconnect(string disconnectReason)
   {
+    if (_disposed)
+      return;
+
     int tries = 0;
     int maxTries = Configuration.GetAutoReconnectMaxRetries();
 
@@ -91,10 +96,8 @@ internal sealed class Client : IDisposable
           $"[{nameof(Client)}] Reached max retries of {maxTries}. "
             + "Considering situation unsalvagable and returning to main menu..."
         );
-        // ReSharper disable once NullableWarningSuppressionIsUsed
-        Plugin.Client = null!;
-        Dispose();
-        scnBase.GoToMainMenu(); // caught by UnapplyPatchesPatch
+        // UnapplyPatchesPatch will tear down client for us
+        scnBase.GoToMainMenu();
       }
 
       Plugin.Logger.LogWarning($"[{nameof(Client)}] Attempting to reconnect (try {tries}/{maxTries})");
@@ -646,6 +649,7 @@ internal sealed class Client : IDisposable
       yield return new WaitUntil(() => disconnect.IsCompleted);
     }
 
+    _disposed = true;
     _cancellationTokenSource.Cancel();
     _cancellationTokenSource.Dispose();
 
