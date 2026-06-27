@@ -4,6 +4,18 @@ internal class ModifierManagerStoryLevelSelect : ModifierManagerBase, IDisposabl
 {
   internal ModifierManagerStoryLevelSelect()
   {
-    Events.Instance.LevelDeselected += (_, _) => ClearAllPreviewTraps();
+    Events.Instance.LevelDeselected += OnInstanceOnLevelDeselected;
+  }
+
+  private void OnInstanceOnLevelDeselected(object _, EventArgs _1)
+  {
+    ClearAllPreviewTraps();
+  }
+
+  public new void Dispose()
+  {
+    base.Dispose();
+    Plugin.Logger.LogInfo($"[{nameof(ModifierManagerStoryLevelSelect)}] Disposing");
+    Events.Instance.LevelDeselected -= OnInstanceOnLevelDeselected;
   }
 }

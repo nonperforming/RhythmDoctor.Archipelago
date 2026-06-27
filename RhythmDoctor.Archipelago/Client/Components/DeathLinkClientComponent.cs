@@ -5,8 +5,6 @@ internal sealed class DeathLinkClientComponent : IClientComponent
   private readonly ArchipelagoSession Session;
   private DeathLinkService Service = null!;
 
-  private CancellationTokenSource _cancellationTokenSource;
-
   // TODO: would be nice to localize these.
   private static readonly string[] Messages =
   [
@@ -36,18 +34,17 @@ internal sealed class DeathLinkClientComponent : IClientComponent
     _cancellationTokenSource = cancellationTokenSource;
   }
 
-  internal async Task Enable()
+  public async Task Enable(ArchipelagoSession session)
   {
     Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Enabling DeathLink...");
     await Task.Run(() =>
     {
-      Service = Session.CreateDeathLinkService();
+      Service = session.CreateDeathLinkService();
       Service.EnableDeathLink();
       Service.OnDeathLinkReceived += DeathLinkReceived;
     });
     Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Enabled DeathLink!");
   }
-
 
   internal void SendDeathLink()
   {

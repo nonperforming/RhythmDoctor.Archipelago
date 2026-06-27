@@ -12,7 +12,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
   internal LoginInformation LoginInformation { get; private set; }
   internal SlotData SlotData { get; private set; }
 
-  internal ModifierManagerBase ModifierManager { get; private set; }
+  internal ArchipelagoModifierManagerClientComponent ModifierManager { get; private set; }
   internal DeathLinkClientComponent? DeathLinkComponent { get; private set; }
   internal IReplicationClientComponent? ReplicationComponent { get; private set; }
   internal ClientState State { get; private set; } = ClientState.NotReady;
@@ -36,7 +36,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
   internal StoryClient(LoginInformation loginInformation)
   {
     LoginInformation = loginInformation;
-    ModifierManager = new ArchipelagoTrapManager();
+    ModifierManager = new ArchipelagoModifierManagerClientComponent();
   }
 
   internal ArchipelagoSession CreateSession()
@@ -102,8 +102,8 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     return loginResult;
   }
 
-  // private void HandleItem(ReceivedItemsHelper helper)
-  //   => _ = Task.Run(() => HandleItem(helper.DequeueItem()));
+  private void HandleItem(ReceivedItemsHelper helper)
+    => HandleItem(helper.DequeueItem());
   
   /// <remarks>
   /// Levels (if not prior item) and entrances are handled in <see cref="UnlockItemPatch.UnlockBonusItemsPatch"/>.
@@ -180,13 +180,16 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
       }
     }
 
-    if (State == ClientState.ReceivingItems)
+    switch (State)
     {
-      if (Bindings.ItemIdToLevel.TryGetValue(itemInfo.ItemId, out Level level))
-        SetBestRank(Session!.Locations.AllLocationsChecked, level);
-      if (Bindings.ModifierItemIdToModifierUid.TryGetValue(itemInfo.ItemId, out Type type))
-        ModifierManager
+      case ClientState.ReceivingItems:
+        if (Bindings.ItemIdToLevel.TryGetValue(itemInfo.ItemId, out Level level))
+          SetBestRank(Session!.Locations.AllLocationsChecked, level);
+        if (Bindings.ModifierItemIdToModifierUid.TryGetValue(itemInfo.ItemId, out string uid))
+          ModifierManager
+          break;
     }
+
   }
 
   private void ThrowIfNotReadyFor(ClientState? wantToGoToState = null)

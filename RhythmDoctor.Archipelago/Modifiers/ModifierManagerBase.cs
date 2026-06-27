@@ -5,12 +5,23 @@ internal abstract class ModifierManagerBase : IDisposable
   private List<IModifier> _previewModifiers = new();
   private List<IModifier> _activeModifiers = new();
 
-  public bool TryAddModifier(string modifierUid, out IEnumerable<IModifier> modifiers)
+  /// <summary>
+  /// T
+  /// </summary>
+  /// <param name="modifierUid"></param>
+  /// <param name="modifiers"></param>
+  /// <returns>True if any </returns>
+  public bool TryAddModifier(string modifierUid, Level level, out IEnumerable<IModifier> modifiers)
   {
-    throw new NotImplementedException();
+    foreach (IModifier previewModifier in _previewModifiers)
+    {
+      if (!ModifierRegistry.TryGetModifier(modifierUid, out _))
+        return false;
+    }
+    return true;
   }
 
-  public bool TryAddModifier(IModifier modifier, out IEnumerable<IModifier> modifiers)
+  public bool TryAddModifier(IModifier modifier, Level level, out IEnumerable<IModifier> modifiers)
   {
     throw new NotImplementedException();
   }
@@ -32,18 +43,7 @@ internal abstract class ModifierManagerBase : IDisposable
 
   public void Dispose()
   {
-    Plugin.Logger.LogInfo("Disposing of TrapManager");
-
-    Events.Instance.LevelDeselected -= OnLevelDeselected;
-
-    foreach ((int _, ITrap trap) in _activeTraps)
-    {
-      trap.ActiveEnd();
-    }
-
-    foreach ((int _, ITrap trap) in _previewTraps)
-    {
-      trap.PreviewLevelEnd();
-    }
+    Plugin.Logger.LogInfo($"[{nameof(ModifierManagerBase)}] Disposing");
+    throw new NotImplementedException();
   }
 }
