@@ -1,5 +1,7 @@
 namespace RhythmDoctor.Archipelago.Patches.Menu;
 
+using System.Text;
+
 // TODO: This script needs a cleanup, maybe don't use scnCLS as base for login?
 
 [HarmonyPatch]
@@ -103,11 +105,12 @@ internal static class ArchipelagoLoginPatch
     __instance.stopButton.interactable = false;
     #endregion
 
-    string[] text = __instance
+    string rawText = __instance
       .transform.Find("screen/Contents/InsertURL Container/URL InputField/Text")
       .GetComponent<Text>()
-      .text.Split('\n');
-    Plugin.Logger.LogInfo($"Input: {text.Join()}");
+      .text;
+    string[] text = rawText.Split('\n').Select(text => text.Trim()).ToArray();
+    Plugin.Logger.LogInfo($"Input: '{text.Join()}' (raw: {Convert.ToBase64String(Encoding.UTF8.GetBytes(rawText))}");
 
     if (text.Length < 2)
     {

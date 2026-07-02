@@ -109,31 +109,36 @@ public class Plugin : BaseUnityPlugin
     //       It would require we pull from game files though...
     //       ...it wouldn't work on CI.
     //       Probably write a script or something that just fetches the required resources and outputs a C# file.
-    Version builtForVersion = new("1.1.0");
+    Version builtForVersion = new("1.1.1");
+    const int RELEASE_NUMBER = 42;
+    const string RELEASE_HASH = "e43207b";
+    const string RELEASE_DATE = "2026/06/15 12:42 AM";
+
+    // https://patorjk.com/software/taag/#p=display&f=Future+Smooth&t=Please+update+your+game!!!
+    // TODO: parse date for same version and release number but differing hash
     Version thisVersion = new(Application.version);
-    if (Releases.releaseNumber < 42 || thisVersion < builtForVersion)
+    if (Releases.releaseNumber < RELEASE_NUMBER || thisVersion < builtForVersion)
     {
-      // https://patorjk.com/software/taag/#p=display&f=Future+Smooth&t=Please+update+your+game!!!
       // csharpier-ignore-start
       Logger.LogWarning( "================================================================================");
-      Logger.LogWarning(@"|   ╭─╮╷  ╭─╴╭─╮╭─╮╭─╴   ╷ ╷╭─╮╶┬╮╭─╮╶┬╴╭─╴   ╷ ╷╭─╮╷ ╷╭─╮   ╭─╴╭─╮╭┬╮╭─╴╷╷╷   |");
-      Logger.LogWarning(@"|   ├─╯│  ├╴ ├─┤╰─╮├╴    │ │├─╯ ││├─┤ │ ├╴    ╰┬╯│ ││ │├┬╯   │╶╮├─┤│││├╴ ╵╵╵   |");
-      Logger.LogWarning(@"|   ╵  ╰─╴╰─╴╵ ╵╰─╯╰─╴   ╰─╯╵  ╶┴╯╵ ╵ ╵ ╰─╴    ╵ ╰─╯╰─╯╵╰╴   ╰─╯╵ ╵╵ ╵╰─╴╵╵╵   |");
+      Logger.LogWarning( "|   ╭─╮╷  ╭─╴╭─╮╭─╮╭─╴   ╷ ╷╭─╮╶┬╮╭─╮╶┬╴╭─╴   ╷ ╷╭─╮╷ ╷╭─╮   ╭─╴╭─╮╭┬╮╭─╴╷╷╷   |");
+      Logger.LogWarning( "|   ├─╯│  ├╴ ├─┤╰─╮├╴    │ │├─╯ ││├─┤ │ ├╴    ╰┬╯│ ││ │├┬╯   │╶╮├─┤│││├╴ ╵╵╵   |");
+      Logger.LogWarning( "|   ╵  ╰─╴╰─╴╵ ╵╰─╯╰─╴   ╰─╯╵  ╶┴╯╵ ╵ ╵ ╰─╴    ╵ ╰─╯╰─╯╵╰╴   ╰─╯╵ ╵╵ ╵╰─╴╵╵╵   |");
       Logger.LogWarning( "================================================================================");
-      Logger.LogWarning($"This version of the mod (v{MyPluginInfo.PLUGIN_VERSION}) was built for: v{builtForVersion} (release 42, commit 578e672, date 2026/04/23 9:27 PM)");
+      Logger.LogWarning($"This version of the mod (v{MyPluginInfo.PLUGIN_VERSION}) was built for: v{builtForVersion} (release {RELEASE_NUMBER}, commit {RELEASE_HASH}, date {RELEASE_DATE})");
       Logger.LogWarning($"Your version is: v{Application.version} (release {Releases.releaseNumber}, commit {Releases.buildCommit}, date {Releases.buildDate})");
       Logger.LogWarning( "================================================================================");
       // csharpier-ignore-end
     }
-    else if (Releases.releaseNumber > 42 || thisVersion > builtForVersion)
+    else if (Releases.releaseNumber > RELEASE_NUMBER || thisVersion > builtForVersion)
     {
       // csharpier-ignore-start
       Logger.LogWarning( "=================================================================================");
-      Logger.LogWarning(@"|         ╭─╮╷  ╭─╴╭─╮╭─╮╭─╴   ╭─╮╭─╮╭─╴╭╮╷   ╭─╮╭╮╷   ╷╭─╮╭─╮╷ ╷╭─╴╷╷╷         |");
-      Logger.LogWarning(@"|         ├─╯│  ├╴ ├─┤╰─╮├╴    │ │├─╯├╴ │╰┤   ├─┤│╰┤   │╰─╮╰─╮│ │├╴ ╵╵╵         |");
-      Logger.LogWarning(@"|         ╵  ╰─╴╰─╴╵ ╵╰─╯╰─╴   ╰─╯╵  ╰─╴╵ ╵   ╵ ╵╵ ╵   ╵╰─╯╰─╯╰─╯╰─╴╵╵╵         |");
+      Logger.LogWarning( "|         ╭─╮╷  ╭─╴╭─╮╭─╮╭─╴   ╭─╮╭─╮╭─╴╭╮╷   ╭─╮╭╮╷   ╷╭─╮╭─╮╷ ╷╭─╴╷╷╷         |");
+      Logger.LogWarning( "|         ├─╯│  ├╴ ├─┤╰─╮├╴    │ │├─╯├╴ │╰┤   ├─┤│╰┤   │╰─╮╰─╮│ │├╴ ╵╵╵         |");
+      Logger.LogWarning( "|         ╵  ╰─╴╰─╴╵ ╵╰─╯╰─╴   ╰─╯╵  ╰─╴╵ ╵   ╵ ╵╵ ╵   ╵╰─╯╰─╯╰─╯╰─╴╵╵╵         |");
       Logger.LogWarning( "=================================================================================");
-      Logger.LogWarning($"This version of the mod (v{MyPluginInfo.PLUGIN_VERSION}) was built for: v{builtForVersion} (release 42, commit 578e672, date 2026/04/23 9:27 PM)");
+      Logger.LogWarning($"This version of the mod (v{MyPluginInfo.PLUGIN_VERSION}) was built for: v{builtForVersion} (release {RELEASE_NUMBER}, commit {RELEASE_HASH}, date {RELEASE_DATE})");
       Logger.LogWarning($"Your version is: v{Application.version} (release {Releases.releaseNumber}, commit {Releases.buildCommit}, date {Releases.buildDate})");
       Logger.LogWarning(null);
       Logger.LogWarning( "First, please check that there is an updated version here: https://github.com/nonperforming/RhythmDoctor.Archipelago/releases. Remember to update Pulse (https://github.com/nonperforming/Pulse/releases) as well.");
