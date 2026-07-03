@@ -27,12 +27,7 @@ internal sealed class DeathLinkClientComponent : IClientComponent
     " wasn't ready yet!", // Beans Hopper achievement
     " couldn't count to 7",
   ];
-
-  internal DeathLinkClientComponent(CancellationTokenSource cancellationTokenSource)
-  {
-    _cancellationTokenSource = cancellationTokenSource;
-  }
-
+  
   public async Task Enable(ArchipelagoSession session)
   {
     Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Enabling DeathLink...");

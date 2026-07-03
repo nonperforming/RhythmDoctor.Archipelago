@@ -69,6 +69,11 @@ internal sealed class ArchipelagoTrapManagerClientComponent : ModifierManagerBas
   // Initializing here will lead to an immediate deadlock on login - no thread can ever get a semaphore.
   private readonly SemaphoreSlim _gettingTrapClearedSemaphore;
 
+  public async Task Enable(ArchipelagoSession session)
+  {
+    throw new NotImplementedException();
+  }
+  
   /// <summary>
   /// Add a trap to the list of queued traps.
   /// </summary>

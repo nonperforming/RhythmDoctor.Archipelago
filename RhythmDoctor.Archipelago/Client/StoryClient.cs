@@ -2,6 +2,8 @@ using System.Collections.ObjectModel;
 
 namespace RhythmDoctor.Archipelago.Client;
 
+using Components.ItemProcessors;
+
 using global::Archipelago.MultiClient.Net.Packets;
 
 using System.Diagnostics.CodeAnalysis;
@@ -16,10 +18,11 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
   internal SlotData SlotData { get; private set; }
 
   // Components
-  internal IItemProcessor[] ItemProcessorComponents { get; private set; } = [];
-  internal ArchipelagoTrapManagerClientComponent? ModifierManagerComponent { get; private set; }
+  internal IItemProcessorClientComponent[] ItemProcessorComponents { get; private set; } = [new StoryLevelItemProcessorClientComponent(), new TrapItemProcessorClientComponent()];
+  internal ArchipelagoTrapManagerClientComponent? ModifierManagerComponent { get; private set; } =
+    new();
   internal DeathLinkClientComponent? DeathLinkComponent { get; private set; }
-  internal IReplicationClientComponent? ReplicationComponent { get; private set; }
+  internal ReplicationClientComponent? ReplicationComponent { get; private set; }
 
   // State
   internal ClientState State { get; private set; } = ClientState.NotReady;
@@ -29,7 +32,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
   {
     get
     {
-      foreach (IItemProcessor itemProcessorComponent in ItemProcessorComponents)
+      foreach (IItemProcessorClientComponent itemProcessorComponent in ItemProcessorComponents)
         yield return itemProcessorComponent;
       if (ModifierManagerComponent != null)
         yield return ModifierManagerComponent;
@@ -47,7 +50,6 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
   internal StoryClient(LoginInformation loginInformation)
   {
     LoginInformation = loginInformation;
-    ModifierManagerComponent = new ArchipelagoTrapManagerClientComponent();
   }
 
   internal ArchipelagoSession CreateSession()
@@ -101,6 +103,10 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     roomInfo.
 
     State = ClientState.LoggingIn;
+    
+    // Wait for all components to enable.
+    ItemProcessorComponents = [new StoryLevelItemProcessorClientComponent(), new TrapItemProcessorClientComponent()];
+    ModifierManagerComponent = new ArchipelagoTrapManagerClientComponent();
 
     // Process all previously received items...
     Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Receiving items...");
@@ -125,7 +131,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
       ItemInfo itemInfo = Session!.Items.DequeueItem();
       Plugin.Logger.LogDebug($"[{nameof(StoryClient)}] Processing item {itemInfo.ItemName} ({itemInfo.ItemId})");
 
-      foreach (IItemProcessor itemProcessorComponent in ItemProcessorComponents)
+      foreach (IItemProcessorClientComponent itemProcessorComponent in ItemProcessorComponents)
       {
         Plugin.Logger.LogDebug($"[{nameof(StoryClient)}] Processing item {itemInfo.ItemName} ({itemInfo.ItemId})");
         if (itemProcessorComponent.HandleItem(itemInfo))

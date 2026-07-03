@@ -2,17 +2,13 @@ using Newtonsoft.Json.Linq;
 
 namespace RhythmDoctor.Archipelago.Client.Components;
 
-internal sealed class StoryModeReplicationClientComponent : IReplicationClientComponent, IClientComponent
+internal sealed class StoryReplicationClientComponent : ReplicationClientComponent
 {
-  public IEnumerable<Type> AssistPatches
-  {
-    get
-    {
-      yield return typeof(StoryModeStateReplicationPatch);
-    }
-  }
-
-  public async Task Enable(ArchipelagoSession session)
+  private ArchipelagoSession _session;
+  
+  public IEnumerable<Type> AssistPatches => [typeof(StoryModeStateReplicationPatch)];
+  
+  public override async Task Enable(ArchipelagoSession session)
   {
     static async Task InitializeSync(ArchipelagoSession session)
     {
@@ -26,7 +22,7 @@ internal sealed class StoryModeReplicationClientComponent : IReplicationClientCo
         if (valueRaw.Type != JTokenType.Null && valueRaw.Type != JTokenType.Undefined)
         {
           T value = valueRaw.ToObject<T>()!;
-          Plugin.Logger.LogInfo($"[{nameof(StoryModeReplicationClientComponent)}] Found {key} state: {value}");
+          Plugin.Logger.LogInfo($"[{nameof(StoryReplicationClientComponent)}] Found {key} state: {value}");
           executeExisting.Invoke(value);
         }
         // TODO: Would love to have DataStorage set here.
@@ -34,7 +30,7 @@ internal sealed class StoryModeReplicationClientComponent : IReplicationClientCo
         else
         {
           T initializeTo = valueDoesntExist.Invoke();
-          Plugin.Logger.LogInfo($"[{nameof(StoryModeReplicationClientComponent)}] Setting initial {key} state to {initializeTo}");
+          Plugin.Logger.LogInfo($"[{nameof(StoryReplicationClientComponent)}] Setting initial {key} state to {initializeTo}");
         }
       }
 
@@ -60,11 +56,12 @@ internal sealed class StoryModeReplicationClientComponent : IReplicationClientCo
         }
       );
 
-      Plugin.Logger.LogInfo($"[{nameof(StoryModeReplicationClientComponent)}] Waiting for initialization to complete...");
+      Plugin.Logger.LogInfo($"[{nameof(StoryReplicationClientComponent)}] Waiting for initialization to complete...");
       await Task.WhenAll(paigeStaysTask, iansDesktopUnlockedTask);
-      Plugin.Logger.LogInfo($"[{nameof(StoryModeReplicationClientComponent)}] Initialization completed!");
+      Plugin.Logger.LogInfo($"[{nameof(StoryReplicationClientComponent)}] Initialization completed!");
     }
 
+    await base.Enable(session);
     await InitializeSync(session);
     session.DataStorage[Scope.Slot, Persistence.PaigeStaysKey].OnValueChanged += ReplicatePaigeStays;
     session.DataStorage[Scope.Slot, Persistence.IanDesktopLoginKey].OnValueChanged += ReplicateIansDesktopUnlocked;
@@ -72,13 +69,13 @@ internal sealed class StoryModeReplicationClientComponent : IReplicationClientCo
   
   private static void ReplicatePaigeStays(JToken oldValue, JToken newValue, Dictionary<string, JToken> _)
   {
-    Plugin.Logger.LogInfo($"[{nameof(StoryModeReplicationClientComponent)}] Paige stays {oldValue}->{newValue}");
+    Plugin.Logger.LogInfo($"[{nameof(StoryReplicationClientComponent)}] Paige stays {oldValue}->{newValue}");
     Persistence.SetPaigeEnding(newValue.ToObject<bool>());
   }
 
   private static void ReplicateIansDesktopUnlocked(JToken oldValue, JToken newValue, Dictionary<string, JToken> _)
   {
-    Plugin.Logger.LogInfo($"[{nameof(StoryModeReplicationClientComponent)}] Ian's desktop unlocked {oldValue}->{newValue}");
+    Plugin.Logger.LogInfo($"[{nameof(StoryReplicationClientComponent)}] Ian's desktop unlocked {oldValue}->{newValue}");
     Persistence.SetIanDesktopLogin(newValue.ToObject<bool>());
   }
 }

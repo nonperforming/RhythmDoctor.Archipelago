@@ -1,6 +1,6 @@
 namespace RhythmDoctor.Archipelago.Client.Components.ItemProcessors;
 
-public class StoryLevelItemProcessor : IItemProcessor
+public class TrapItemProcessorClientComponent : IItemProcessorClientComponent
 {
   public async Task Enable(ArchipelagoSession session)
   {
