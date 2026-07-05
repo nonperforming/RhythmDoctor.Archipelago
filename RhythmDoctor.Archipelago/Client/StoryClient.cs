@@ -16,9 +16,9 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
   internal SlotData SlotData { get; private set; }
 
   // Components
-  internal IItemProcessorClientComponent[] ItemProcessorComponents { get; private set; } = [new StoryLevelItemProcessorClientComponent(), new TrapItemProcessorClientComponent()];
-  internal ArchipelagoTrapManagerClientComponent? ModifierManagerComponent { get; private set; } =
-    new();
+  internal ItemProcessorClientComponent[] ItemProcessorComponents { get; private set; } = [new StoryLevelItemProcessorClientComponent(), new TrapItemProcessorClientComponent()];
+  //internal ArchipelagoTrapManagerClientComponent? ModifierManagerComponent { get; private set; } =
+  //  new();
   internal DeathLinkClientComponent? DeathLinkComponent { get; private set; }
   internal ReplicationClientComponent? ReplicationComponent { get; private set; }
 
@@ -26,14 +26,14 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
   internal ClientState State { get; private set; } = ClientState.NotReady;
   internal SlotData Slot { get; private set; }
 
-  internal IEnumerable<IClientComponent> ClientComponents
+  internal IEnumerable<ClientComponent> ClientComponents
   {
     get
     {
-      foreach (IItemProcessorClientComponent itemProcessorComponent in ItemProcessorComponents)
+      foreach (ItemProcessorClientComponent itemProcessorComponent in ItemProcessorComponents)
         yield return itemProcessorComponent;
-      if (ModifierManagerComponent != null)
-        yield return ModifierManagerComponent;
+      //if (ModifierManagerComponent != null)
+      //  yield return ModifierManagerComponent;
       if (DeathLinkComponent != null)
         yield return DeathLinkComponent;
       if (ReplicationComponent != null)
@@ -110,12 +110,12 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     // Wait for all components to enable.
     List<Task> componentEnableTasks = new();
     ItemProcessorComponents = [new StoryLevelItemProcessorClientComponent(), new TrapItemProcessorClientComponent()];
-    ModifierManagerComponent = new ArchipelagoTrapManagerClientComponent();
-    foreach (IItemProcessorClientComponent itemProcessorClientComponent in ItemProcessorComponents)
+    //ModifierManagerComponent = new ArchipelagoTrapManagerClientComponent();
+    foreach (ItemProcessorClientComponent itemProcessorClientComponent in ItemProcessorComponents)
     {
       componentEnableTasks.Add(itemProcessorClientComponent.Enable(Session));
     }
-    componentEnableTasks.Add(ModifierManagerComponent.Enable(Session));
+    //componentEnableTasks.Add(ModifierManagerComponent.Enable(Session));
     Task.WaitAll(componentEnableTasks.ToArray());
 
     // Process all previously received items...
@@ -124,6 +124,9 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     Parallel.ForEach(Session.Items.AllItemsReceived, HandleInitialItem);
     UnlockItemPatch.TryUnlockAllBossSongs();
 
+    // We're done here. Go to level select.
+    scnBase.GoToScene("scnLevelSelect");
+    
     State = ClientState.LoggedIn;
     return loginResult;
   }
@@ -141,7 +144,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
       ItemInfo itemInfo = Session!.Items.DequeueItem();
       Plugin.Logger.LogDebug($"[{nameof(StoryClient)}] Processing item {itemInfo.ItemName} ({itemInfo.ItemId})");
 
-      foreach (IItemProcessorClientComponent itemProcessorComponent in ItemProcessorComponents)
+      foreach (ItemProcessorClientComponent itemProcessorComponent in ItemProcessorComponents)
       {
         Plugin.Logger.LogDebug($"[{nameof(StoryClient)}] Processing item {itemInfo.ItemName} ({itemInfo.ItemId})");
         if (itemProcessorComponent.HandleItem(itemInfo))
@@ -230,8 +233,8 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
       case ClientState.ReceivingItems:
         if (Bindings.ItemIdToLevel.TryGetValue(itemInfo.ItemId, out Level level))
           SetBestRank(Session!.Locations.AllLocationsChecked, level);
-        if (Bindings.ModifierItemIdToModifierUid.TryGetValue(itemInfo.ItemId, out string uid))
-          ModifierManager
+        //if (Bindings.ModifierItemIdToModifierUid.TryGetValue(itemInfo.ItemId, out string uid))
+        //  ModifierManager;
           break;
     }
   }

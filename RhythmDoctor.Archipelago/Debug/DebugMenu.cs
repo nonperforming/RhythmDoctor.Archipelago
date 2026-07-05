@@ -21,7 +21,7 @@ public class DebugMenu : MonoBehaviour
   /// Unlike the <see cref="StoryClient"/>'s <see cref="StoryClient.ModifierManagerComponent"/>, traps from this Trap Manager will not be
   /// automatically deleted.
   /// </remarks>
-  internal ArchipelagoTrapManagerClientComponent ArchipelagoTrapManagerClientComponent = new();
+  //internal ArchipelagoTrapManagerClientComponent ArchipelagoTrapManagerClientComponent = new();
 
   private void Start()
   {
@@ -102,15 +102,6 @@ public class DebugMenu : MonoBehaviour
         break;
       case ActivatedGUI.Patches:
         GUI.Box(new Rect(10, 10, 330, 890), "Rhythm Doctor Archipelago Patches Debug");
-        if (GUI.Button(new Rect(30, 30, 300, 20), "Discard active traps"))
-        {
-          ArchipelagoTrapManagerClientComponent.ClearActiveTraps(false);
-        }
-        if (GUI.Button(new Rect(30, 60, 300, 20), "Discard all traps immediately"))
-        {
-          ArchipelagoTrapManagerClientComponent.ClearActiveTraps(false);
-          ArchipelagoTrapManagerClientComponent.Traps.Clear();
-        }
 
         if (GUI.Button(new Rect(30, 450, 300, 20), "Apply post-login patches"))
         {
@@ -127,12 +118,6 @@ public class DebugMenu : MonoBehaviour
         {
           Notify("Unapplying debug patches");
           Plugin.UnapplyDebugPatches();
-        }
-
-        if (GUI.Button(new Rect(30, 540, 300, 20), "Create Client class"))
-        {
-          Notify("Creating empty Client");
-          Plugin.ClientOld = new Client.ClientOld();
         }
         break;
       case ActivatedGUI.Levels:

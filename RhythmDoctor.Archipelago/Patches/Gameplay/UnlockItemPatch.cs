@@ -277,7 +277,7 @@ internal static class UnlockItemPatch
                   new List<scnLevelSelect.LevelSelectDestination>();
                 if (
                   // ReSharper disable once NullableWarningSuppressionIsUsed
-                  Plugin.ClientOld.Session!.Items.AllItemsReceived.Any(item =>
+                  Plugin.StoryClient.Session!.Items.AllItemsReceived.Any(item =>
                     item.ItemId == Bindings.SLEEVE_PAINT_ITEM_ID
                   )
                 )
@@ -313,7 +313,7 @@ internal static class UnlockItemPatch
                   new List<scnLevelSelect.LevelSelectDestination>();
                 if (
                   // ReSharper disable once NullableWarningSuppressionIsUsed
-                  Plugin.ClientOld.Session!.Items.AllItemsReceived.Any(item =>
+                  Plugin.StoryClient.Session!.Items.AllItemsReceived.Any(item =>
                     item.ItemId == Bindings.RegionToKeyID[Region.RecordsRoom]
                   )
                 )
@@ -466,7 +466,7 @@ internal static class UnlockItemPatch
         continue;
       }
 
-      int minimumRank = Plugin.ClientOld.Slot.bossUnlockRequirement switch
+      int minimumRank = Plugin.StoryClient.Slot.bossUnlockRequirement switch
       {
         SlotData.BossUnlockRequirement.ARankAll => Rank.A,
         SlotData.BossUnlockRequirement.Perfect => Rank.S,
@@ -480,7 +480,7 @@ internal static class UnlockItemPatch
       {
         clearedInAct++;
 
-        long clearRequirement = Plugin.ClientOld.Slot.GetBossSongLevelClearRequirement(act);
+        long clearRequirement = Plugin.StoryClient.Slot.GetBossSongLevelClearRequirement(act);
         if (clearedInAct >= clearRequirement)
         {
           Plugin.Logger.LogInfo($"Unlocking {act} boss ({clearRequirement} requirement, rank {minimumRank})");

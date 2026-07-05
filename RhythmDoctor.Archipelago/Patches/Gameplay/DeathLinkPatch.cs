@@ -25,7 +25,7 @@ internal static class DeathLinkPatch
 
     Plugin.Logger.LogInfo($"[{nameof(DeathLinkPatch)}] Sending {nameof(RowEntity.CrackAdvance)} death");
     enabled = false;
-    Plugin.ClientOld.SendDeathLink();
+    Plugin.StoryClient.DeathLinkComponent.SendDeathLink();
   }
 
   [HarmonyPatch(typeof(scnGame), nameof(scnGame.FailLevel))]
@@ -55,7 +55,7 @@ internal static class DeathLinkPatch
     Plugin.Logger.LogInfo($"[{nameof(DeathLinkPatch)}] Sending {nameof(scnGame.FailLevelLite)} death");
 
     enabled = false;
-    Plugin.ClientOld.SendDeathLink();
+    Plugin.StoryClient.DeathLinkComponent?.SendDeathLink();
   }
 
   [HarmonyPatch(typeof(LevelBase), nameof(LevelBase.RunTag))]
@@ -73,7 +73,7 @@ internal static class DeathLinkPatch
       Plugin.Logger.LogInfo($"[{nameof(DeathLinkPatch)}] Sending Beans Hopper death");
       enabled = false;
       // TODO: Some kind of visual indication that you failed Beans would be nice
-      Plugin.ClientOld.SendDeathLink();
+      Plugin.StoryClient.DeathLinkComponent?.SendDeathLink();
     }
   }
 }

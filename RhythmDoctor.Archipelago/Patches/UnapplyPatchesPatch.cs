@@ -29,8 +29,8 @@ internal static class UnapplyPatchesPatch
     }
 
     // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
-    Plugin.ClientOld?.Dispose();
+    Plugin.StoryClient?.Dispose();
     // ReSharper disable once NullableWarningSuppressionIsUsed
-    Plugin.ClientOld = null!;
+    Plugin.StoryClient = null!;
   }
 }

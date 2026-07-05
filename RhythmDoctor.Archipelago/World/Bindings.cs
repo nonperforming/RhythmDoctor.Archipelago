@@ -184,7 +184,7 @@ internal static class Bindings
   ];
   #endregion
 
-  internal static readonly IReadOnlyCollection<Type> Traps = ModifierItemIdToModifierUid.Values;
+  internal static readonly IReadOnlyCollection<string> Traps = ModifierItemIdToModifierUid.Values;
 
   internal static readonly IReadOnlyCollection<Level> Levels = LevelToStage.Keys;
 

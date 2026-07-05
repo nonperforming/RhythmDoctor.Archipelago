@@ -4,11 +4,9 @@ namespace RhythmDoctor.Archipelago.Client.Components;
 
 internal sealed class StoryReplicationClientComponent : ReplicationClientComponent
 {
-  private ArchipelagoSession _session;
-  
   public IEnumerable<Type> AssistPatches => [typeof(StoryModeStateReplicationPatch)];
   
-  public override async Task Enable(ArchipelagoSession session)
+  internal override async Task Enable(ArchipelagoSession session)
   {
     static async Task InitializeSync(ArchipelagoSession session)
     {

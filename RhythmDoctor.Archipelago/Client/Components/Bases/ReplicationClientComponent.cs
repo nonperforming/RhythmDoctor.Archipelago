@@ -1,16 +1,7 @@
 namespace RhythmDoctor.Archipelago.Client.Components.Interfaces;
 
-internal abstract class ReplicationClientComponent : IClientComponent
+internal abstract class ReplicationClientComponent : ClientComponent
 {
-  private ArchipelagoSession _session;
-  
-  public virtual Task Enable(ArchipelagoSession session)
-  {
-    _session = session;
-    base.Enable();
-    return Task.CompletedTask;
-  }
-  
   internal void UpdateRemote(string key, object value)
   {
     Plugin.Logger.LogInfo($"[{nameof(ReplicationClientComponent)}] Replicating {key} to {value}");

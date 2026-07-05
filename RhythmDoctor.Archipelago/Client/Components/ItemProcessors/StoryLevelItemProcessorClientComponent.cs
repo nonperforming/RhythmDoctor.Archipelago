@@ -2,17 +2,16 @@ namespace RhythmDoctor.Archipelago.Client.Components.ItemProcessors;
 
 using System.Collections.ObjectModel;
 
-public class StoryLevelItemProcessorClientComponent : IItemProcessorClientComponent
+internal class StoryLevelItemProcessorClientComponent : ItemProcessorClientComponent
 {
-  private ArchipelagoSession _session;
-  
-  public async Task Enable(ArchipelagoSession session)
+  internal override async Task Enable(ArchipelagoSession session)
   {
-    _session = session;
-    throw new NotImplementedException();
+    await base.Enable(session);
+    // TODO: CACHE
+    // throw new NotImplementedException();
   }
 
-  public bool HandleItemInitial(ItemInfo itemInfo)
+  internal override bool HandleItemInitial(ItemInfo itemInfo)
   {
     // TODO: could be optimized heavily, prevent iterating over ALL locations sent many many times.
     //       When Enabled, get the top rank for each level and cache it.
@@ -95,7 +94,7 @@ public class StoryLevelItemProcessorClientComponent : IItemProcessorClientCompon
     return true;
   }
 
-  public bool HandleItem(ItemInfo itemInfo)
+  internal override bool HandleItem(ItemInfo itemInfo)
   {
     if (!Bindings.ItemIdToLevel.TryGetValue(itemInfo.ItemId, out Level level))
       return false; // Not a level.

@@ -55,7 +55,7 @@ public class Plugin : BaseUnityPlugin
   private static readonly Type[] PostLoginPatches =
   [
     typeof(Act5Patch),
-    typeof(ClearLocationPatch),
+    typeof(ClearStoryLocationPatch),
     typeof(DeathLinkPatch),
     //typeof(JanitorPatch), // use pause menu for in/outbox
     typeof(LevelSelectVisualFixesPatch),

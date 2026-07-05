@@ -43,7 +43,7 @@ internal static class Configuration
       "RemoteTrapClearsTimeout",
       3000,
       "How long to wait in milliseconds until getting remote trap clear status times out "
-        + "and defaults to 0/last known good value."
+        + "and defaults to 0."
     );
 
     _slotToUse = config.Bind("zzzDebugDoNotTouchUnlessAsked", "SlotToUse", 0, "Slot to use for Archipelago.");
@@ -52,10 +52,10 @@ internal static class Configuration
   internal static async Task<DeathLinkConfig> GetDeathLink()
   {
     // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-    if (Plugin.ClientOld is null || Plugin.ClientOld.Session is null)
+    if (Plugin.StoryClient is null || Plugin.StoryClient.Session is null)
       return _deathLink.Value;
 
-    return await Plugin.ClientOld.Session.DataStorage.GetRaceModeAsync()
+    return await Plugin.StoryClient.Session.DataStorage.GetRaceModeAsync()
       ? DeathLinkConfig.FollowSlot
       : _deathLink.Value;
   }

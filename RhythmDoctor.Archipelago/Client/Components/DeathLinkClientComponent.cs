@@ -1,8 +1,7 @@
 namespace RhythmDoctor.Archipelago.Client.Components;
 
-internal sealed class DeathLinkClientComponent : IClientComponent
+internal sealed class DeathLinkClientComponent : ClientComponent
 {
-  private ArchipelagoSession Session = null!;
   private DeathLinkService Service = null!;
 
   // TODO: would be nice to localize these.
@@ -28,10 +27,10 @@ internal sealed class DeathLinkClientComponent : IClientComponent
     " couldn't count to 7",
   ];
   
-  public async Task Enable(ArchipelagoSession session)
+  internal override async Task Enable(ArchipelagoSession session)
   {
     Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Enabling DeathLink...");
-    Session = session;
+    await base.Enable(session);
     await Task.Run(() =>
     {
       Service = session.CreateDeathLinkService();
@@ -44,7 +43,7 @@ internal sealed class DeathLinkClientComponent : IClientComponent
   internal void SendDeathLink()
   {
     // ReSharper disable once NullableWarningSuppressionIsUsed
-    PlayerInfo player = Session.Players.ActivePlayer;
+    PlayerInfo player = _session.Players.ActivePlayer;
 
     string message = player.Alias + Messages[Plugin.Random.Next(Messages.Length)];
 

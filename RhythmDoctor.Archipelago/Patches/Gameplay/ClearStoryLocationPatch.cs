@@ -4,7 +4,7 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 
 [HarmonyPatch]
-internal static class ClearLocationPatch
+internal static class ClearStoryLocationPatch
 {
   private static Dictionary<long, ScoutedItemInfo> ItemsToSend = new();
 
@@ -95,7 +95,7 @@ internal static class ClearLocationPatch
       Rank rank = scnGame.instance.currentLevel.GetRankFromMistakes();
       IEnumerable<long> ids = GetStageLocationIDsToClear(GetCurrentLevel(), rank);
       long[] newLocations = ids.Where(id =>
-          !Plugin.ClientOld.Session.Locations.AllLocationsChecked.Contains(id) || JustSentLocations.Contains(id)
+          !Plugin.StoryClient.Session.Locations.AllLocationsChecked.Contains(id) || JustSentLocations.Contains(id)
         )
         .ToArray();
 
@@ -170,7 +170,7 @@ internal static class ClearLocationPatch
   [HarmonyPostfix]
   private static void MiracleDefibrillatorClearLocationPatch(Level_Montage __instance)
   {
-    bool hasScrambledCharacter = Plugin.StoryClient.ModifierManagerComponent.IsTrapActive(ScrambleCharactersTrapPatch.name);
+    bool hasScrambledCharacter = false; //Plugin.StoryClient.ModifierManagerComponent.IsTrapActive(ScrambleCharactersTrapPatch.name);
 
     // We need to calculate the level's rank manually...
     int rank;
@@ -199,7 +199,7 @@ internal static class ClearLocationPatch
     else
     {
       long[] newLocations = ids.Where(id =>
-          !Plugin.ClientOld.Session.Locations.AllLocationsChecked.Contains(id) || JustSentLocations.Contains(id)
+          !Plugin.StoryClient.Session.Locations.AllLocationsChecked.Contains(id) || JustSentLocations.Contains(id)
         )
         .ToArray();
       Plugin.Logger.LogDebug($"IDs: {string.Join(", ", ids)} (of which {string.Join(", ", newLocations)} are new)");
@@ -237,11 +237,11 @@ internal static class ClearLocationPatch
   {
 #if DEBUG
     // Discard Debug Menu traps regardless of result.
-    Plugin.DebugMenu.ArchipelagoTrapManagerClientComponent.ClearActiveTraps(false);
+    //Plugin.DebugMenu.ArchipelagoTrapManagerClientComponent.ClearActiveTraps(false);
 #endif
     if (bossLevelFailed)
     {
-      Plugin.StoryClient.ModifierManagerComponent.ClearActiveTraps(false);
+      //Plugin.StoryClient.ModifierManagerComponent.ClearActiveTraps(false);
       return [];
     }
 
@@ -249,21 +249,21 @@ internal static class ClearLocationPatch
 
     // Check if we fulfill the End Goal requirements
 #pragma warning disable Harmony003
-    if (Plugin.ClientOld.Slot.endGoal == SlotData.EndGoal.HelpingHands && level == Level.HelpingHands && rank.passed)
+    if (Plugin.StoryClient.Slot.endGoal == SlotData.EndGoal.HelpingHands && level == Level.HelpingHands && rank.passed)
 #pragma warning restore Harmony003
     {
       Plugin.Logger.LogInfo("Setting goal achieved - Helping Hands");
-      Plugin.ClientOld.Session.SetGoalAchieved();
+      Plugin.StoryClient.Session.SetGoalAchieved();
     }
-    else if (Plugin.ClientOld.Slot.endGoal != SlotData.EndGoal.HelpingHands)
+    else if (Plugin.StoryClient.Slot.endGoal != SlotData.EndGoal.HelpingHands)
     {
       bool clearedAll = true;
-      Rank minimumRank = Plugin.ClientOld.Slot.endGoal switch
+      Rank minimumRank = Plugin.StoryClient.Slot.endGoal switch
       {
         SlotData.EndGoal.PerfectAll => Rank.S,
         SlotData.EndGoal.ARankAll => Rank.A,
         SlotData.EndGoal.BRankAll => Rank.B,
-        _ => throw new ArgumentOutOfRangeException($"End Goal ({Plugin.ClientOld.Slot.endGoal}) not valid value."),
+        _ => throw new ArgumentOutOfRangeException($"End Goal ({Plugin.StoryClient.Slot.endGoal}) not valid value."),
       };
 
       foreach (Level otherLevel in Bindings.Levels)
@@ -280,20 +280,20 @@ internal static class ClearLocationPatch
       if (clearedAll)
       {
         Plugin.Logger.LogInfo("Setting goal achieved - Cleared all");
-        Plugin.ClientOld.Session.SetGoalAchieved();
+        Plugin.StoryClient.Session.SetGoalAchieved();
       }
     }
 
-    bool clearedNewLocation = ids.Any(id => !Plugin.ClientOld.Session.Locations.AllLocationsChecked.Contains(id));
+    bool clearedNewLocation = ids.Any(id => !Plugin.StoryClient.Session.Locations.AllLocationsChecked.Contains(id));
     if (clearedNewLocation)
     {
       JustSentLocations = ids.Where(id => !Plugin.StoryClient.Session.Locations.AllLocationsChecked.Contains(id)).ToArray();
       Task.Run(() => Plugin.StoryClient.Session.Locations.CompleteLocationChecksAsync(ids.ToArray()));
-      Plugin.StoryClient.ModifierManagerComponent.ClearActiveTraps(false);
+      //Plugin.StoryClient.ModifierManagerComponent.ClearActiveTraps(false);
     }
     else
     {
-      Plugin.StoryClient.ModifierManagerComponent.ClearActiveTraps(true);
+      //Plugin.StoryClient.ModifierManagerComponent.ClearActiveTraps(true);
     }
 
     return ids;
@@ -303,7 +303,7 @@ internal static class ClearLocationPatch
   {
     Plugin.Logger.LogInfo($"Scouting location checks for ids {string.Join(", ", ids)}... (try {retries})");
     Task<Dictionary<long, ScoutedItemInfo>> scout = Task.Run(() =>
-      Plugin.ClientOld.Session.Locations.ScoutLocationsAsync(HintCreationPolicy.None, ids)
+      Plugin.StoryClient.Session.Locations.ScoutLocationsAsync(HintCreationPolicy.None, ids)
     );
     yield return new WaitUntil(() => scout.IsCompleted);
     Plugin.Logger.LogInfo("Completed scouting");
@@ -329,7 +329,7 @@ internal static class ClearLocationPatch
     if (!Enum.TryParse(scnGame.internalIdentifier, out Level level))
     {
       Plugin.Logger.LogError($"Couldn't find Level. Level identifier: {scnGame.internalIdentifier}");
-      Plugin.StoryClient.ModifierManagerComponent.ClearActiveTraps(false);
+      //Plugin.StoryClient.ModifierManagerComponent.ClearActiveTraps(false);
       throw new ArgumentOutOfRangeException($"Couldn't find level {scnGame.internalIdentifier}");
     }
 
