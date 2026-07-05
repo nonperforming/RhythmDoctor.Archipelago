@@ -49,27 +49,6 @@ public class Plugin : BaseUnityPlugin
 #endif
   ];
 
-  /// <summary>
-  /// Patches that are applied after logging into Archipelago, and unapplied after logging out.
-  /// </summary>
-  private static readonly Type[] PostLoginPatches =
-  [
-    typeof(Act5Patch),
-    typeof(ClearStoryLocationPatch),
-    typeof(DeathLinkPatch),
-    //typeof(JanitorPatch), // use pause menu for in/outbox
-    typeof(LevelSelectVisualFixesPatch),
-    typeof(RhythmDogtorLevelPatch),
-    typeof(RhythmWeightlifterPatch),
-    typeof(RunningCharactersPatch),
-    typeof(SkipCutscenePatch),
-    typeof(SkipTutorialPatch),
-    typeof(UnlockItemPatch),
-    typeof(WelcomeBackPatch),
-    typeof(SavingPatch),
-    typeof(UnapplyPatchesPatch),
-  ];
-
   private static readonly Type CustomLoginScreenPatch = typeof(ArchipelagoLoginPatch);
 
   /// <summary>
@@ -152,7 +131,8 @@ public class Plugin : BaseUnityPlugin
     }
   }
 
-  private static void ApplyPatches(string id, params Type[] patches)
+  // TODO: see storyclient L144 ("pull this out")
+  internal static void ApplyPatches(string id, params Type[] patches)
   {
     Logger.LogInfo($"Applying patches as {id}");
     Harmony harmony = new(id);
@@ -162,13 +142,6 @@ public class Plugin : BaseUnityPlugin
       Logger.LogInfo($"Applying {patch.Name}");
       harmony.PatchAll(patch);
     }
-  }
-
-  internal static void ApplyGameplayPatches()
-  {
-    Logger.LogInfo("Applying gameplay patches");
-    ApplyPatches(PATCH_ID_POST_LOGIN, PostLoginPatches);
-    ApplyPatches(PATCH_ID_SLEEVE_PAINT, typeof(LockSleevePaintPatch));
   }
 
   internal static void UnapplyGameplayPatches()

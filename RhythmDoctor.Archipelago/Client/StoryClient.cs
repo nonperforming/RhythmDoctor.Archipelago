@@ -26,6 +26,27 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
   internal ClientState State { get; private set; } = ClientState.NotReady;
   internal SlotData Slot { get; private set; }
 
+  /// <summary>
+  /// Patches that are applied after logging into Archipelago, and unapplied after logging out.
+  /// </summary>
+  private static readonly Type[] PostLoginPatches =
+  [
+    typeof(Act5Patch),
+    typeof(ClearStoryLocationPatch),
+    typeof(DeathLinkPatch),
+    //typeof(JanitorPatch), // use pause menu for in/outbox
+    typeof(LevelSelectVisualFixesPatch),
+    typeof(RhythmDogtorLevelPatch),
+    typeof(RhythmWeightlifterPatch),
+    typeof(RunningCharactersPatch),
+    typeof(SkipCutscenePatch),
+    typeof(SkipTutorialPatch),
+    typeof(UnlockItemPatch),
+    typeof(WelcomeBackPatch),
+    typeof(SavingPatch),
+    typeof(UnapplyPatchesPatch),
+  ];
+  
   internal IEnumerable<ClientComponent> ClientComponents
   {
     get
@@ -118,12 +139,32 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     //componentEnableTasks.Add(ModifierManagerComponent.Enable(Session));
     Task.WaitAll(componentEnableTasks.ToArray());
 
+    // Apply necessary patches.
+    Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Applying gameplay patches");
+    // TODO: pull this OUT of plugin
+    Plugin.ApplyPatches(Plugin.PATCH_ID_POST_LOGIN, PostLoginPatches);
+    Plugin.ApplyPatches(Plugin.PATCH_ID_SLEEVE_PAINT, typeof(LockSleevePaintPatch));
+    
+    // If we got here then SavingPatch has been applied, and this should be safe.
+    Persistence.slotPrefs[Configuration.GetSlotToUse()].dict.Clear();
+    
+    // Let LockSleevePaintPatch set the Sleeve Paint to a default colour
+    Persistence.p1Skin.Reload();
+    Persistence.p2Skin.Reload();
+    
+    // Some levels come unlocked by default, such as X-1.
+    // Lock all levels to force the user to unlock them with an item.
+    foreach (Level level in Enum.GetValues(typeof(Level)))
+    {
+      Persistence.SetLevelRank(level, Rank.NotAvailable, true);
+    }
+    
     // Process all previously received items...
     Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Receiving items...");
     State = ClientState.ReceivingItems;
     Parallel.ForEach(Session.Items.AllItemsReceived, HandleInitialItem);
     UnlockItemPatch.TryUnlockAllBossSongs();
-
+    
     // We're done here. Go to level select.
     scnBase.GoToScene("scnLevelSelect");
     

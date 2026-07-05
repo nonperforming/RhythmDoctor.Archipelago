@@ -103,11 +103,6 @@ public class DebugMenu : MonoBehaviour
       case ActivatedGUI.Patches:
         GUI.Box(new Rect(10, 10, 330, 890), "Rhythm Doctor Archipelago Patches Debug");
 
-        if (GUI.Button(new Rect(30, 450, 300, 20), "Apply post-login patches"))
-        {
-          Notify("Applying post-login patches");
-          Plugin.ApplyGameplayPatches();
-        }
         if (GUI.Button(new Rect(30, 480, 300, 20), "Unapply post-login patches"))
         {
           Notify("Unapplying post-login patches");
