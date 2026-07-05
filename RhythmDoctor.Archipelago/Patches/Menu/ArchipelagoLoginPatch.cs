@@ -147,11 +147,10 @@ internal static class ArchipelagoLoginPatch
 
     // Attempt to log in with the information given.
     Plugin.Logger.LogInfo("Creating client");
-    Plugin.ClientOld = new Client.ClientOld();
+    Plugin.StoryClient = new StoryClient(new LoginInformation(Mode.Main, new Uri(url), name, password));
 
     // Should be safe in this context
-    // ReSharper disable AccessToDisposedClosure
-    Task<LoginResult> login = Task.Run(() => Plugin.ClientOld.CreateSessionAndConnect(url, name, password));
+    Task<LoginResult> login = Task.Run(Plugin.StoryClient.Login);
     yield return new WaitUntil(() => login.IsCompleted);
 
     if (login.IsCanceled || login.IsFaulted)
@@ -174,7 +173,7 @@ internal static class ArchipelagoLoginPatch
         UnpatchMenuPatch();
 
         // Wait for setup...
-        while (!Plugin.ClientOld.Setup)
+        while (!Plugin.StoryClient.State)
         {
           yield return new WaitForSecondsRealtime(1);
         }

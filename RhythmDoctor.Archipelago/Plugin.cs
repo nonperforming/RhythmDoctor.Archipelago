@@ -9,8 +9,7 @@ namespace RhythmDoctor.Archipelago;
 public class Plugin : BaseUnityPlugin
 {
   // ReSharper disable NullableWarningSuppressionIsUsed
-  internal static Client.ClientOld ClientOld = null!;
-  internal static Client.StoryClient StoryClient = null!;
+  internal static StoryClient StoryClient = null!;
   internal static new ManualLogSource Logger = null!;
 #if DEBUG
   internal static DebugMenu DebugMenu = null!;

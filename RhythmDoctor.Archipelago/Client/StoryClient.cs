@@ -6,8 +6,6 @@ using Components.ItemProcessors;
 
 using global::Archipelago.MultiClient.Net.Packets;
 
-using System.Diagnostics.CodeAnalysis;
-
 /// <summary>
 /// Archipelago client for the story mode.
 /// </summary>
@@ -96,22 +94,34 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
   {
     ThrowIfNotReadyFor(ClientState.LoggingIn);
 
-    //if (State == )
-    //
-    Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Logging in...");
+    Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Connecting...");
     RoomInfoPacket roomInfo = await Session.ConnectAsync();
-    roomInfo.
+    Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Logging in...");
+    LoginResult loginResult = await Session.LoginAsync(
+      Bindings.GAME,
+      LoginInformation.SlotName,
+      ItemsHandlingFlags.AllItems,
+      new Version(0, 6, 7),
+      password: LoginInformation.Password
+    );
 
     State = ClientState.LoggingIn;
     
     // Wait for all components to enable.
+    List<Task> componentEnableTasks = new();
     ItemProcessorComponents = [new StoryLevelItemProcessorClientComponent(), new TrapItemProcessorClientComponent()];
     ModifierManagerComponent = new ArchipelagoTrapManagerClientComponent();
+    foreach (IItemProcessorClientComponent itemProcessorClientComponent in ItemProcessorComponents)
+    {
+      componentEnableTasks.Add(itemProcessorClientComponent.Enable(Session));
+    }
+    componentEnableTasks.Add(ModifierManagerComponent.Enable(Session));
+    Task.WaitAll(componentEnableTasks.ToArray());
 
     // Process all previously received items...
     Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Receiving items...");
     State = ClientState.ReceivingItems;
-    Parallel.ForEach(Session.Items.AllItemsReceived, HandleItem);
+    Parallel.ForEach(Session.Items.AllItemsReceived, HandleInitialItem);
     UnlockItemPatch.TryUnlockAllBossSongs();
 
     State = ClientState.LoggedIn;
@@ -226,6 +236,11 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     }
   }
 
+  private void HandleInitialItem(ItemInfo itemInfo)
+  {
+    
+  }
+  
   private void ThrowIfNotReadyFor(ClientState? wantToGoToState = null)
   {
     if (State == ClientState.Disposed || wantToGoToState == ClientState.Failed)

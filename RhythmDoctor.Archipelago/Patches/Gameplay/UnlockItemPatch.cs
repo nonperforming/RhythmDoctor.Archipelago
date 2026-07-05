@@ -445,7 +445,7 @@ internal static class UnlockItemPatch
 
       return true;
     }
-    Plugin.Logger.LogDebug($"[{nameof(UnlockItemPatch)}] Does not meet requirements to unlock {act}'s boss song for");
+    Plugin.Logger.LogDebug($"[{nameof(UnlockItemPatch)}] Does not meet requirements to unlock {act}'s boss song");
     return false;
   }
 

@@ -15,10 +15,24 @@ internal abstract class ModifierManagerBase :  IDisposable
   {
     foreach (IModifier previewModifier in _previewModifiers)
     {
-      if (!ModifierRegistry.TryGetModifier(modifierUid, out _))
-        return false;
+      // Not a valid modifier.
+      Plugin.Logger.LogWarning(
+        $"[{nameof(ModifierManagerBase)}] Attempted to add non-existant modifier {modifierUid}, ignoring"
+      );
+      return;
     }
-    return true;
+
+    if (chosenModifiers.Contains(modifier))
+    {
+      // Duplicated.
+      Plugin.Logger.LogWarning(
+        $"[{nameof(ModifierManagerBase)}] Attempted to add already existing modifier {modifierUid}, ignoring"
+      );
+      return;
+    }
+
+    Plugin.Logger.LogInfo($"[{nameof(ModifierManagerBase)}] Adding modifier {modifierUid}");
+    chosenModifiers.Add(modifier);
   }
 
   public bool TryAddModifier(IModifier modifier, Level level, out IEnumerable<IModifier> modifiers)
