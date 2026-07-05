@@ -1,6 +1,6 @@
 namespace RhythmDoctor.Archipelago.Client.Components.Interfaces;
 
-internal interface IItemProcessorClientComponent : IClientComponent
+internal abstract class IItemProcessorClientComponent : ClientComponent
 {
   /// <returns>True if item was processed without issue</returns>
   internal bool HandleItemInitial(ItemInfo itemInfo);

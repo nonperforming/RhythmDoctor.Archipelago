@@ -27,7 +27,7 @@ internal static class ClearLocationPatch
     if (!Enum.TryParse(scnGame.internalIdentifier, out Level level))
     {
       Plugin.Logger.LogError($"Couldn't find Level. Level identifier: {scnGame.internalIdentifier}");
-      Plugin.StoryClient.ModifierManagerComponent.ClearActiveTraps(false);
+      //Plugin.StoryClient.ModifierManagerComponent.ClearActiveTraps(false);
       return;
     }
 
@@ -75,7 +75,7 @@ internal static class ClearLocationPatch
       return;
     }
     // TODO: Show what item we have sent out somehow.
-    Plugin.ClientOld.Session.Locations.CompleteLocationChecks(
+    Plugin.StoryClient.Session.Locations.CompleteLocationChecks(
       Bindings.RhythmWeightlifterStageToLocationID[RhythmWeightlifter.scnRhythmWeightlifter.gameInstance.LevelIndex]
     );
   }

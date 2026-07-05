@@ -7,6 +7,7 @@ internal abstract class ReplicationClientComponent : IClientComponent
   public virtual Task Enable(ArchipelagoSession session)
   {
     _session = session;
+    base.Enable();
     return Task.CompletedTask;
   }
   
