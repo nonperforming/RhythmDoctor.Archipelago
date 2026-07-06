@@ -111,6 +111,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     // TODO: break into multiple methods, don't login and go to level select here
     ThrowIfNotReadyFor(ClientState.LoggingIn);
 
+    State = ClientState.LoggingIn;
     Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Connecting...");
     RoomInfoPacket roomInfo = await Session.ConnectAsync();
     Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Logging in...");
@@ -129,18 +130,28 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     }
     Slot = new SlotData(loginSuccessful.SlotData);
     
-    State = ClientState.LoggingIn;
+    List<Task> clientComponentsToEnable = new();
+    ReplicationComponent = new StoryReplicationClientComponent();
+    clientComponentsToEnable.Add(ReplicationComponent.Enable(Session));
+    
+    // Create DeathLink if applicable
+    Configuration.DeathLinkConfig deathLinkConfig = await Configuration.GetDeathLink();
+    if (deathLinkConfig == Configuration.DeathLinkConfig.On
+        || (deathLinkConfig == Configuration.DeathLinkConfig.FollowSlot && Slot.deathLink))
+    {
+      DeathLinkComponent = new DeathLinkClientComponent();
+      clientComponentsToEnable.Add(DeathLinkComponent.Enable(Session));
+    }
     
     // Wait for all components to enable.
-    List<Task> componentEnableTasks = new();
     ItemProcessorComponents = [new StoryLevelItemProcessorClientComponent(), new TrapItemProcessorClientComponent()];
     //ModifierManagerComponent = new ArchipelagoTrapManagerClientComponent();
     foreach (ItemProcessorClientComponent itemProcessorClientComponent in ItemProcessorComponents)
     {
-      componentEnableTasks.Add(itemProcessorClientComponent.Enable(Session));
+      clientComponentsToEnable.Add(itemProcessorClientComponent.Enable(Session));
     }
     //componentEnableTasks.Add(ModifierManagerComponent.Enable(Session));
-    Task.WaitAll(componentEnableTasks.ToArray());
+    Task.WaitAll(clientComponentsToEnable.ToArray());
 
     // Apply necessary patches.
     Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Applying gameplay patches");
