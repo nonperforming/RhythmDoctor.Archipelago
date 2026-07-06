@@ -12,6 +12,9 @@ internal static class UnlockItemPatch
   {
     // TODO: Bit inefficient
 
+    // Processing new items...
+    Plugin.StoryClient.ProcessNewReceivedItems();
+    
     // This is a PostLogin patch, session is guaranteed to exist (assuming going through normal flow)
     Plugin.Logger.LogInfo($"[{nameof(UnlockItemPatch)}] Unlocking bonus items");
 
@@ -19,6 +22,8 @@ internal static class UnlockItemPatch
     Plugin.Logger.LogInfo($"[{nameof(UnlockItemPatch)}] Checking for regions to unlock");
 
     bool hasBasementKey = false;
+    
+    // TODO: remove once we've fully migrated to using storyclient.
     // ReSharper disable once NullableWarningSuppressionIsUsed
     foreach (ItemInfo item in Plugin.StoryClient.Session!.Items.AllItemsReceived)
     {
@@ -52,7 +57,7 @@ internal static class UnlockItemPatch
     Plugin.Logger.LogInfo("Moving 1-CNY");
     __instance.FindSelectableEntity("1-CNY").gamePosition.x = -564;
 
-    if (Plugin.StoryClient.SlotData.endGoal == SlotData.EndGoal.HelpingHands)
+    if (Plugin.StoryClient.Slot.endGoal == SlotData.EndGoal.HelpingHands)
     {
       // Moving X-1 - Art Exercise to the basement if end goal is X-0 - Helping Hands
       Plugin.Logger.LogInfo("Moving X-1 to the basement");

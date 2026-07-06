@@ -63,6 +63,7 @@ internal static class ClearStoryLocationPatch
     Level level = GetCurrentLevel();
     Rank rank = scnGame.instance.currentLevel.GetRankFromMistakes();
     SendLocations(level, rank, bossLevelFailed);
+    UnlockItemPatch.TryUnlockBossSong(Bindings.LevelToAct[level]);
   }
 
   [HarmonyPatch(typeof(RhythmWeightlifter.Level), nameof(RhythmWeightlifter.Level.GetRank))]

@@ -29,19 +29,19 @@ internal enum ClientState
   LoggingIn,
 
   /// <summary>
-  /// The client is processing previously collected items from the Archipelago server.
-  /// It should not be used yet.
-  /// </summary>
-  ReceivingItems,
-
-  /// <summary>
-  /// The client is logged in and waiting to proceed to the Level Select/next scene.
+  /// The client is logged in.
   /// It should not be used yet.
   /// </summary>
   LoggedIn,
+  
+  /// <summary>
+  /// The client is processing previously collected items from the Archipelago server.
+  /// It should not be used yet.
+  /// </summary>
+  ReceivingPriorItems,
 
   /// <summary>
-  /// The client is ready and is able to receive new items.
+  /// The client has processed all prior items; it is ready for use, and able to receive new items.
   /// </summary>
   Ready,
 

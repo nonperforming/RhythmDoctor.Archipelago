@@ -178,15 +178,10 @@ internal static class ArchipelagoLoginPatch
         yield return null;
 
         UnpatchMenuPatch();
-
-        // Wait for setup...
-        while (Plugin.StoryClient.State != ClientState.Ready)
-        {
-          yield return new WaitForSecondsRealtime(1);
-        }
-
-        Plugin.Logger.LogInfo("Heading to Level Select...");
-        scnBase.GoToScene(GC.SceneLevelSelect);
+        
+        Task receivePriorItems = Plugin.StoryClient.ReceivePriorItems();
+        yield return new WaitUntil(() => receivePriorItems.IsCompleted);
+        Plugin.StoryClient.StartPlay();
         yield break;
       case LoginFailure fail:
         Plugin.Logger.LogError(

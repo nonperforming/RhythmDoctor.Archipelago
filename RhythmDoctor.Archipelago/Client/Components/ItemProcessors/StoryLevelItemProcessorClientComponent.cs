@@ -55,7 +55,7 @@ internal class StoryLevelItemProcessorClientComponent : ItemProcessorClientCompo
       return false; // Not a level.
     
     // Try to find if this level was cleared beforehand.
-    if (Bindings.LevelToStage.TryGetValue(level, out BaseStage stage))
+    if (!Bindings.LevelToStage.TryGetValue(level, out BaseStage stage))
     {
       Plugin.Logger.LogWarning($"[{nameof(StoryLevelItemProcessorClientComponent)}] Level {level} was found but couldn't find related Stage."
                                + " Ignoring any prior progress; setting rank to Rank.NotFinished");

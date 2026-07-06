@@ -23,6 +23,7 @@ global using RDLevelEditor;
 global using RhythmDoctor.Archipelago;
 global using RhythmDoctor.Archipelago.Client;
 global using RhythmDoctor.Archipelago.Client.Components;
+global using RhythmDoctor.Archipelago.Client.Components.ItemProcessors;
 global using RhythmDoctor.Archipelago.Client.Components.Interfaces;
 #if DEBUG
 global using RhythmDoctor.Archipelago.Debug;
