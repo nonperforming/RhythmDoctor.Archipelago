@@ -426,16 +426,16 @@ internal static class UnlockItemPatch
     }
   }
 
-  internal static void TryUnlockAllBossSongs()
+  internal static void TryUnlockAllBossSongs(bool initial = false)
   {
     Plugin.Logger.LogInfo($"[{nameof(UnlockItemPatch)}] Attempting to unlock all boss songs");
     foreach (Act act in Enum.GetValues(typeof(Act)))
     {
-      TryUnlockBossSong(act);
+      TryUnlockBossSong(act, initial);
     }
   }
 
-  internal static bool TryUnlockBossSong(Act act)
+  internal static bool TryUnlockBossSong(Act act, bool initial = false)
   {
     Plugin.Logger.LogDebug($"[{nameof(UnlockItemPatch)}] Attempting to unlock {act}'s boss songs");
     if (HasUnlockedBossSong(act))
@@ -445,7 +445,14 @@ internal static class UnlockItemPatch
 
       foreach (Level levelBoss in levelBosses)
       {
-        Persistence.SetLevelRank(levelBoss, Rank.NotFinished);
+        if (initial)
+        {
+          StoryLevelItemProcessorClientComponent.SetLevelBestRank(levelBoss, Bindings.LevelToStage[levelBoss]);
+        }
+        else
+        {
+          Persistence.SetLevelRank(levelBoss, Rank.NotFinished);
+        }
       }
 
       return true;

@@ -191,7 +191,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
       HandleInitialItem(Session.Items.DequeueItem());
     }
     
-    UnlockItemPatch.TryUnlockAllBossSongs();
+    UnlockItemPatch.TryUnlockAllBossSongs(true);
     State = ClientState.Ready;
   }
   

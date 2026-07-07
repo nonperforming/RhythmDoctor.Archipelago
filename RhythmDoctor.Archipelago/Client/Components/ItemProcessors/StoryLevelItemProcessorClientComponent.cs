@@ -13,44 +13,6 @@ internal class StoryLevelItemProcessorClientComponent : ItemProcessorClientCompo
 
   internal override bool HandleItemInitial(ItemInfo itemInfo)
   {
-    // TODO: could be optimized heavily, prevent iterating over ALL locations sent many many times.
-    //       When Enabled, get the top rank for each level and cache it.
-    //       Then retrieve it here.
-    static Rank GetBestRankForStandardLevel(Level level, BaseStage stage, ReadOnlyCollection<long> locations)
-    {
-      Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Handling level");
-      (Rank, long)[] stageLocationIds;
-
-      switch (stage)
-      {
-        case RegularStage regularStage:
-          stageLocationIds = [(Rank.S, regularStage.SRankLocation), (Rank.A, regularStage.ARankLocation),
-            (Rank.B, regularStage.BRankLocation)];
-          break;
-        case BossStage bossStage:
-          stageLocationIds = bossStage.CompletePlusLocation.HasValue
-            ? [(Rank.BossPerfect, bossStage.PerfectLocation), (Rank.BossNoCheckpoints, bossStage.CompletePlusLocation.Value), (Rank.BossClear, bossStage.ClearLocation)]
-            : [(Rank.BossPerfect, bossStage.PerfectLocation), (Rank.BossClear, bossStage.ClearLocation)];
-          break;
-        default:
-          throw new InvalidOperationException("Can't get best rank for this type of Stage.");
-      }
-
-      // Locations are always sent in the order of B-A-S ranks, so if we iterate in reverse we always
-      //  will catch the highest rank first.
-      for (int sentLocationsIndex = locations.Count - 1; sentLocationsIndex >= 0; sentLocationsIndex--)
-      {
-        long locationId = locations[sentLocationsIndex];
-
-        foreach ((Rank rank, long stageLocationId) in stageLocationIds)
-        {
-          if (stageLocationId == locationId)
-            return rank;
-        }
-      }
-      return Rank.NotFinished;
-    }
-    
     if (!Bindings.ItemIdToLevel.TryGetValue(itemInfo.ItemId, out Level level))
       return false; // Not a level.
     
@@ -60,8 +22,10 @@ internal class StoryLevelItemProcessorClientComponent : ItemProcessorClientCompo
       Plugin.Logger.LogWarning($"[{nameof(StoryLevelItemProcessorClientComponent)}] Level {level} was found but couldn't find related Stage."
                                + " Ignoring any prior progress; setting rank to Rank.NotFinished");
       Persistence.SetLevelRank(level, Rank.NotFinished);
+      return true;
     }
-    else if (level == Level.RhythmWeightlifter)
+    
+    if (level == Level.RhythmWeightlifter)
     {
       // TODO: set level rank for each of the 12 stages to cleared
       Plugin.Logger.LogInfo($"[{nameof(StoryLevelItemProcessorClientComponent)}] Handling Rhythm Weightlifter");
@@ -88,7 +52,7 @@ internal class StoryLevelItemProcessorClientComponent : ItemProcessorClientCompo
     else
     {
       // Normal level
-      Persistence.SetLevelRank(level, GetBestRankForStandardLevel(level, stage, _session.Locations.AllLocationsChecked));
+      SetLevelBestRank(level, stage);
     }
     
     return true;
@@ -101,5 +65,47 @@ internal class StoryLevelItemProcessorClientComponent : ItemProcessorClientCompo
 
     Persistence.SetLevelRank(level, Rank.NotFinished);
     return true;
+  }
+
+  // TODO: this.. probably shouldn't be in here?
+  //       it's just here so UnlockItemPatch can use it for boss levels
+  // TODO: could be optimized heavily, prevent iterating over ALL locations sent many many times.
+  //       When Enabled, get the top rank for each level and cache it.
+  //       Then retrieve it here.
+  internal static void SetLevelBestRank(Level level, BaseStage stage)
+  {
+    Plugin.Logger.LogInfo($"[{nameof(StoryLevelItemProcessorClientComponent)}] Handling level");
+    (Rank, long)[] stageLocationIds;
+
+    switch (stage)
+    {
+      case RegularStage regularStage:
+        stageLocationIds = [(Rank.S, regularStage.SRankLocation), (Rank.A, regularStage.ARankLocation),
+          (Rank.B, regularStage.BRankLocation)];
+        break;
+      case BossStage bossStage:
+        stageLocationIds = bossStage.CompletePlusLocation.HasValue
+          ? [(Rank.BossPerfect, bossStage.PerfectLocation), (Rank.BossNoCheckpoints, bossStage.CompletePlusLocation.Value), (Rank.BossClear, bossStage.ClearLocation)]
+          : [(Rank.BossPerfect, bossStage.PerfectLocation), (Rank.BossClear, bossStage.ClearLocation)];
+        break;
+      default:
+        throw new InvalidOperationException("Can't get best rank for this type of Stage.");
+    }
+
+    ReadOnlyCollection<long> locations = Plugin.StoryClient.Session.Locations.AllLocationsChecked;
+    
+    // Locations are always sent in the order of B-A-S ranks, so if we iterate in reverse we always
+    //  will catch the highest rank first.
+    for (int sentLocationsIndex = locations.Count - 1; sentLocationsIndex >= 0; sentLocationsIndex--)
+    {
+      long locationId = locations[sentLocationsIndex];
+
+      foreach ((Rank rank, long stageLocationId) in stageLocationIds)
+      {
+        if (stageLocationId == locationId)
+          Persistence.SetLevelRank(level, rank);
+      }
+    }
+    Persistence.SetLevelRank(level, Rank.NotFinished);
   }
 }
