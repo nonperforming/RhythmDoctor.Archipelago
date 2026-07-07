@@ -1,22 +1,19 @@
 namespace RhythmDoctor.Archipelago.Client.Components.ItemProcessors;
 
-internal class TrapItemProcessorClientComponent : ItemProcessorClientComponent
+public class TrapItemProcessorClientComponent : IItemProcessorClientComponent
 {
-  internal override Task Enable(ArchipelagoSession session)
+  public async Task Enable(ArchipelagoSession session)
   {
-    return Task.CompletedTask;
-    //throw new NotImplementedException();
+    throw new NotImplementedException();
   }
 
-  internal override bool HandleItemInitial(ItemInfo itemInfo)
+  public bool HandleItemInitial(ItemInfo itemInfo)
   {
-    return false;
-    //throw new NotImplementedException();
+    throw new NotImplementedException();
   }
 
-  internal override bool HandleItem(ItemInfo itemInfo)
+  public bool HandleItem(ItemInfo itemInfo)
   {
-    return false;
-    //throw new NotImplementedException();
+    throw new NotImplementedException();
   }
 }
