@@ -295,13 +295,16 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
 
   public void Dispose()
   {
+    if (State == ClientState.Disposed)
+      return;
     State = ClientState.Disposed;
-    throw new NotImplementedException();
+    // UnapplyPatchesPatch will do the rest for us
+    scnBase.GoToMainMenu();
   }
 
   public ValueTask DisposeAsync()
   {
-    State = ClientState.Disposed;
-    throw new NotImplementedException();
+    Dispose();
+    return new ValueTask(Task.CompletedTask);
   }
 }
