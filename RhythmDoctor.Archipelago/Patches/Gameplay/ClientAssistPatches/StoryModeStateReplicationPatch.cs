@@ -1,6 +1,5 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay.ClientAssistPatches;
 
-
 /// <summary>
 /// Helper patch for <see cref="StoryReplicationClientComponent"/>
 /// </summary>

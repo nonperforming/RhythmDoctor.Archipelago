@@ -26,7 +26,7 @@ internal sealed class DeathLinkClientComponent : ClientComponent
     " wasn't ready yet!", // Beans Hopper achievement
     " couldn't count to 7",
   ];
-  
+
   internal override async Task Enable(ArchipelagoSession session)
   {
     Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Enabling DeathLink...");

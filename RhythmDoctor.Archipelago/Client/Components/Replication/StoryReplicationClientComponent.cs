@@ -5,12 +5,17 @@ namespace RhythmDoctor.Archipelago.Client.Components;
 internal sealed class StoryReplicationClientComponent : ReplicationClientComponent
 {
   public IEnumerable<Type> AssistPatches => [typeof(StoryModeStateReplicationPatch)];
-  
+
   internal override async Task Enable(ArchipelagoSession session)
   {
     static async Task InitializeSync(ArchipelagoSession session)
     {
-      static async Task InitializeKey<T>(ArchipelagoSession session, string key, Action<T> executeExisting, Func<T> valueDoesntExist)
+      static async Task InitializeKey<T>(
+        ArchipelagoSession session,
+        string key,
+        Action<T> executeExisting,
+        Func<T> valueDoesntExist
+      )
       {
         // Manual implementation of asynchronous DataStorageElement.Initialize() here to avoid timeout errors
         // TODO: retry multiple times if we timeout
@@ -28,7 +33,9 @@ internal sealed class StoryReplicationClientComponent : ReplicationClientCompone
         else
         {
           T initializeTo = valueDoesntExist.Invoke();
-          Plugin.Logger.LogInfo($"[{nameof(StoryReplicationClientComponent)}] Setting initial {key} state to {initializeTo}");
+          Plugin.Logger.LogInfo(
+            $"[{nameof(StoryReplicationClientComponent)}] Setting initial {key} state to {initializeTo}"
+          );
         }
       }
 
@@ -64,7 +71,7 @@ internal sealed class StoryReplicationClientComponent : ReplicationClientCompone
     session.DataStorage[Scope.Slot, Persistence.PaigeStaysKey].OnValueChanged += ReplicatePaigeStays;
     session.DataStorage[Scope.Slot, Persistence.IanDesktopLoginKey].OnValueChanged += ReplicateIansDesktopUnlocked;
   }
-  
+
   private static void ReplicatePaigeStays(JToken oldValue, JToken newValue, Dictionary<string, JToken> _)
   {
     Plugin.Logger.LogInfo($"[{nameof(StoryReplicationClientComponent)}] Paige stays {oldValue}->{newValue}");

@@ -14,7 +14,7 @@ internal static class UnlockItemPatch
 
     // Processing new items...
     Plugin.StoryClient.ProcessNewReceivedItems();
-    
+
     // This is a PostLogin patch, session is guaranteed to exist (assuming going through normal flow)
     Plugin.Logger.LogInfo($"[{nameof(UnlockItemPatch)}] Unlocking bonus items");
 
@@ -22,7 +22,7 @@ internal static class UnlockItemPatch
     Plugin.Logger.LogInfo($"[{nameof(UnlockItemPatch)}] Checking for regions to unlock");
 
     bool hasBasementKey = false;
-    
+
     // TODO: remove once we've fully migrated to using storyclient.
     // ReSharper disable once NullableWarningSuppressionIsUsed
     foreach (ItemInfo item in Plugin.StoryClient.Session!.Items.AllItemsReceived)

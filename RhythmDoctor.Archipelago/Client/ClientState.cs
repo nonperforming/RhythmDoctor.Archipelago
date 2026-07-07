@@ -33,7 +33,7 @@ internal enum ClientState
   /// It should not be used yet.
   /// </summary>
   LoggedIn,
-  
+
   /// <summary>
   /// The client is processing previously collected items from the Archipelago server.
   /// It should not be used yet.

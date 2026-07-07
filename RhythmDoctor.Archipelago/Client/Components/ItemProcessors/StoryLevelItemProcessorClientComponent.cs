@@ -15,21 +15,23 @@ internal class StoryLevelItemProcessorClientComponent : ItemProcessorClientCompo
   {
     if (!Bindings.ItemIdToLevel.TryGetValue(itemInfo.ItemId, out Level level))
       return false; // Not a level.
-    
+
     // Try to find if this level was cleared beforehand.
     if (!Bindings.LevelToStage.TryGetValue(level, out BaseStage stage))
     {
-      Plugin.Logger.LogWarning($"[{nameof(StoryLevelItemProcessorClientComponent)}] Level {level} was found but couldn't find related Stage."
-                               + " Ignoring any prior progress; setting rank to Rank.NotFinished");
+      Plugin.Logger.LogWarning(
+        $"[{nameof(StoryLevelItemProcessorClientComponent)}] Level {level} was found but couldn't find related Stage."
+          + " Ignoring any prior progress; setting rank to Rank.NotFinished"
+      );
       Persistence.SetLevelRank(level, Rank.NotFinished);
       return true;
     }
-    
+
     if (level == Level.RhythmWeightlifter)
     {
       // TODO: set level rank for each of the 12 stages to cleared
       Plugin.Logger.LogInfo($"[{nameof(StoryLevelItemProcessorClientComponent)}] Handling Rhythm Weightlifter");
-    
+
       // Rhythm Weightlifter is a special case in that it has 12 stages inside its level.
       // As the stages can only be played sequentially, and we don't have any specific Rank locations,
       //  we can take a shortcut and just set the last level unlocked to the number of
@@ -37,15 +39,19 @@ internal class StoryLevelItemProcessorClientComponent : ItemProcessorClientCompo
       int stagesCleared = _session.Locations.AllLocationsChecked.Count(locationId =>
         Bindings.RhythmWeightlifterStageToLocationID.Contains(locationId)
       );
-    
+
       if (stagesCleared == 0)
       {
         // We haven't cleared any stages yet.
-        Plugin.Logger.LogInfo($"[{nameof(StoryLevelItemProcessorClientComponent)}] Couldn't find any Rhythm Weightlifter locations");
+        Plugin.Logger.LogInfo(
+          $"[{nameof(StoryLevelItemProcessorClientComponent)}] Couldn't find any Rhythm Weightlifter locations"
+        );
       }
       else
       {
-        Plugin.Logger.LogInfo($"[{nameof(StoryLevelItemProcessorClientComponent)}] Unlocking Rhythm Weightlifter stages up to stage {stagesCleared}");
+        Plugin.Logger.LogInfo(
+          $"[{nameof(StoryLevelItemProcessorClientComponent)}] Unlocking Rhythm Weightlifter stages up to stage {stagesCleared}"
+        );
         Persistence.SetRhythmWeightlifterLastLevelUnlocked(stagesCleared);
       }
     }
@@ -54,7 +60,7 @@ internal class StoryLevelItemProcessorClientComponent : ItemProcessorClientCompo
       // Normal level
       SetLevelBestRank(level, stage);
     }
-    
+
     return true;
   }
 
@@ -80,12 +86,21 @@ internal class StoryLevelItemProcessorClientComponent : ItemProcessorClientCompo
     switch (stage)
     {
       case RegularStage regularStage:
-        stageLocationIds = [(Rank.S, regularStage.SRankLocation), (Rank.A, regularStage.ARankLocation),
-          (Rank.B, regularStage.BRankLocation)];
+        stageLocationIds =
+        [
+          (Rank.S, regularStage.SRankLocation),
+          (Rank.A, regularStage.ARankLocation),
+          (Rank.B, regularStage.BRankLocation),
+        ];
         break;
       case BossStage bossStage:
         stageLocationIds = bossStage.CompletePlusLocation.HasValue
-          ? [(Rank.BossPerfect, bossStage.PerfectLocation), (Rank.BossNoCheckpoints, bossStage.CompletePlusLocation.Value), (Rank.BossClear, bossStage.ClearLocation)]
+          ?
+          [
+            (Rank.BossPerfect, bossStage.PerfectLocation),
+            (Rank.BossNoCheckpoints, bossStage.CompletePlusLocation.Value),
+            (Rank.BossClear, bossStage.ClearLocation),
+          ]
           : [(Rank.BossPerfect, bossStage.PerfectLocation), (Rank.BossClear, bossStage.ClearLocation)];
         break;
       default:
@@ -93,7 +108,7 @@ internal class StoryLevelItemProcessorClientComponent : ItemProcessorClientCompo
     }
 
     ReadOnlyCollection<long> locations = Plugin.StoryClient.Session.Locations.AllLocationsChecked;
-    
+
     // Locations are always sent in the order of B-A-S ranks, so if we iterate in reverse we always
     //  will catch the highest rank first.
     for (int sentLocationsIndex = locations.Count - 1; sentLocationsIndex >= 0; sentLocationsIndex--)

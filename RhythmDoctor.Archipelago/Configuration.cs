@@ -42,8 +42,7 @@ internal static class Configuration
       "zzzDebugDoNotTouchUnlessAsked",
       "RemoteTrapClearsTimeout",
       3000,
-      "How long to wait in milliseconds until getting remote trap clear status times out "
-        + "and defaults to 0."
+      "How long to wait in milliseconds until getting remote trap clear status times out and defaults to 0."
     );
 
     _slotToUse = config.Bind("zzzDebugDoNotTouchUnlessAsked", "SlotToUse", 0, "Slot to use for Archipelago.");

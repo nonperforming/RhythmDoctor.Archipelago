@@ -11,7 +11,9 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
   internal LoginInformation LoginInformation { get; private set; }
 
   // Components
-  internal ItemProcessorClientComponent[] ItemProcessorComponents { get; private set; } = [new StoryLevelItemProcessorClientComponent(), new TrapItemProcessorClientComponent()];
+  internal ItemProcessorClientComponent[] ItemProcessorComponents { get; private set; } =
+  [new StoryLevelItemProcessorClientComponent(), new TrapItemProcessorClientComponent()];
+
   //internal ArchipelagoTrapManagerClientComponent? ModifierManagerComponent { get; private set; } =
   //  new();
   internal DeathLinkClientComponent? DeathLinkComponent { get; private set; }
@@ -41,7 +43,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     typeof(SavingPatch),
     typeof(UnapplyPatchesPatch),
   ];
-  
+
   internal IEnumerable<ClientComponent> ClientComponents
   {
     get
@@ -76,12 +78,16 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
       );
       // TODO: attempt reconnect on socket close.
       //       Remember to process items we may have received from time of disconnection to reconnection
-      session.Socket.SocketClosed += (__reason =>
-      {
-        Plugin.Logger.LogFatal($"[{nameof(StoryClient)}] Archipelago client closed ({__reason}), returning to Main Menu...");
-        scnBase.GoToMainMenu();
-        Dispose();
-      });
+      session.Socket.SocketClosed += (
+        __reason =>
+        {
+          Plugin.Logger.LogFatal(
+            $"[{nameof(StoryClient)}] Archipelago client closed ({__reason}), returning to Main Menu..."
+          );
+          scnBase.GoToMainMenu();
+          Dispose();
+        }
+      );
       session.MessageLog.OnMessageReceived += (
         __message => Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Received message \"{__message}\"")
       );
@@ -126,23 +132,26 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     if (loginResult is not LoginSuccessful loginSuccessful)
     {
       // TODO: handle failure gracefully
-      return loginResult as LoginFailure ?? throw new InvalidOperationException("Login not successful but not failure either!?");
+      return loginResult as LoginFailure
+        ?? throw new InvalidOperationException("Login not successful but not failure either!?");
     }
     Slot = new SlotData(loginSuccessful.SlotData);
-    
+
     List<Task> clientComponentsToEnable = new();
     ReplicationComponent = new StoryReplicationClientComponent();
     clientComponentsToEnable.Add(ReplicationComponent.Enable(Session));
-    
+
     // Create DeathLink if applicable
     Configuration.DeathLinkConfig deathLinkConfig = await Configuration.GetDeathLink();
-    if (deathLinkConfig == Configuration.DeathLinkConfig.On
-        || (deathLinkConfig == Configuration.DeathLinkConfig.FollowSlot && Slot.deathLink))
+    if (
+      deathLinkConfig == Configuration.DeathLinkConfig.On
+      || (deathLinkConfig == Configuration.DeathLinkConfig.FollowSlot && Slot.deathLink)
+    )
     {
       DeathLinkComponent = new DeathLinkClientComponent();
       clientComponentsToEnable.Add(DeathLinkComponent.Enable(Session));
     }
-    
+
     // Wait for all components to enable.
     ItemProcessorComponents = [new StoryLevelItemProcessorClientComponent(), new TrapItemProcessorClientComponent()];
     //ModifierManagerComponent = new ArchipelagoTrapManagerClientComponent();
@@ -158,21 +167,21 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     // TODO: pull this OUT of plugin
     Plugin.ApplyPatches(Plugin.PATCH_ID_POST_LOGIN, PostLoginPatches);
     Plugin.ApplyPatches(Plugin.PATCH_ID_SLEEVE_PAINT, typeof(LockSleevePaintPatch));
-    
+
     // If we got here then SavingPatch has been applied, and this should be safe.
     Persistence.slotPrefs[Configuration.GetSlotToUse()].dict.Clear();
-    
+
     // Let LockSleevePaintPatch set the Sleeve Paint to a default colour
     Persistence.p1Skin.Reload();
     Persistence.p2Skin.Reload();
-    
+
     // Some levels come unlocked by default, such as X-1.
     // Lock all levels to force the user to unlock them with an item.
     foreach (Level level in Enum.GetValues(typeof(Level)))
     {
       Persistence.SetLevelRank(level, Rank.NotAvailable, true);
     }
-    
+
     State = ClientState.LoggedIn;
     return loginResult;
   }
@@ -180,26 +189,26 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
   internal async Task ReceivePriorItems()
   {
     ThrowIfNotReadyFor(ClientState.ReceivingPriorItems);
-    
+
     // Process all previously received items...
     Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Receiving items...");
     State = ClientState.ReceivingPriorItems;
-    
+
     while (Session.Items.Any())
     {
       // TODO: async
       HandleInitialItem(Session.Items.DequeueItem());
     }
-    
+
     UnlockItemPatch.TryUnlockAllBossSongs(true);
     State = ClientState.Ready;
   }
-  
+
   internal Task StartPlay()
   {
     if (State != ClientState.Ready)
       throw new InvalidOperationException("Not ready to start play");
-    
+
     scnBase.GoToScene(GC.SceneLevelSelect);
     return Task.CompletedTask;
   }
@@ -221,14 +230,16 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
 
   private void HandleInitialItem(ItemInfo itemInfo)
   {
-    Plugin.Logger.LogDebug($"[{nameof(StoryClient)}] Processing item initially {itemInfo.ItemName} ({itemInfo.ItemId})");
+    Plugin.Logger.LogDebug(
+      $"[{nameof(StoryClient)}] Processing item initially {itemInfo.ItemName} ({itemInfo.ItemId})"
+    );
     foreach (ItemProcessorClientComponent itemProcessorClientComponent in ItemProcessorComponents)
     {
       if (itemProcessorClientComponent.HandleItemInitial(itemInfo))
         break;
     }
   }
-  
+
   private void HandleItem(ItemInfo itemInfo)
   {
     Plugin.Logger.LogDebug($"[{nameof(StoryClient)}] Processing item {itemInfo.ItemName} ({itemInfo.ItemId})");
@@ -238,7 +249,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
         break;
     }
   }
-  
+
   private void ThrowIfNotReadyFor(ClientState? wantToGoToState = null)
   {
     if (State == ClientState.Disposed || wantToGoToState == ClientState.Failed)

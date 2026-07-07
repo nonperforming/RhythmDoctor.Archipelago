@@ -288,7 +288,8 @@ internal static class ClearStoryLocationPatch
     bool clearedNewLocation = ids.Any(id => !Plugin.StoryClient.Session.Locations.AllLocationsChecked.Contains(id));
     if (clearedNewLocation)
     {
-      JustSentLocations = ids.Where(id => !Plugin.StoryClient.Session.Locations.AllLocationsChecked.Contains(id)).ToArray();
+      JustSentLocations = ids.Where(id => !Plugin.StoryClient.Session.Locations.AllLocationsChecked.Contains(id))
+        .ToArray();
       Task.Run(() => Plugin.StoryClient.Session.Locations.CompleteLocationChecksAsync(ids.ToArray()));
       //Plugin.StoryClient.ModifierManagerComponent.ClearActiveTraps(false);
     }

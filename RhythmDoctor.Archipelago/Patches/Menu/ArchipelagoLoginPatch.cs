@@ -155,7 +155,7 @@ internal static class ArchipelagoLoginPatch
     // TODO: use URIs. `new Uri($"ws://{url}")` likes throwing errors..
     Plugin.StoryClient = new StoryClient(new LoginInformation(Mode.Main, url, name, password));
     Plugin.StoryClient.CreateSession();
-    
+
     // Should be safe in this context
     Task<LoginResult> login = Task.Run(Plugin.StoryClient.Login);
     yield return new WaitUntil(() => login.IsCompleted);
@@ -166,7 +166,9 @@ internal static class ArchipelagoLoginPatch
         // ReSharper disable once NullableWarningSuppressionIsUsed
         ? login.Exception!.ToString()
         : "false";
-      Plugin.Logger.LogError($"[{nameof(ArchipelagoLoginPatch)}] Login has cancelled or faulted (cancel: {login.IsCanceled} / fault: {fault})");
+      Plugin.Logger.LogError(
+        $"[{nameof(ArchipelagoLoginPatch)}] Login has cancelled or faulted (cancel: {login.IsCanceled} / fault: {fault})"
+      );
       goto Failure;
     }
 
@@ -178,7 +180,7 @@ internal static class ArchipelagoLoginPatch
         yield return null;
 
         UnpatchMenuPatch();
-        
+
         Task receivePriorItems = Plugin.StoryClient.ReceivePriorItems();
         yield return new WaitUntil(() => receivePriorItems.IsCompleted);
         Plugin.StoryClient.StartPlay();
