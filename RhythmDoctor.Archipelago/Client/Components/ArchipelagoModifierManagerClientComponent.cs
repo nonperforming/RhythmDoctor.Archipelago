@@ -2,6 +2,7 @@ namespace RhythmDoctor.Archipelago.Client.Components;
 
 internal class ArchipelagoModifierManagerClientComponent : ModifierManagerStoryLevelSelect, IClientComponent
 {
+  public IEnumerable<Type> AssistPatches => [typeof(ModifierManagerPatch)];
   public Task Enable(ArchipelagoSession session) => Task.CompletedTask;
 
   internal void AddModifierToQueue(string modifierUid)

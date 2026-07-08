@@ -14,8 +14,8 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
   internal ItemProcessorClientComponent[] ItemProcessorComponents { get; private set; } =
   [new StoryLevelItemProcessorClientComponent(), new TrapItemProcessorClientComponent()];
 
-  //internal ArchipelagoTrapManagerClientComponent? ModifierManagerComponent { get; private set; } =
-  //  new();
+  internal ArchipelagoTrapManagerClientComponent? ModifierManagerComponent { get; private set; } =
+    new();
   internal DeathLinkClientComponent? DeathLinkComponent { get; private set; }
   internal ReplicationClientComponent? ReplicationComponent { get; private set; }
 
@@ -139,7 +139,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
 
     List<Task> clientComponentsToEnable = new();
     ReplicationComponent = new StoryReplicationClientComponent();
-    clientComponentsToEnable.Add(ReplicationComponent.Enable(Session));
+    clientComponentsToEnable.Add(ReplicationComponent.Enable(this, Session));
 
     // Create DeathLink if applicable
     Configuration.DeathLinkConfig deathLinkConfig = await Configuration.GetDeathLink();
@@ -149,7 +149,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     )
     {
       DeathLinkComponent = new DeathLinkClientComponent();
-      clientComponentsToEnable.Add(DeathLinkComponent.Enable(Session));
+      clientComponentsToEnable.Add(DeathLinkComponent.Enable(this, Session));
     }
 
     // Wait for all components to enable.
@@ -157,7 +157,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     //ModifierManagerComponent = new ArchipelagoTrapManagerClientComponent();
     foreach (ItemProcessorClientComponent itemProcessorClientComponent in ItemProcessorComponents)
     {
-      clientComponentsToEnable.Add(itemProcessorClientComponent.Enable(Session));
+      clientComponentsToEnable.Add(itemProcessorClientComponent.Enable(this, Session));
     }
     //componentEnableTasks.Add(ModifierManagerComponent.Enable(Session));
     Task.WaitAll(clientComponentsToEnable.ToArray());

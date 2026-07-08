@@ -2,62 +2,98 @@ namespace RhythmDoctor.Archipelago.Modifiers;
 
 internal abstract class ModifierManagerBase : IDisposable
 {
-  private List<IModifier> _previewModifiers = new();
-  private List<IModifier> _activeModifiers = new();
+  private List<IModifier> _chosenModifiers = [];
+  private List<IModifier> _previewModifiers = [];
+  private List<IModifier> _activeModifiers = [];
 
   /// <summary>
-  /// T
+  /// Attempts to add a modifier to <see cref="_chosenModifiers"/>.
   /// </summary>
-  /// <param name="modifierUid"></param>
-  /// <param name="modifiers"></param>
-  /// <returns>True if any </returns>
-  public bool TryAddModifier(string modifierUid, Level level, out IEnumerable<IModifier> modifiers)
+  /// <param name="modifierUid">UID of the modifier to add.</param>
+  /// <returns>True if the modifier was added.</returns>
+  public bool TryAddModifier(string modifierUid)
   {
-    foreach (IModifier previewModifier in _previewModifiers)
+    // Check if modifier UID is valid.
+    if (ModifierRegistry.TryGetModifier(modifierUid, out IModifier modifier))
     {
-      // Not a valid modifier.
       Plugin.Logger.LogWarning(
         $"[{nameof(ModifierManagerBase)}] Attempted to add non-existant modifier {modifierUid}, ignoring"
       );
-      return;
+      return false;
     }
 
-    if (chosenModifiers.Contains(modifier))
+    return TryAddModifier(modifier);
+  }
+
+  /// <summary>
+  /// Attempts to add a modifier to <see cref="_chosenModifiers"/>.
+  /// </summary>
+  /// <param name="modifier">Modifier to add.</param>
+  /// <returns>True if the modifier was added.</returns>
+  public bool TryAddModifier(IModifier modifier)
+  {
+    // Check if modifier is duplicated.
+    if (_chosenModifiers.Contains(modifier))
     {
-      // Duplicated.
       Plugin.Logger.LogWarning(
         $"[{nameof(ModifierManagerBase)}] Attempted to add already existing modifier {modifierUid}, ignoring"
       );
-      return;
+      return false;
     }
 
     Plugin.Logger.LogInfo($"[{nameof(ModifierManagerBase)}] Adding modifier {modifierUid}");
-    chosenModifiers.Add(modifier);
+    _chosenModifiers.Add(modifier);
+    return true;
   }
-
-  public bool TryAddModifier(IModifier modifier, Level level, out IEnumerable<IModifier> modifiers)
+  
+  public void ClearAllChosenTraps()
   {
-    throw new NotImplementedException();
+    _chosenModifiers.Clear();
   }
-
+  
   public void ClearAllPreviewTraps()
   {
-    throw new NotImplementedException();
+    foreach (IModifier modifier in _previewModifiers)
+    {
+      modifier.PreviewEnd();
+    }
+    _previewModifiers.Clear();
   }
 
   public void ClearAllActiveTraps()
   {
-    throw new NotImplementedException();
+    foreach (IModifier modifier in _activeModifiers)
+    {
+      modifier.PreviewEnd();
+    }
+    _activeModifiers.Clear();
   }
 
   public void ClearAllTraps()
   {
-    throw new NotImplementedException();
+    ClearAllChosenTraps();
+    ClearAllPreviewTraps();
+    ClearAllActiveTraps();
+  }
+  
+  internal protected IEnumerable<IModifier> GetModifiersForLevel(Level level)
+  {
+    List<IModifier> modifiers = [];
+    
+    foreach (IModifier modifierToAdd in _chosenModifiers)
+    {
+      if (ModifierRegistry.Compatible(modifierToAdd, level, modifiers))
+      {
+        modifiers.Add(modifierToAdd);
+      }
+    }
+
+    return modifiers;
   }
 
   public void Dispose()
   {
     Plugin.Logger.LogInfo($"[{nameof(ModifierManagerBase)}] Disposing");
-    throw new NotImplementedException();
+    ClearAllTraps();
   }
 }

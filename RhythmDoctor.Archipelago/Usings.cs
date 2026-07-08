@@ -31,7 +31,6 @@ global using RhythmDoctor.Archipelago.Debug.Patches;
 #endif
 global using RhythmDoctor.Archipelago.Extensions;
 global using RhythmDoctor.Archipelago.Helpers;
-global using RhythmDoctor.Archipelago.Interfaces;
 global using RhythmDoctor.Archipelago.Modifiers;
 global using RhythmDoctor.Archipelago.Modifiers.Archipelago;
 global using RhythmDoctor.Archipelago.Patches;

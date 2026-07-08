@@ -1,5 +1,6 @@
 namespace RhythmDoctor.Archipelago.Modifiers;
 
+/// <remarks>Depends on <see cref="ArchipelagoModifierManagerClientComponent"/>.</remarks>
 internal class ModifierManagerStoryLevelSelect : ModifierManagerBase, IDisposable
 {
   internal ModifierManagerStoryLevelSelect()

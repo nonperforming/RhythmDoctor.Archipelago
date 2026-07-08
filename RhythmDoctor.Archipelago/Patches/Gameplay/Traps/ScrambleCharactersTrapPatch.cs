@@ -3,7 +3,8 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
 // FIXME: Narration will break
 internal class ScrambleCharactersTrapPatch : ModifierPatch<ScrambleCharactersTrapPatch>, IModifier, IArchipelagoModifier
 {
-  public string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.scrambleCharacters";
+  internal const string UID = $"{MyPluginInfo.PLUGIN_GUID}.mod.scrambleCharacters";
+  public string Uid => UID;
   public string LocalizationKey => "mods.archipelago.trap.scrambleCharacters";
   public ModifierCompatibility Compatibility =>
     ModifierCompatibilityBuilder

@@ -6,7 +6,7 @@ internal sealed class StoryReplicationClientComponent : ReplicationClientCompone
 {
   public IEnumerable<Type> AssistPatches => [typeof(StoryModeStateReplicationPatch)];
 
-  internal override async Task Enable(ArchipelagoSession session)
+  internal override async Task Enable(StoryClient client, ArchipelagoSession session)
   {
     static async Task InitializeSync(ArchipelagoSession session)
     {
@@ -66,7 +66,7 @@ internal sealed class StoryReplicationClientComponent : ReplicationClientCompone
       Plugin.Logger.LogInfo($"[{nameof(StoryReplicationClientComponent)}] Initialization completed!");
     }
 
-    await base.Enable(session);
+    await base.Enable(client, session);
     await InitializeSync(session);
     session.DataStorage[Scope.Slot, Persistence.PaigeStaysKey].OnValueChanged += ReplicatePaigeStays;
     session.DataStorage[Scope.Slot, Persistence.IanDesktopLoginKey].OnValueChanged += ReplicateIansDesktopUnlocked;

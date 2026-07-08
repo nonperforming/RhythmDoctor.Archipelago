@@ -4,9 +4,9 @@ using System.Collections.ObjectModel;
 
 internal class StoryLevelItemProcessorClientComponent : ItemProcessorClientComponent
 {
-  internal override async Task Enable(ArchipelagoSession session)
+  internal override async Task Enable(StoryClient client, ArchipelagoSession session)
   {
-    await base.Enable(session);
+    await base.Enable(client, session);
     // TODO: CACHE
     // throw new NotImplementedException();
   }

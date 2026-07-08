@@ -27,10 +27,10 @@ internal sealed class DeathLinkClientComponent : ClientComponent
     " couldn't count to 7",
   ];
 
-  internal override async Task Enable(ArchipelagoSession session)
+  internal override async Task Enable(StoryClient client, ArchipelagoSession session)
   {
     Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Enabling DeathLink...");
-    await base.Enable(session);
+    await base.Enable(client, session);
     await Task.Run(() =>
     {
       Service = session.CreateDeathLinkService();
