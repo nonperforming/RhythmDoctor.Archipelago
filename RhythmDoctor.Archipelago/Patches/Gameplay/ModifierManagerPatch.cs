@@ -1,18 +1,8 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 
-/// <summary>
-/// A <see cref="HarmonyPatch"/> that invokes <see cref="ITrap.Compatible"/>, <see cref="ITrap.Active"/> and
-/// <see cref="ITrap.PreviewLevel"/> in the <see cref="StoryClient"/>'s <see cref="ArchipelagoTrapManagerClientComponent"/>'s trap queue for the
-/// selected level just before entering a level, and restores them into the <see cref="ArchipelagoTrapManagerClientComponent"/>'s
-/// <see cref="ArchipelagoTrapManagerClientComponent.Client.ModiTrapManagera level without clearing a location in the <see cref="StoryClient"/>.
-/// Also invokes <see cref="ITrap.PreviewLevel"/> and <see cref="ITrap.PreviewLevelEnd"/>.
-/// </summary>
-/// <remarks>
-/// If built in the Debug configuration, the applicable <see cref="ITrap"/>s in <see cref="DebugMenu"/>'s
-/// <see cref="ArchipelagoTrapManagerClientComponent"/> will be applied after the <see cref="StoryClient"/>'s traps.
-/// </remarks>
-/// <seealso cref="ITrap"/>
+/// <seealso cref="IModifier"/>
 /// <seealso cref="ArchipelagoTrapManagerClientComponent"/>
+/// <seealso cref="ModifierManagerBase"/>
 [HarmonyPatch]
 internal static class ModifierManagerPatch
 {
@@ -24,12 +14,7 @@ internal static class ModifierManagerPatch
       return;
 
     Level level = selectableCharacter.levels[__instance.currentDifficulty];
-    Plugin.StoryClient.ModifierManagerComponent.ApplyApplicableTraps(level);
-
-#if DEBUG
-    Plugin.Logger.LogInfo($"DEBUG TRAPS: Applying applicable trap previews for level {level}");
-    Plugin.DebugMenu.ArchipelagoTrapManagerClientComponent.ApplyApplicableTraps(level);
-#endif
+    Plugin.StoryClient.ModifierManagerComponent.TryApplyChosenModifiersForLevel(level);
   }
 
   [HarmonyPatch(typeof(HeartMonitor), nameof(HeartMonitor.Show))]
@@ -91,15 +76,10 @@ internal static class ModifierManagerPatch
       // The cheat code for Rhythm Dogtor allows you to end it
       // hovering over any level, we need to check the levelToGo.
       Level level = RDUtils.ParseEnum(levelToGo, Level.None);
-      Plugin.StoryClient.ModifierManagerComponent.ApplyApplicableTraps(level);
+      Plugin.StoryClient.ModifierManagerComponent.TryApplyChosenModifiersForLevel(level);
     }
 
-    Plugin.StoryClient.ModifierManagerComponent.PromotePreviewTrapsToActiveTraps();
-
-#if DEBUG
-    Plugin.Logger.LogInfo("DEBUG: Promoting preview traps to active traps");
-    Plugin.DebugMenu.ArchipelagoTrapManagerClientComponent.PromotePreviewTrapsToActiveTraps();
-#endif
+    Plugin.StoryClient.ModifierManagerComponent.PromotePreviewModifiers();
   }
 
   [HarmonyPatch(typeof(scnBase), nameof(scnBase.GoToLevel))]
@@ -112,22 +92,17 @@ internal static class ModifierManagerPatch
     if (level == Level.Montage2)
     {
       Plugin.Logger.LogWarning($"Applying traps for {level} immediately");
-      Plugin.StoryClient.ModifierManagerComponent.ApplyApplicableTraps(level);
-      Plugin.StoryClient.ModifierManagerComponent.PromotePreviewTrapsToActiveTraps();
+      Plugin.StoryClient.ModifierManagerComponent.TryApplyChosenModifiersForLevel(level);
+      Plugin.StoryClient.ModifierManagerComponent.PromotePreviewModifiers();
     }
   }
 
   // Unactive by clearing a level is handled by ClearLocationPatch.
-
   [HarmonyPatch(typeof(scnGame), nameof(scnGame.Quit))]
   [HarmonyPostfix]
   private static void RestoreActiveTrapsOnAbandonPatch()
   {
     Plugin.Logger.LogInfo("Clearing active traps (returning to queue)");
-    Plugin.StoryClient.ModifierManagerComponent.ClearActiveTraps(true);
-#if DEBUG
-    Plugin.Logger.LogInfo("DEBUG: Clearing active traps (do not return to queue)");
-    Plugin.DebugMenu.ArchipelagoTrapManagerClientComponent.ClearActiveTraps(false);
-#endif
+    Plugin.StoryClient.ModifierManagerComponent.ReturnActiveTrapsToQueue();
   }
 }

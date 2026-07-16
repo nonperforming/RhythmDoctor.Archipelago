@@ -45,7 +45,8 @@ internal class TrapItemProcessorClientComponent : ItemProcessorClientComponent
   {
     if (!Bindings.ModifierItemIdToModifierUid.TryGetValue(itemInfo.ItemId, out string trapUid))
       return false; // Not a trap
-    
-    _client.ModifierManagerComponent.Add
+
+    _client.ModifierManagerComponent.TryAddModifier(trapUid);
+    return true;
   }
 }

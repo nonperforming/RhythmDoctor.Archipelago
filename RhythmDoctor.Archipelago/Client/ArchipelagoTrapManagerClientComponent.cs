@@ -2,14 +2,31 @@ namespace RhythmDoctor.Archipelago.Client;
 
 internal sealed class ArchipelagoTrapManagerClientComponent : ModifierManagerBase, IClientComponent, IDisposable
 {
+  private List<KeyValuePair<uint, string>> TrapAndIndexPairs;
+  
   public ArchipelagoTrapManagerClientComponent(Dictionary<string, int>? clearedTraps = null)
   {
     Events.Instance.LevelDeselected += OnLevelDeselected;
   }
   
+  public async Task Enable(ArchipelagoSession session)
+  {
+    throw new NotImplementedException();
+  }
+  
   private void OnLevelDeselected(object _, EventArgs __)
   {
-    ClearAllPreviewTraps();
+    ClearAllPreviewModifiers();
+  }
+
+  internal void ReturnActiveTrapsToQueue()
+  {
+    
+  }
+
+  protected override float GetModifierStrength(string modifierUid)
+  {
+    throw new NotImplementedException();
   }
 
   public new void Dispose()

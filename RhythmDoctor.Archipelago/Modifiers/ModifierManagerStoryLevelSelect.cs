@@ -10,7 +10,12 @@ internal class ModifierManagerStoryLevelSelect : ModifierManagerBase, IDisposabl
 
   private void OnInstanceOnLevelDeselected(object _, EventArgs _1)
   {
-    ClearAllPreviewTraps();
+    ClearAllPreviewModifiers();
+  }
+
+  protected override float GetModifierStrength(string modifierUid)
+  {
+    throw new NotImplementedException();
   }
 
   public new void Dispose()
