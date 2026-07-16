@@ -171,7 +171,9 @@ internal static class ClearStoryLocationPatch
   [HarmonyPostfix]
   private static void MiracleDefibrillatorClearLocationPatch(Level_Montage __instance)
   {
-    bool hasScrambledCharacter = Plugin.StoryClient.ModifierManagerComponent.IsTrapActive(ScrambleCharactersTrapPatch.UID);
+    bool hasScrambledCharacter = Plugin.StoryClient.ModifierManagerComponent.IsTrapActive(
+      ScrambleCharactersTrapPatch.UID
+    );
 
     // We need to calculate the level's rank manually...
     int rank;

@@ -4,11 +4,11 @@ internal class TrapItemProcessorClientComponent : ItemProcessorClientComponent
 {
   private Dictionary<string, uint> _localTrapClearCache = new();
   private Dictionary<string, uint> _remoteTrapClearCache = new();
-  
+
   internal override async Task Enable(StoryClient client, ArchipelagoSession session)
   {
     await base.Enable(client, session);
-    
+
     // TODO: could be made lazy :ppp
     // Get remote trap cache
     foreach (string trapUid in ModifierRegistry.GetAllRegisteredTrapsUid())
@@ -17,7 +17,7 @@ internal class TrapItemProcessorClientComponent : ItemProcessorClientComponent
       _localTrapClearCache[trapUid] = 0;
       _remoteTrapClearCache[trapUid] = (uint)_session.DataStorage[Scope.Slot, trapUid];
     }
-    
+
     // Add sticky traps
     // TODO:
   }
@@ -32,7 +32,9 @@ internal class TrapItemProcessorClientComponent : ItemProcessorClientComponent
     uint remote = _remoteTrapClearCache[trapUid];
     if ((local <= remote) && (remote != 0))
     {
-      Plugin.Logger.LogDebug($"[{nameof(TrapItemProcessorClientComponent)}] Trap {trapUid} already cleared, skipping (l: {local} <= r: {remote})");
+      Plugin.Logger.LogDebug(
+        $"[{nameof(TrapItemProcessorClientComponent)}] Trap {trapUid} already cleared, skipping (l: {local} <= r: {remote})"
+      );
       _localTrapClearCache[trapUid]++;
       return true;
     }

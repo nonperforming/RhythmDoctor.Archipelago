@@ -41,7 +41,7 @@ internal static class ModifierRegistry
   {
     return _uidToModifier.Keys;
   }
-  
+
   internal static bool Compatible(IModifier toAdd, Level level = Level.None, params IEnumerable<IModifier> others)
   {
     //if (!others.All((IModifier other) => Compatible(toAdd, other)))

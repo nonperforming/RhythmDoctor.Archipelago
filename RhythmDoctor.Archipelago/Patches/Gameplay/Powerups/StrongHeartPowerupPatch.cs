@@ -23,8 +23,8 @@ internal class StrongHeartPowerupPatch : ModifierPatch<StrongHeartPowerupPatch>,
     ModifierCompatibilityBuilder.GetDefaultBuilderForMod(this).SetMaximumStrength(2).Build();
   public ModifierCapability[] Capabilities => [ModifierCapability.HeartStrength];
 
-  public override Type[]? PreviewPatches => [];
-  public override Type[]? ActivePatches => [typeof(ActivePatch)];
+  public override Type[] PreviewPatches => [];
+  public override Type[] ActivePatches => [typeof(ActivePatch)];
 
   public override void Active(float strength)
   {

@@ -45,12 +45,12 @@ internal abstract class ModifierManagerBase : IDisposable
     _chosenModifiers.Add(modifier);
     return true;
   }
-  
+
   public void ClearAllChosenModifiers()
   {
     _chosenModifiers.Clear();
   }
-  
+
   public void ClearAllPreviewModifiers()
   {
     foreach (IModifier modifier in _previewModifiers)
@@ -81,7 +81,7 @@ internal abstract class ModifierManagerBase : IDisposable
   /// </summary>
   /// <param name="level">Level to check against for compatibility.</param>
   /// <returns>True if any modifiers were applied.</returns>
-  internal protected bool TryApplyChosenModifiersForLevel(Level level)
+  protected internal bool TryApplyChosenModifiersForLevel(Level level)
   {
     // do not iterate multiple times
     bool any = false;
@@ -95,11 +95,11 @@ internal abstract class ModifierManagerBase : IDisposable
     return any;
   }
 
-  internal protected bool PromotePreviewModifiers()
+  protected internal bool PromotePreviewModifiers()
   {
     _activeModifiers = new List<IModifier>(_previewModifiers);
     _previewModifiers.Clear();
-    
+
     // do not iterate multiple times
     bool any = false;
     foreach (IModifier modifier in _activeModifiers)
@@ -111,11 +111,11 @@ internal abstract class ModifierManagerBase : IDisposable
   }
 
   protected abstract float GetModifierStrength(string modifierUid);
-  
+
   private protected IEnumerable<IModifier> GetModifiersForLevel(Level level)
   {
     List<IModifier> modifiers = [];
-    
+
     foreach (IModifier modifierToAdd in _chosenModifiers)
     {
       if (ModifierRegistry.Compatible(modifierToAdd, level, modifiers))
@@ -129,15 +129,11 @@ internal abstract class ModifierManagerBase : IDisposable
 
   internal IEnumerable<string> GetPreviewTrapNames()
   {
-    foreach (IModifier modifier in _previewModifiers)
-    {
-      yield return RDString.Get(modifier.LocalizationKey);
-    }
+    return _previewModifiers.Select(modifier => modifier.GetLocalizedName());
   }
 
-  internal bool IsTrapActive(string modifierUid)
-    => _activeModifiers.Any(modifier => modifier.Uid == modifierUid);
-  
+  internal bool IsTrapActive(string modifierUid) => _activeModifiers.Any(modifier => modifier.Uid == modifierUid);
+
   public void Dispose()
   {
     Plugin.Logger.LogInfo($"[{nameof(ModifierManagerBase)}] Disposing");

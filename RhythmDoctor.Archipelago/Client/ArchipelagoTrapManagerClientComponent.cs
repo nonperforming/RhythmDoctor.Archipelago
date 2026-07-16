@@ -3,30 +3,32 @@ namespace RhythmDoctor.Archipelago.Client;
 internal sealed class ArchipelagoTrapManagerClientComponent : ModifierManagerBase, IClientComponent, IDisposable
 {
   private List<KeyValuePair<uint, string>> TrapAndIndexPairs;
-  
+
   public ArchipelagoTrapManagerClientComponent(Dictionary<string, int>? clearedTraps = null)
   {
     Events.Instance.LevelDeselected += OnLevelDeselected;
   }
-  
+
   public async Task Enable(ArchipelagoSession session)
   {
     throw new NotImplementedException();
   }
-  
+
   private void OnLevelDeselected(object _, EventArgs __)
   {
     ClearAllPreviewModifiers();
   }
 
+  // TODO: implement return to queue system, need to override default ModifierManagerBase methods
+
   internal void ReturnActiveTrapsToQueue()
   {
-    
+    throw new NotImplementedException(); // TODO:
   }
 
   protected override float GetModifierStrength(string modifierUid)
   {
-    throw new NotImplementedException();
+    throw new NotImplementedException(); // TODO: pull from number of trap items that are being used
   }
 
   public new void Dispose()
@@ -92,7 +94,7 @@ internal sealed class ArchipelagoTrapManagerClientComponent : ModifierManagerBas
 //   /// Sticky traps should be applied before the standard trap queue.
 //   /// </remarks>
 //   internal readonly List<ITrap> StickyTraps = new();
-//   
+//
 //   public async Task Enable(ArchipelagoSession session)
 //   {
 //     throw new NotImplementedException();
