@@ -244,7 +244,7 @@ internal static class ClearStoryLocationPatch
 #endif
     if (bossLevelFailed)
     {
-      //Plugin.StoryClient.ModifierManagerComponent.ClearActiveTraps(false);
+      Plugin.StoryClient.ModifierManagerComponent.ReturnActiveTrapsToQueue();
       return [];
     }
 
@@ -293,11 +293,11 @@ internal static class ClearStoryLocationPatch
       JustSentLocations = ids.Where(id => !Plugin.StoryClient.Session.Locations.AllLocationsChecked.Contains(id))
         .ToArray();
       Task.Run(() => Plugin.StoryClient.Session.Locations.CompleteLocationChecksAsync(ids.ToArray()));
-      //Plugin.StoryClient.ModifierManagerComponent.ClearActiveTraps(false);
+      Plugin.StoryClient.ModifierManagerComponent.ClearAllActiveModifiers();
     }
     else
     {
-      //Plugin.StoryClient.ModifierManagerComponent.ClearActiveTraps(true);
+      Plugin.StoryClient.ModifierManagerComponent.ReturnActiveTrapsToQueue();
     }
 
     return ids;

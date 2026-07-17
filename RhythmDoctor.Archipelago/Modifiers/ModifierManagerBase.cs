@@ -81,7 +81,7 @@ internal abstract class ModifierManagerBase : IDisposable
   /// </summary>
   /// <param name="level">Level to check against for compatibility.</param>
   /// <returns>True if any modifiers were applied.</returns>
-  protected internal bool TryApplyChosenModifiersForLevel(Level level)
+  protected internal virtual bool TryApplyChosenModifiersForLevel(Level level)
   {
     // do not iterate multiple times
     bool any = false;
@@ -90,7 +90,7 @@ internal abstract class ModifierManagerBase : IDisposable
       any = true;
       _chosenModifiers.Remove(modifier);
       _previewModifiers.Add(modifier);
-      modifier.Preview(GetModifierStrength(modifier.Uid));
+      modifier.Preview(GetModifierStrength(modifier));
     }
     return any;
   }
@@ -105,12 +105,12 @@ internal abstract class ModifierManagerBase : IDisposable
     foreach (IModifier modifier in _activeModifiers)
     {
       any = true;
-      modifier.Active(GetModifierStrength(modifier.Uid));
+      modifier.Active(GetModifierStrength(modifier));
     }
     return any;
   }
 
-  protected abstract float GetModifierStrength(string modifierUid);
+  protected abstract float GetModifierStrength(IModifier modifier);
 
   private protected IEnumerable<IModifier> GetModifiersForLevel(Level level)
   {

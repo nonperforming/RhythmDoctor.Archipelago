@@ -1,7 +1,7 @@
 namespace RhythmDoctor.Archipelago.Modifiers;
 
 /// <remarks>Depends on <see cref="ArchipelagoModifierManagerClientComponent"/>.</remarks>
-internal class ModifierManagerStoryLevelSelect : ModifierManagerBase, IDisposable
+internal abstract class ModifierManagerStoryLevelSelect : ModifierManagerBase, IDisposable
 {
   internal ModifierManagerStoryLevelSelect()
   {
@@ -11,11 +11,6 @@ internal class ModifierManagerStoryLevelSelect : ModifierManagerBase, IDisposabl
   private void OnInstanceOnLevelDeselected(object _, EventArgs _1)
   {
     ClearAllPreviewModifiers();
-  }
-
-  protected override float GetModifierStrength(string modifierUid)
-  {
-    throw new NotImplementedException();
   }
 
   public new void Dispose()
