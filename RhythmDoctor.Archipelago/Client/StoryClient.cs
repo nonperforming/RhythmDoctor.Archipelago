@@ -14,7 +14,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
   internal ItemProcessorClientComponent[] ItemProcessorComponents { get; private set; } =
   [new StoryLevelItemProcessorClientComponent(), new TrapItemProcessorClientComponent()];
 
-  internal ArchipelagoTrapManagerClientComponent? ModifierManagerComponent { get; private set; } = new();
+  internal ArchipelagoModifierManagerClientComponent? ModifierManagerComponent { get; private set; } = new();
   internal DeathLinkClientComponent? DeathLinkComponent { get; private set; }
   internal ReplicationClientComponent? ReplicationComponent { get; private set; }
 
@@ -116,11 +116,15 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     // TODO: break into multiple methods, don't login and go to level select here
     ThrowIfNotReadyFor(ClientState.LoggingIn);
 
+    // At this point Session is guaranteed to not be null
+
     State = ClientState.LoggingIn;
     Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Connecting...");
-    RoomInfoPacket roomInfo = await Session.ConnectAsync();
+    // ReSharper disable once NullableWarningSuppressionIsUsed
+    RoomInfoPacket roomInfo = await Session!.ConnectAsync();
     Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Logging in...");
-    LoginResult loginResult = await Session.LoginAsync(
+    // ReSharper disable once NullableWarningSuppressionIsUsed
+    LoginResult loginResult = await Session!.LoginAsync(
       Bindings.GAME,
       LoginInformation.SlotName,
       ItemsHandlingFlags.AllItems,
@@ -189,11 +193,14 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
   {
     ThrowIfNotReadyFor(ClientState.ReceivingPriorItems);
 
+    // At this point Session is guaranteed to not be null.
+
     // Process all previously received items...
     Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Receiving items...");
     State = ClientState.ReceivingPriorItems;
 
-    while (Session.Items.Any())
+    // ReSharper disable once NullableWarningSuppressionIsUsed
+    while (Session!.Items.Any())
     {
       // TODO: async
       HandleInitialItem(Session.Items.DequeueItem());

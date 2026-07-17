@@ -1,10 +1,10 @@
 namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 
 /// <seealso cref="IModifier"/>
-/// <seealso cref="ArchipelagoTrapManagerClientComponent"/>
+/// <seealso cref="ArchipelagoModifierManagerClientComponent"/>
 /// <seealso cref="ModifierManagerBase"/>
 [HarmonyPatch]
-internal static class ModifierManagerPatch
+internal static class ArchipelagoModifierManagerPatch
 {
   [HarmonyPatch(typeof(scnLevelSelect), nameof(scnLevelSelect.SelectCharacter))]
   [HarmonyPrefix]
@@ -14,14 +14,14 @@ internal static class ModifierManagerPatch
       return;
 
     Level level = selectableCharacter.levels[__instance.currentDifficulty];
-    Plugin.StoryClient.ModifierManagerComponent.TryApplyChosenModifiersForLevel(level);
+    Plugin.StoryClient.ModifierManagerComponent!.TryApplyChosenModifiersForLevel(level);
   }
 
   [HarmonyPatch(typeof(HeartMonitor), nameof(HeartMonitor.Show))]
   [HarmonyPostfix]
   private static void ShowTrapNameOnPhonePatch(HeartMonitor __instance)
   {
-    IEnumerable<string> previewTraps = Plugin.StoryClient.ModifierManagerComponent.GetPreviewTrapNames();
+    IEnumerable<string> previewTraps = Plugin.StoryClient.ModifierManagerComponent!.GetPreviewTrapNames();
     if (!previewTraps.Any())
       return;
 
@@ -66,20 +66,22 @@ internal static class ModifierManagerPatch
   [HarmonyPostfix]
   private static void ApplyApplicableTrapsPatch(string levelToGo, scnLevelSelect __instance)
   {
-    Plugin.Logger.LogInfo("Promoting preview traps to active traps");
+    Plugin.Logger.LogInfo($"[{nameof(ArchipelagoModifierManagerPatch)}] Promoting preview traps to active traps");
 
     // Rhythm Dogtor and Rhythm Weightlifter dog mode can bypass selection,
     // so we may need apply preview patches here.
-    if (levelToGo is "Lesmis" or "RhythmWeightlifter")
+    if (levelToGo is nameof(Level.Lesmis) or nameof(Level.RhythmWeightlifter))
     {
       Plugin.Logger.LogInfo("Going to Rhythm Dogtor/Rhythm Weightlifter (dog) - applying preview traps now");
       // The cheat code for Rhythm Dogtor allows you to end it
       // hovering over any level, we need to check the levelToGo.
       Level level = RDUtils.ParseEnum(levelToGo, Level.None);
-      Plugin.StoryClient.ModifierManagerComponent.TryApplyChosenModifiersForLevel(level);
+      // ReSharper disable once NullableWarningSuppressionIsUsed
+      Plugin.StoryClient.ModifierManagerComponent!.TryApplyChosenModifiersForLevel(level);
     }
 
-    Plugin.StoryClient.ModifierManagerComponent.PromotePreviewModifiers();
+    // ReSharper disable once NullableWarningSuppressionIsUsed
+    Plugin.StoryClient.ModifierManagerComponent!.PromotePreviewModifiers();
   }
 
   [HarmonyPatch(typeof(scnBase), nameof(scnBase.GoToLevel))]
@@ -91,9 +93,9 @@ internal static class ModifierManagerPatch
 
     if (level == Level.Montage2)
     {
-      Plugin.Logger.LogWarning($"Applying traps for {level} immediately");
-      Plugin.StoryClient.ModifierManagerComponent.TryApplyChosenModifiersForLevel(level);
-      Plugin.StoryClient.ModifierManagerComponent.PromotePreviewModifiers();
+      Plugin.Logger.LogWarning($"[{nameof(ArchipelagoModifierManagerPatch)}] Applying traps for {level} immediately");
+      Plugin.StoryClient.ModifierManagerComponent!.TryApplyChosenModifiersForLevel(level);
+      Plugin.StoryClient.ModifierManagerComponent!.PromotePreviewModifiers();
     }
   }
 
@@ -102,7 +104,7 @@ internal static class ModifierManagerPatch
   [HarmonyPostfix]
   private static void RestoreActiveTrapsOnAbandonPatch()
   {
-    Plugin.Logger.LogInfo("Clearing active traps (returning to queue)");
-    Plugin.StoryClient.ModifierManagerComponent.ReturnActiveTrapsToQueue();
+    Plugin.Logger.LogInfo($"[{nameof(ArchipelagoModifierManagerPatch)}] Clearing active traps (returning to queue)");
+    Plugin.StoryClient.ModifierManagerComponent!.ReturnActiveTrapsToQueue();
   }
 }

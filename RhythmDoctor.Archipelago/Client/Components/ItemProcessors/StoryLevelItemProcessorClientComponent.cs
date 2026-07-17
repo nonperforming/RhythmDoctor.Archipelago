@@ -107,7 +107,8 @@ internal class StoryLevelItemProcessorClientComponent : ItemProcessorClientCompo
         throw new InvalidOperationException("Can't get best rank for this type of Stage.");
     }
 
-    ReadOnlyCollection<long> locations = Plugin.StoryClient.Session.Locations.AllLocationsChecked;
+    // ReSharper disable once NullableWarningSuppressionIsUsed
+    ReadOnlyCollection<long> locations = Plugin.StoryClient.Session!.Locations.AllLocationsChecked;
 
     // Locations are always sent in the order of B-A-S ranks, so if we iterate in reverse we always
     //  will catch the highest rank first.

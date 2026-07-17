@@ -3,8 +3,8 @@ namespace RhythmDoctor.Archipelago.Modifiers;
 internal abstract class ModifierPatch<T>
   where T : IModifier
 {
-  internal Harmony _previewHarmony;
-  internal Harmony _activeHarmony;
+  internal Harmony _previewHarmony = null!;
+  internal Harmony _activeHarmony = null!;
 
   public abstract Type[] PreviewPatches { get; }
   public abstract Type[] ActivePatches { get; }
