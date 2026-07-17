@@ -68,6 +68,27 @@ public class Plugin : BaseUnityPlugin
     Logger.LogInfo($"Registering custom localization ({Paths.Localization})");
     CustomLocalizationHelper.SearchAndRegisterDirectory(Paths.Localization);
 
+    Logger.LogInfo("Registering modifiers");
+    foreach (
+      Type modifierType in (Type[])
+        [
+          typeof(EasyDifficultyPowerupPatch),
+          typeof(StrongHeartPowerupPatch),
+          typeof(ChilliSpeedTrapPatch),
+          typeof(FragileHeartTrapPatch),
+          typeof(GhostTapTrapPatch),
+          typeof(HardDifficultyTrapPatch),
+          typeof(IceSpeedTrapPatch),
+          typeof(ScrambleBeatsoundsTrapPatch),
+          typeof(ScrambleCharactersTrapPatch),
+          typeof(ScrambleHitsoundsTrapPatch),
+        ]
+    )
+    {
+      IModifier modifier = (IModifier)Activator.CreateInstance(modifierType);
+      ModifierRegistry.Register(modifier);
+    }
+
     Logger.LogInfo("Applying always active patches");
     ApplyPatches(PATCH_ID_ALWAYS_ACTIVE, AlwaysActivePatches);
 
