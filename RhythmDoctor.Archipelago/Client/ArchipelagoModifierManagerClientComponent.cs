@@ -7,7 +7,7 @@ internal sealed class ArchipelagoModifierManagerClientComponent : ModifierManage
   private readonly List<string> _modifierQueue = [];
   private readonly List<(int index, string Uid)> _modifierAndIndexPairs = [];
 
-  public Task Enable(ArchipelagoSession session)
+  public Task Enable(StoryClient client, ArchipelagoSession session)
   {
     return Task.CompletedTask;
   }

@@ -1,11 +1,13 @@
 namespace RhythmDoctor.Archipelago.Client.Components.Interfaces;
 
-internal abstract class ClientComponent
+internal abstract class ClientComponentBase : IClientComponent
 {
   internal StoryClient _client = null!;
   internal ArchipelagoSession _session = null!;
 
-  internal virtual Task Enable(StoryClient client, ArchipelagoSession session)
+  private IEnumerable<Type> AssistPatches => [];
+
+  public virtual Task Enable(StoryClient client, ArchipelagoSession session)
   {
     _client = client;
     _session = session;
@@ -15,6 +17,4 @@ internal abstract class ClientComponent
     }
     return Task.CompletedTask;
   }
-
-  private IEnumerable<Type> AssistPatches => [];
 }

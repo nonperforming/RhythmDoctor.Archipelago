@@ -6,7 +6,7 @@ internal sealed class StoryReplicationClientComponent : ReplicationClientCompone
 {
   public IEnumerable<Type> AssistPatches => [typeof(StoryModeStateReplicationPatch)];
 
-  internal override async Task Enable(StoryClient client, ArchipelagoSession session)
+  public override async Task Enable(StoryClient client, ArchipelagoSession session)
   {
     static async Task InitializeSync(ArchipelagoSession session)
     {

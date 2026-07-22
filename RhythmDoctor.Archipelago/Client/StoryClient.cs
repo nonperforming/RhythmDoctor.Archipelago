@@ -43,17 +43,17 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     typeof(UnapplyPatchesPatch),
   ];
 
-  internal IEnumerable<ClientComponent> ClientComponents
+  internal IEnumerable<IClientComponent> ClientComponents
   {
     get
     {
       foreach (ItemProcessorClientComponent itemProcessorComponent in ItemProcessorComponents)
         yield return itemProcessorComponent;
-      //if (ModifierManagerComponent != null)
-      //  yield return ModifierManagerComponent;
-      if (DeathLinkComponent != null)
+      if (ModifierManagerComponent is not null)
+        yield return ModifierManagerComponent;
+      if (DeathLinkComponent is not null)
         yield return DeathLinkComponent;
-      if (ReplicationComponent != null)
+      if (ReplicationComponent is not null)
         yield return ReplicationComponent;
     }
   }

@@ -1,6 +1,6 @@
 namespace RhythmDoctor.Archipelago.Client.Components.Interfaces;
 
-internal abstract class ReplicationClientComponent : ClientComponent
+internal abstract class ReplicationClientComponent : ClientComponentBase
 {
   internal void UpdateRemote(string key, object value)
   {

@@ -1,6 +1,6 @@
 namespace RhythmDoctor.Archipelago.Client.Components;
 
-internal sealed class DeathLinkClientComponent : ClientComponent
+internal sealed class DeathLinkClientComponent : ClientComponentBase
 {
   private DeathLinkService Service = null!;
 
@@ -27,7 +27,7 @@ internal sealed class DeathLinkClientComponent : ClientComponent
     " couldn't count to 7",
   ];
 
-  internal override async Task Enable(StoryClient client, ArchipelagoSession session)
+  public override async Task Enable(StoryClient client, ArchipelagoSession session)
   {
     Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Enabling DeathLink...");
     await base.Enable(client, session);

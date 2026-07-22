@@ -5,7 +5,7 @@ internal class TrapItemProcessorClientComponent : ItemProcessorClientComponent
   private Dictionary<string, uint> _localTrapClearCache = new();
   private Dictionary<string, uint> _remoteTrapClearCache = new();
 
-  internal override async Task Enable(StoryClient client, ArchipelagoSession session)
+  public override async Task Enable(StoryClient client, ArchipelagoSession session)
   {
     await base.Enable(client, session);
 
