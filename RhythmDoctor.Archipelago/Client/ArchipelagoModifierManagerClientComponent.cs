@@ -12,6 +12,12 @@ internal sealed class ArchipelagoModifierManagerClientComponent : ModifierManage
     return Task.CompletedTask;
   }
 
+  internal void AddModifierToQueue(string modifierUid)
+  {
+    Plugin.Logger.LogInfo($"[{nameof(ArchipelagoModifierManagerClientComponent)}] Adding {modifierUid} to queue");
+    _modifierQueue.Add(modifierUid);
+  }
+
   internal void ReturnActiveTrapsToQueue()
   {
     // We iterate in reverse because _trapAndIndexPairs is guaranteed to be ordered from the

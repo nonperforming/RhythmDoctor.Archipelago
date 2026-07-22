@@ -189,7 +189,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     return loginResult;
   }
 
-  internal async Task ReceivePriorItems()
+  internal Task ReceivePriorItems()
   {
     ThrowIfNotReadyFor(ClientState.ReceivingPriorItems);
 
@@ -208,6 +208,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
 
     UnlockItemPatch.TryUnlockAllBossSongs(true);
     State = ClientState.Ready;
+    return Task.CompletedTask;
   }
 
   internal Task StartPlay()
@@ -252,8 +253,11 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     foreach (ItemProcessorClientComponent itemProcessorClientComponent in ItemProcessorComponents)
     {
       if (itemProcessorClientComponent.HandleItem(itemInfo))
-        break;
+        return;
     }
+    Plugin.Logger.LogWarning(
+      $"[{nameof(StoryClient)}] Item '{itemInfo.ItemName}' (ID: {itemInfo.ItemId}) went through all processors without being processed!"
+    );
   }
 
   private void ThrowIfNotReadyFor(ClientState? wantToGoToState = null)
@@ -304,6 +308,17 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     if (State == ClientState.Disposed)
       return;
     State = ClientState.Disposed;
+
+    // Don't return to main menu if we haven't applied any patches yet
+    if (
+      State
+      is ClientState.NotReady
+        or ClientState.CreatingSession
+        or ClientState.CreatedSession
+        or ClientState.LoggingIn
+    )
+      return;
+
     // UnapplyPatchesPatch will do the rest for us
     scnBase.GoToMainMenu();
   }
