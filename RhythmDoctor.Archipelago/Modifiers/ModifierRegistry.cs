@@ -9,7 +9,7 @@ internal static class ModifierRegistry
     if (_uidToModifier.ContainsKey(modifier.Uid))
     {
       // TODO: consider using custom exception
-      throw new Exception("Trap already registered");
+      throw new Exception($"Trap '{modifier.Uid}' already registered");
     }
 
     Plugin.Logger.LogInfo($"[{nameof(ModifierRegistry)}] Registering trap {modifier.Uid}");
