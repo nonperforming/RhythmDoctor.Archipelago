@@ -6,26 +6,6 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 [HarmonyPatch(typeof(scnGame))]
 internal static class SkipTutorialPatch
 {
-  // From https://github.com/Mysthaps/MyseIfRDPatches/blob/master/Main.cs#L223
-  /// <summary>
-  /// Fix story levels that exclusively use custom scripts not loading.
-  /// </summary>
-  /// <param name="instructions">IL instructions</param>
-  /// <returns>Modified IL instructions</returns>
-  [HarmonyPatch(nameof(scnGame.Start))]
-  [HarmonyTranspiler]
-  private static IEnumerable<CodeInstruction> FixLesmisPatch(IEnumerable<CodeInstruction> instructions)
-  {
-    return new CodeMatcher(instructions)
-      .MatchForward(false, new CodeMatch(OpCodes.Ldstr, "Level_"))
-      .Advance(3)
-      .InsertAndAdvance(
-        new CodeInstruction(OpCodes.Ldstr, ", Assembly-CSharp"),
-        new CodeInstruction(OpCodes.Call, AccessTools.Method("System.String:Concat", [typeof(string), typeof(string)]))
-      )
-      .InstructionEnumeration();
-  }
-
   /// <summary>
   /// Patch to force not attempting to load the tutorial.
   /// </summary>
