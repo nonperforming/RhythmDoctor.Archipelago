@@ -9,6 +9,10 @@ internal sealed class ArchipelagoModifierManagerClientComponent : ModifierManage
 
   public Task Enable(StoryClient client, ArchipelagoSession session)
   {
+    foreach (Type assistPatch in AssistPatches)
+    {
+      Harmony.CreateAndPatchAll(assistPatch, Plugin.PATCH_ID_POST_LOGIN);
+    }
     return Task.CompletedTask;
   }
 
