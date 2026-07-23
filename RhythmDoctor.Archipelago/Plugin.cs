@@ -70,22 +70,21 @@ public class Plugin : BaseUnityPlugin
 
     Logger.LogInfo("Registering modifiers");
     foreach (
-      Type modifierType in (Type[])
+      IModifier modifier in (IModifier[])
         [
-          typeof(EasyDifficultyPowerup),
-          typeof(StrongHeartPowerup),
-          typeof(ChilliSpeedTrap),
-          typeof(FragileHeartTrap),
-          typeof(GhostTapTrap),
-          typeof(HardDifficultyTrap),
-          typeof(IceSpeedTrap),
-          typeof(ScrambleBeatsoundsTrap),
-          typeof(ScrambleCharactersTrap),
-          typeof(ScrambleHitsoundsTrap),
+          new EasyDifficultyPowerup(),
+          new StrongHeartPowerup(),
+          new ChilliSpeedTrap(),
+          new FragileHeartTrap(),
+          new GhostTapTrap(),
+          new HardDifficultyTrap(),
+          new IceSpeedTrap(),
+          new ScrambleBeatsoundsTrap(),
+          new ScrambleCharactersTrap(),
+          new ScrambleHitsoundsTrap(),
         ]
     )
     {
-      IModifier modifier = (IModifier)Activator.CreateInstance(modifierType);
       ModifierRegistry.Register(modifier);
     }
 
