@@ -1,10 +1,10 @@
-namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
+namespace RhythmDoctor.Archipelago.Modifiers.Archipelago.Traps;
 
 /// <summary>
 /// Take damage from ghost taps.
 /// </summary>
 /// <remarks>Adapted from https://github.com/Mysthaps/MyseIfRDPatches/blob/master/GhostTapMiss.cs</remarks>
-internal class GhostTapTrapPatch : ModifierPatch<GhostTapTrapPatch>, IModifier, IArchipelagoModifier
+internal class GhostTapTrap : ModifierPatch<GhostTapTrap>, IModifier, IArchipelagoModifier
 {
   public string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.ghostTap";
   public string LocalizationKey => "mods.archipelago.trap.ghostTap";

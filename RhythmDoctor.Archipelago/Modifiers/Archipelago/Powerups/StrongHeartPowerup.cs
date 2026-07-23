@@ -1,10 +1,10 @@
-namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
+namespace RhythmDoctor.Archipelago.Modifiers.Archipelago.Powerups;
 
-internal class FragileHeartTrapPatch : ModifierPatch<FragileHeartTrapPatch>, IModifier, IArchipelagoModifier
+internal class StrongHeartPowerup : ModifierPatch<StrongHeartPowerup>, IModifier, IArchipelagoModifier
 {
   /// <summary>
   /// By how much we should reduce mistake weight:
-  /// mistake weight = original mistake weight * strength,
+  /// mistake weight = original mistake weight * strength^-1,
   /// where strength is 2*consumed
   /// </summary>
   private static float Strength;
@@ -15,8 +15,8 @@ internal class FragileHeartTrapPatch : ModifierPatch<FragileHeartTrapPatch>, IMo
   /// <seealso cref="Strength"/>
   private const int MAX_CONSUMED = 2;
 
-  public string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.fragileHeart";
-  public string LocalizationKey => "mods.archipelago.trap.fragileHeart";
+  public string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.strongHeart";
+  public string LocalizationKey => "mods.archipelago.powerup.strongHeart";
 
   // TODO: CACHE
   public ModifierCompatibility Compatibility =>
@@ -36,7 +36,7 @@ internal class FragileHeartTrapPatch : ModifierPatch<FragileHeartTrapPatch>, IMo
   {
     // this doesn't run if trap weight is 0/no traps in queue
     consumed = Math.Clamp(num, 1, MAX_CONSUMED);
-    return num * (2 * consumed);
+    return num * (2 * consumed) ^ -1;
   }
 
   [HarmonyPatch(typeof(MistakesManager))]
@@ -44,9 +44,9 @@ internal class FragileHeartTrapPatch : ModifierPatch<FragileHeartTrapPatch>, IMo
   {
     [HarmonyPatch(nameof(MistakesManager.AddMistake))]
     [HarmonyPrefix]
-    private static void IncreaseMistakeWeightPatch(ref float weight)
+    private static void ReduceMistakeWeightPatch(ref float weight)
     {
-      weight *= Strength;
+      weight /= Strength;
     }
   }
 }

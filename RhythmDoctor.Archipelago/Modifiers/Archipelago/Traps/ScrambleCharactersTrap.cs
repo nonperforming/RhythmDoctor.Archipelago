@@ -1,7 +1,7 @@
-namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
+namespace RhythmDoctor.Archipelago.Modifiers.Archipelago.Traps;
 
 // FIXME: Narration will break
-internal class ScrambleCharactersTrapPatch : ModifierPatch<ScrambleCharactersTrapPatch>, IModifier, IArchipelagoModifier
+internal class ScrambleCharactersTrap : ModifierPatch<ScrambleCharactersTrap>, IModifier, IArchipelagoModifier
 {
   internal const string UID = $"{MyPluginInfo.PLUGIN_GUID}.mod.scrambleCharacters";
   public string Uid => UID;
@@ -70,10 +70,10 @@ internal class ScrambleCharactersTrapPatch : ModifierPatch<ScrambleCharactersTra
       scrambled[originalCharacter] = randomizeTo;
     }
 
-    Plugin.Logger.LogDebug($"[{nameof(ScrambleCharactersTrapPatch)}] Randomized characters:");
+    Plugin.Logger.LogDebug($"[{nameof(ScrambleCharactersTrap)}] Randomized characters:");
     foreach ((Character originalCharacter, Character randomizedCharacter) in scrambled)
     {
-      Plugin.Logger.LogDebug($"[{nameof(ScrambleCharactersTrapPatch)}]  {originalCharacter} -> {randomizedCharacter}");
+      Plugin.Logger.LogDebug($"[{nameof(ScrambleCharactersTrap)}]  {originalCharacter} -> {randomizedCharacter}");
     }
   }
 
@@ -96,7 +96,7 @@ internal class ScrambleCharactersTrapPatch : ModifierPatch<ScrambleCharactersTra
           }
 
           Plugin.Logger.LogDebug(
-            $"[{nameof(ScrambleCharactersTrapPatch)}] ChangeCharacter custom method: {callCustomMethod.methodName}"
+            $"[{nameof(ScrambleCharactersTrap)}] ChangeCharacter custom method: {callCustomMethod.methodName}"
           );
 
           string changeToString = callCustomMethod
@@ -111,7 +111,7 @@ internal class ScrambleCharactersTrapPatch : ModifierPatch<ScrambleCharactersTra
             randomized.ToString(),
             StringComparison.Ordinal
           );
-          Plugin.Logger.LogDebug($"[{nameof(ScrambleCharactersTrapPatch)}] Character changed to: {randomized}");
+          Plugin.Logger.LogDebug($"[{nameof(ScrambleCharactersTrap)}] Character changed to: {randomized}");
         }
       }
     }
@@ -121,7 +121,7 @@ internal class ScrambleCharactersTrapPatch : ModifierPatch<ScrambleCharactersTra
     private static void ModifyMakeRowPatch(ref Character character)
     {
       Plugin.Logger.LogDebug(
-        $"[{nameof(ScrambleCharactersTrapPatch)}] Modifying MakeRow method from {character} to {scrambled[character]}"
+        $"[{nameof(ScrambleCharactersTrap)}] Modifying MakeRow method from {character} to {scrambled[character]}"
       );
       character = scrambled[character];
     }
@@ -131,7 +131,7 @@ internal class ScrambleCharactersTrapPatch : ModifierPatch<ScrambleCharactersTra
     private static void ModifyChangeCharacterPatch(ref Character newChar)
     {
       Plugin.Logger.LogDebug(
-        $"[{nameof(ScrambleCharactersTrapPatch)}] Modifying ChangeCharacter method from {newChar} to {scrambled[newChar]}"
+        $"[{nameof(ScrambleCharactersTrap)}] Modifying ChangeCharacter method from {newChar} to {scrambled[newChar]}"
       );
       newChar = scrambled[newChar];
     }

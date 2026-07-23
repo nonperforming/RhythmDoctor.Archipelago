@@ -72,16 +72,16 @@ public class Plugin : BaseUnityPlugin
     foreach (
       Type modifierType in (Type[])
         [
-          typeof(EasyDifficultyPowerupPatch),
-          typeof(StrongHeartPowerupPatch),
-          typeof(ChilliSpeedTrapPatch),
-          typeof(FragileHeartTrapPatch),
-          typeof(GhostTapTrapPatch),
-          typeof(HardDifficultyTrapPatch),
-          typeof(IceSpeedTrapPatch),
-          typeof(ScrambleBeatsoundsTrapPatch),
-          typeof(ScrambleCharactersTrapPatch),
-          typeof(ScrambleHitsoundsTrapPatch),
+          typeof(EasyDifficultyPowerup),
+          typeof(StrongHeartPowerup),
+          typeof(ChilliSpeedTrap),
+          typeof(FragileHeartTrap),
+          typeof(GhostTapTrap),
+          typeof(HardDifficultyTrap),
+          typeof(IceSpeedTrap),
+          typeof(ScrambleBeatsoundsTrap),
+          typeof(ScrambleCharactersTrap),
+          typeof(ScrambleHitsoundsTrap),
         ]
     )
     {

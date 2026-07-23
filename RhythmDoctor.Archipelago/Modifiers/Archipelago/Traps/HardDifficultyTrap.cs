@@ -1,9 +1,9 @@
-namespace RhythmDoctor.Archipelago.Patches.Gameplay.Powerups;
+namespace RhythmDoctor.Archipelago.Modifiers.Archipelago.Traps;
 
-internal class EasyDifficultyPowerupPatch : ModifierPatch<EasyDifficultyPowerupPatch>, IModifier, IArchipelagoModifier
+internal class HardDifficultyTrap : ModifierPatch<HardDifficultyTrap>, IModifier, IArchipelagoModifier
 {
-  public string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.easyDifficulty";
-  public string LocalizationKey => "mods.archipelago.powerup.easyDifficulty";
+  public string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.hardDifficulty";
+  public string LocalizationKey => "mods.archipelago.trap.hardDifficulty";
   public ModifierCompatibility Compatibility => ModifierCompatibilityBuilder.GetDefaultCompatibilityForMod(this);
   public ModifierCapability[] Capabilities => [ModifierCapability.Difficulty];
 
@@ -18,10 +18,10 @@ internal class EasyDifficultyPowerupPatch : ModifierPatch<EasyDifficultyPowerupP
     [HarmonyPatch(typeof(Persistence), nameof(Persistence.GetDefibrillatorP1))]
     [HarmonyPatch(typeof(Persistence), nameof(Persistence.GetDefibrillatorP2))]
     [HarmonyPrefix]
-    private static void ForceEasyDifficultyPatch(ref DefibMode __result, ref bool __runOriginal)
+    private static void ForceHardDifficultyPatch(ref DefibMode __result, ref bool __runOriginal)
     {
       __runOriginal = false;
-      __result = DefibMode.Easy;
+      __result = DefibMode.Hard;
     }
   }
 }

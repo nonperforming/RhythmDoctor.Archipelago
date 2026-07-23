@@ -1,9 +1,9 @@
-namespace RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
+namespace RhythmDoctor.Archipelago.Modifiers.Archipelago.Traps;
 
-internal class IceSpeedTrapPatch : ModifierPatch<IceSpeedTrapPatch>, IModifier, IArchipelagoModifier
+internal class ChilliSpeedTrap : ModifierPatch<ChilliSpeedTrap>, IModifier, IArchipelagoModifier
 {
-  public string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.iceSpeed";
-  public string LocalizationKey => "mods.archipelago.trap.iceSpeed";
+  public string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.chilliSpeed";
+  public string LocalizationKey => "mods.archipelago.trap.chilliSpeed";
   public ModifierCompatibility Compatibility => ModifierCompatibilityBuilder.GetDefaultCompatibilityForMod(this);
   public ModifierCapability[] Capabilities => [ModifierCapability.Speed];
 
@@ -17,14 +17,14 @@ internal class IceSpeedTrapPatch : ModifierPatch<IceSpeedTrapPatch>, IModifier, 
   {
     [HarmonyPatch(nameof(HeartMonitor.Update))]
     [HarmonyPrefix]
-    private static void ForceLevelSpeed(HeartMonitor __instance)
+    private static void ForceLevelSpeedPatch(HeartMonitor __instance)
     {
       __instance.isSpeedOptionShown = false;
-      __instance.currentLevelSpeedIndex = 0;
-      __instance.speedSettings[0].phoneScreen.SetActive(true);
+      __instance.currentLevelSpeedIndex = 2;
+      __instance.speedSettings[0].phoneScreen.SetActive(false);
       __instance.speedSettings[1].phoneScreen.SetActive(false);
-      __instance.speedSettings[2].phoneScreen.SetActive(false);
-      __instance.speedSettingIce.Play();
+      __instance.speedSettings[2].phoneScreen.SetActive(true);
+      __instance.speedSettingChilli.Play();
     }
 
     [HarmonyPatch(nameof(HeartMonitor.ChangeLevelSpeed))]

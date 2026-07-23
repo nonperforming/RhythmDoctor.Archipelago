@@ -172,7 +172,7 @@ internal static class ClearStoryLocationPatch
   private static void MiracleDefibrillatorClearLocationPatch(Level_Montage __instance)
   {
     bool hasScrambledCharacter = Plugin.StoryClient.ModifierManagerComponent.IsTrapActive(
-      ScrambleCharactersTrapPatch.UID
+      ScrambleCharactersTrap.UID
     );
 
     // We need to calculate the level's rank manually...
