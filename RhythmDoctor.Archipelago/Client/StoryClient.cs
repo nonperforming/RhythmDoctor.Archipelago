@@ -12,7 +12,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
 
   // Components
   internal ItemProcessorClientComponent[] ItemProcessorComponents { get; private set; } =
-  [new StoryLevelItemProcessorClientComponent(), new TrapItemProcessorClientComponent()];
+    [new StoryLevelItemProcessorClientComponent(), new TrapItemProcessorClientComponent()];
 
   internal ArchipelagoModifierManagerClientComponent? ModifierManagerComponent { get; private set; } = new();
   internal DeathLinkClientComponent? DeathLinkComponent { get; private set; }
