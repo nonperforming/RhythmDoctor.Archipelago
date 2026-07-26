@@ -27,7 +27,7 @@ If you have BepInEx 5 installed already, skip to step 3.
 1. **Install BepInEx 5**
    [Download and install BepInEx 5.](https://docs.bepinex.dev/v5.4.21/articles/user_guide/installation/index.html)
    - If you are on macOS, it is recommended to use [gib](https://github.com/toebeann/gib) to install BepInEx.
-     If you are using gib, complete the setup and skip to step 4.
+     If you are using gib, complete the setup and skip to step 3.
 
 3. **Run the Game**
    Launch Rhythm Doctor once to ensure that BepInEx sets up the required folder structure.
