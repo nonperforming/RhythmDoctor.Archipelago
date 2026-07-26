@@ -1,6 +1,6 @@
 namespace RhythmDoctor.Archipelago.Modifiers.Archipelago;
 
-internal abstract class ScaleBase<T> : Lazy<T>, IScale
+internal abstract class ScaleBase<T> : IScale
   where T : new()
 {
   private static readonly Lazy<T> lazy = new(() => new T());
