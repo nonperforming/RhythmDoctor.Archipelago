@@ -3,7 +3,7 @@ namespace RhythmDoctor.Archipelago.Modifiers.Archipelago.Traps;
 internal class FragileHeartTrap : ModifierPatch<FragileHeartTrap>, IModifier, IArchipelagoModifier
 {
   /// <summary>
-  /// By how much we should reduce mistake weight:
+  /// By how much we should increase mistake weight:
   /// mistake weight = original mistake weight * strength,
   /// where strength is 2*consumed
   /// </summary>
