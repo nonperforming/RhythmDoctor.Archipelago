@@ -10,7 +10,7 @@ internal class HardDifficultyTrap : ModifierPatch<HardDifficultyTrap>, IModifier
   public override Type[] PreviewPatches => [];
   public override Type[] ActivePatches => [typeof(ActivePatch), typeof(LockDifficultyPatch)];
 
-  public float GetScale(int num, out int consumed) => Scales.BinaryScale(num, out consumed);
+  public IScale Scale => BinaryScale.Instance;
 
   [HarmonyPatch]
   private static class ActivePatch

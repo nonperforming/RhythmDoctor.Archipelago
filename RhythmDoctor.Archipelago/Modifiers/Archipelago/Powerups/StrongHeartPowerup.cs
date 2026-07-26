@@ -9,12 +9,6 @@ internal class StrongHeartPowerup : ModifierPatch<StrongHeartPowerup>, IModifier
   /// </summary>
   private static float Strength;
 
-  /// <summary>
-  /// How much traps we can consume in one usage.
-  /// </summary>
-  /// <seealso cref="Strength"/>
-  private const int MAX_CONSUMED = 2;
-
   public string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.strongHeart";
   public string LocalizationKey => "mods.archipelago.powerup.strongHeart";
 
@@ -26,17 +20,12 @@ internal class StrongHeartPowerup : ModifierPatch<StrongHeartPowerup>, IModifier
   public override Type[] PreviewPatches => [];
   public override Type[] ActivePatches => [typeof(ActivePatch)];
 
+  public IScale Scale => new StrongHeartScale();
+
   public override void Active(float strength)
   {
     base.Active(strength);
     Strength = strength;
-  }
-
-  public float GetScale(int num, out int consumed)
-  {
-    // this doesn't run if trap weight is 0/no traps in queue
-    consumed = Math.Clamp(num, 1, MAX_CONSUMED);
-    return num * (2 * consumed) ^ -1;
   }
 
   [HarmonyPatch(typeof(MistakesManager))]
@@ -47,6 +36,22 @@ internal class StrongHeartPowerup : ModifierPatch<StrongHeartPowerup>, IModifier
     private static void ReduceMistakeWeightPatch(ref float weight)
     {
       weight /= Strength;
+    }
+  }
+
+  private class StrongHeartScale : IScale
+  {
+    /// <summary>
+    /// How much traps we can consume in one usage.
+    /// </summary>
+    /// <seealso cref="Strength"/>
+    private const int MAX_CONSUMED = 2;
+
+    public float GetScale(int num, out int consumed)
+    {
+      // this doesn't run if trap weight is 0/no traps in queue
+      consumed = Math.Clamp(num, 1, MAX_CONSUMED);
+      return num * (2 * consumed) ^ -1;
     }
   }
 }

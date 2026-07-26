@@ -34,6 +34,7 @@ global using RhythmDoctor.Archipelago.Helpers;
 global using RhythmDoctor.Archipelago.Modifiers;
 global using RhythmDoctor.Archipelago.Modifiers.Archipelago;
 global using RhythmDoctor.Archipelago.Modifiers.Archipelago.Powerups;
+global using RhythmDoctor.Archipelago.Modifiers.Archipelago.Scales;
 global using RhythmDoctor.Archipelago.Modifiers.Archipelago.Traps;
 global using RhythmDoctor.Archipelago.Patches;
 global using RhythmDoctor.Archipelago.Patches.Gameplay;

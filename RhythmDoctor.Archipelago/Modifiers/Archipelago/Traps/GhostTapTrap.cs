@@ -18,7 +18,7 @@ internal class GhostTapTrap : ModifierPatch<GhostTapTrap>, IModifier, IArchipela
   public override Type[] PreviewPatches => [];
   public override Type[] ActivePatches => [typeof(ActivePatch)];
 
-  public float GetScale(int num, out int consumed) => Scales.BinaryScale(num, out consumed);
+  public IScale Scale => BinaryScale.Instance;
 
   [HarmonyPatch]
   private static class ActivePatch

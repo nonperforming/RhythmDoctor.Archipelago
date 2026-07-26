@@ -10,7 +10,7 @@ internal class ChilliSpeedTrap : ModifierPatch<ChilliSpeedTrap>, IModifier, IArc
   public override Type[] PreviewPatches => [typeof(PreviewPatch)];
   public override Type[] ActivePatches => [];
 
-  public float GetScale(int num, out int consumed) => Scales.BinaryScale(num, out consumed);
+  public IScale Scale => BinaryScale.Instance;
 
   [HarmonyPatch(typeof(HeartMonitor))]
   private static class PreviewPatch

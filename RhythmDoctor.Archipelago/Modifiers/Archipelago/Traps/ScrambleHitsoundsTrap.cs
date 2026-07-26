@@ -15,7 +15,7 @@ internal class ScrambleHitsoundsTrap : ModifierPatch<ScrambleHitsoundsTrap>, IMo
   public override Type[] PreviewPatches => [];
   public override Type[] ActivePatches => [typeof(ActivePatch)];
 
-  public float GetScale(int num, out int consumed) => Scales.BinaryScale(num, out consumed);
+  public IScale Scale => BinaryScale.Instance;
 
   private static Dictionary<string, string> scrambled = new();
 
