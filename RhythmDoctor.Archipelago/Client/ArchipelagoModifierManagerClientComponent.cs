@@ -46,7 +46,7 @@ internal sealed class ArchipelagoModifierManagerClientComponent : ModifierManage
       .Select((otherUid, i) => otherUid == modifier.Uid ? i : -1)
       .Where(i => i != -1)
       .ToList();
-    float scale = archipelagoModifier.GetScale(matchIndexes.Count, out int consumed);
+    float scale = archipelagoModifier.Scale.GetScale(matchIndexes.Count, out int consumed);
 
     // Remove 'consumed' amount of traps at their respective index, and add them to _trapAndIndexPairs.
     for (int i = 0; i < consumed; i++)
