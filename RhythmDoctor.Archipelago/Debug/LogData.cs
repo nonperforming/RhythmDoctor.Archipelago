@@ -67,18 +67,18 @@ internal static class LogData
     }
     sb.AppendLine();
 
-    sb.AppendLine("--- Sprites");
-    foreach (LevelEvent_MakeSprite sprite in data.sprites)
-    {
-      sb.AppendLine("-")
-        .AppendLine($"Failed Loading Custom Character: {sprite.failedLoadingCustomCharacter}")
-        .AppendLine($"Visible: {sprite.visible}")
-        .AppendLine($"ID: {sprite.spriteId}")
-        .AppendLine($"Filename: {sprite.filename}")
-        .AppendLine($"Depth: {sprite.depth}")
-        .AppendLine($"Texture Filtering: {sprite.filter}");
-    }
-    sb.AppendLine();
+    // sb.AppendLine("--- Sprites");
+    // foreach (LevelEvent_MakeSprite sprite in data.sprites)
+    // {
+    //   sb.AppendLine("-")
+    //     .AppendLine($"Failed Loading Custom Character: {sprite.failedLoadingCustomCharacter}")
+    //     .AppendLine($"Visible: {sprite.visible}")
+    //     .AppendLine($"ID: {sprite.spriteId}")
+    //     .AppendLine($"Filename: {sprite.filename}")
+    //     .AppendLine($"Depth: {sprite.depth}")
+    //     .AppendLine($"Texture Filtering: {sprite.filter}");
+    // }
+    // sb.AppendLine();
 
     sb.AppendLine("--- Level Events");
     foreach (LevelEvent_Base levelEvent in data.levelEvents)
