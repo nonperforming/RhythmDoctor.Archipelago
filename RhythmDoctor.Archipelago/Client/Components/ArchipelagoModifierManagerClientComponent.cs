@@ -1,4 +1,4 @@
-namespace RhythmDoctor.Archipelago.Client;
+namespace RhythmDoctor.Archipelago.Client.Components;
 
 internal sealed class ArchipelagoModifierManagerClientComponent : ModifierManagerBase, IClientComponent, IDisposable
 {
