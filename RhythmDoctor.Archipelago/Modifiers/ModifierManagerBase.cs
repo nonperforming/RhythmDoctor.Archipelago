@@ -2,9 +2,9 @@ namespace RhythmDoctor.Archipelago.Modifiers;
 
 internal abstract class ModifierManagerBase : IDisposable
 {
-  private List<IModifier> _chosenModifiers = [];
-  private List<IModifier> _previewModifiers = [];
-  private List<IModifier> _activeModifiers = [];
+  protected List<IModifier> _chosenModifiers = [];
+  protected List<IModifier> _previewModifiers = [];
+  protected List<IModifier> _activeModifiers = [];
 
   /// <summary>
   /// Attempts to add a modifier to <see cref="_chosenModifiers"/>.
@@ -14,7 +14,7 @@ internal abstract class ModifierManagerBase : IDisposable
   public bool TryAddModifier(string modifierUid)
   {
     // Check if modifier UID is valid.
-    if (ModifierRegistry.TryGetModifier(modifierUid, out IModifier modifier))
+    if (!ModifierRegistry.TryGetModifier(modifierUid, out IModifier modifier))
     {
       Plugin.Logger.LogWarning(
         $"[{nameof(ModifierManagerBase)}] Attempted to add non-existant modifier {modifierUid}, ignoring"

@@ -23,7 +23,7 @@ internal class ScrambleHitsoundsTrap : ModifierPatch<ScrambleHitsoundsTrap>, IMo
   // Although this method is marked for P1 the only difference is the order of the sound effects
   private static readonly string[] hitsounds = LevelEvent_SetClapSounds.GetClapSoundsP1();
 
-  public void Active()
+  public override void Active(float strength)
   {
     string[] randomizedOrder = (string[])hitsounds.Clone();
 

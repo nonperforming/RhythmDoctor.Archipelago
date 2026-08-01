@@ -9,6 +9,8 @@ internal class TrapItemProcessorClientComponent : ItemProcessorClientComponent
   {
     await base.Enable(client, session);
 
+    Plugin.Logger.LogInfo($"[{nameof(TrapItemProcessorClientComponent)}] Enabling...");
+
     // TODO: could be made lazy :ppp
     // Get remote trap cache
     foreach (string trapUid in ModifierRegistry.GetAllRegisteredTrapsUid())
@@ -17,6 +19,8 @@ internal class TrapItemProcessorClientComponent : ItemProcessorClientComponent
       _localTrapClearCache[trapUid] = 0;
       _remoteTrapClearCache[trapUid] = (uint)_session.DataStorage[Scope.Slot, trapUid];
     }
+
+    Plugin.Logger.LogInfo($"[{nameof(TrapItemProcessorClientComponent)}] Enabled");
 
     // Add sticky traps
     // TODO:
@@ -40,6 +44,9 @@ internal class TrapItemProcessorClientComponent : ItemProcessorClientComponent
     }
 
     // Not cleared already, add to trap manager
+    Plugin.Logger.LogInfo(
+      $"[{nameof(TrapItemProcessorClientComponent)}] Trap {trapUid} not cleared previously, handling normally"
+    );
     return HandleItem(itemInfo);
   }
 
@@ -47,6 +54,8 @@ internal class TrapItemProcessorClientComponent : ItemProcessorClientComponent
   {
     if (!Bindings.ModifierItemIdToModifierUid.TryGetValue(itemInfo.ItemId, out string trapUid))
       return false; // Not a trap
+
+    Plugin.Logger.LogInfo($"[{nameof(TrapItemProcessorClientComponent)}] Handling trap {trapUid}");
 
     _client.ModifierManagerComponent!.AddModifierToQueue(trapUid);
     return true;

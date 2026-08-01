@@ -2,7 +2,7 @@ namespace RhythmDoctor.Archipelago.Client.Components;
 
 internal sealed class ArchipelagoModifierManagerClientComponent : ModifierManagerBase, IClientComponent, IDisposable
 {
-  internal IEnumerable<Type> AssistPatches = [typeof(ArchipelagoModifierManagerPatch)];
+  public IEnumerable<Type> AssistPatches => [typeof(ArchipelagoModifierManagerPatch)];
 
   private readonly List<string> _modifierQueue = [];
   private readonly List<(int index, string Uid)> _modifierAndIndexPairs = [];
@@ -20,6 +20,31 @@ internal sealed class ArchipelagoModifierManagerClientComponent : ModifierManage
   {
     Plugin.Logger.LogInfo($"[{nameof(ArchipelagoModifierManagerClientComponent)}] Adding {modifierUid} to queue");
     _modifierQueue.Add(modifierUid);
+  }
+
+  internal void PushCompatibleInQueueToChosenModifiers(Level level)
+  {
+    foreach (string uid in _modifierQueue)
+    {
+      if (!ModifierRegistry.TryGetModifier(uid, out IModifier modifier))
+      {
+        Plugin.Logger.LogWarning(
+          $"[{nameof(ArchipelagoModifierManagerClientComponent)}] Cannot add unregistered modifier {uid} to chosen"
+        );
+        continue;
+      }
+
+      if (ModifierRegistry.Compatible(modifier, level, _chosenModifiers))
+      {
+        TryAddModifier(uid);
+      }
+    }
+  }
+
+  internal void PushAndApplyCompatibleTrapsInQueue(Level level)
+  {
+    PushCompatibleInQueueToChosenModifiers(level);
+    TryApplyChosenModifiersForLevel(level);
   }
 
   internal void ReturnActiveTrapsToQueue()
@@ -57,6 +82,7 @@ internal sealed class ArchipelagoModifierManagerClientComponent : ModifierManage
     {
       int indexToRemove = matchIndexes[i];
       _modifierAndIndexPairs.Add((indexToRemove, modifier.Uid));
+      _modifierQueue.RemoveAt(matchIndexes[i]);
     }
 
     return scale;

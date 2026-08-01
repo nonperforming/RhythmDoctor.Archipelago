@@ -13,6 +13,7 @@ internal static class ModifierRegistry
     }
 
     Plugin.Logger.LogInfo($"[{nameof(ModifierRegistry)}] Registering trap {modifier.Uid}");
+    modifier.Initialize();
     _uidToModifier.Add(modifier.Uid, modifier);
   }
 
@@ -40,6 +41,17 @@ internal static class ModifierRegistry
   internal static IEnumerable<string> GetAllRegisteredTrapsUid()
   {
     return _uidToModifier.Keys;
+  }
+
+  internal static bool Compatible(
+    string modifierUidToAdd,
+    Level level = Level.None,
+    params IEnumerable<IModifier> others
+  )
+  {
+    if (!TryGetModifier(modifierUidToAdd, out IModifier modifier))
+      return false;
+    return Compatible(modifier, level, others);
   }
 
   internal static bool Compatible(IModifier toAdd, Level level = Level.None, params IEnumerable<IModifier> others)

@@ -80,10 +80,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
       session.Socket.SocketClosed += (
         __reason =>
         {
-          Plugin.Logger.LogFatal(
-            $"[{nameof(StoryClient)}] Archipelago client closed ({__reason}), returning to Main Menu..."
-          );
-          scnBase.GoToMainMenu();
+          Plugin.Logger.LogFatal($"[{nameof(StoryClient)}] Archipelago client closed ({__reason}), disposing...");
           Dispose();
         }
       );
@@ -157,12 +154,12 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
 
     // Wait for all components to enable.
     ItemProcessorComponents = [new StoryLevelItemProcessorClientComponent(), new TrapItemProcessorClientComponent()];
-    //ModifierManagerComponent = new ArchipelagoTrapManagerClientComponent();
+    ModifierManagerComponent = new ArchipelagoModifierManagerClientComponent();
     foreach (ItemProcessorClientComponent itemProcessorClientComponent in ItemProcessorComponents)
     {
       clientComponentsToEnable.Add(itemProcessorClientComponent.Enable(this, Session));
     }
-    //componentEnableTasks.Add(ModifierManagerComponent.Enable(Session));
+    clientComponentsToEnable.Add(ModifierManagerComponent.Enable(this, Session));
     Task.WaitAll(clientComponentsToEnable.ToArray());
 
     // Apply necessary patches.
@@ -306,8 +303,16 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
   public void Dispose()
   {
     if (State == ClientState.Disposed)
+    {
+      Plugin.Logger.LogWarning($"[{nameof(StoryClient)}] Attempted to dispose already disposed client");
       return;
-    State = ClientState.Disposed;
+    }
+
+    if (Session?.Socket is not null && Session.Socket.Connected)
+    {
+      Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Disconnecting from Archipelago...");
+      Task.Run(Session.Socket.DisconnectAsync);
+    }
 
     // Don't return to main menu if we haven't applied any patches yet
     if (
@@ -317,9 +322,14 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
         or ClientState.CreatedSession
         or ClientState.LoggingIn
     )
+    {
+      State = ClientState.Disposed;
       return;
+    }
 
-    // UnapplyPatchesPatch will do the rest for us
+    State = ClientState.Disposed;
+
+    // UnapplyPatchesPatch will unapply patches for us
     scnBase.GoToMainMenu();
   }
 

@@ -1,12 +1,11 @@
 namespace RhythmDoctor.Archipelago.Client.Components.ItemProcessors;
 
-using System.Collections.ObjectModel;
-
 internal class StoryLevelItemProcessorClientComponent : ItemProcessorClientComponent
 {
   public override async Task Enable(StoryClient client, ArchipelagoSession session)
   {
     await base.Enable(client, session);
+    Plugin.Logger.LogInfo($"[{nameof(StoryLevelItemProcessorClientComponent)}] Enabled");
     // TODO: CACHE
     // throw new NotImplementedException();
   }
@@ -59,6 +58,7 @@ internal class StoryLevelItemProcessorClientComponent : ItemProcessorClientCompo
     {
       // Normal level
       SetLevelBestRank(level, stage);
+      Plugin.Logger.LogInfo($"[{nameof(StoryLevelItemProcessorClientComponent)}] Handled standard level");
     }
 
     return true;
@@ -68,6 +68,8 @@ internal class StoryLevelItemProcessorClientComponent : ItemProcessorClientCompo
   {
     if (!Bindings.ItemIdToLevel.TryGetValue(itemInfo.ItemId, out Level level))
       return false; // Not a level.
+
+    Plugin.Logger.LogInfo($"[{nameof(StoryLevelItemProcessorClientComponent)}] Handling standard level {level}");
 
     Persistence.SetLevelRank(level, Rank.NotFinished);
     return true;

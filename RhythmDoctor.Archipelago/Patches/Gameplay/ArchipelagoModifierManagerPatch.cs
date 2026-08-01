@@ -14,7 +14,7 @@ internal static class ArchipelagoModifierManagerPatch
       return;
 
     Level level = selectableCharacter.levels[__instance.currentDifficulty];
-    Plugin.StoryClient.ModifierManagerComponent!.TryApplyChosenModifiersForLevel(level);
+    Plugin.StoryClient.ModifierManagerComponent!.PushAndApplyCompatibleTrapsInQueue(level);
   }
 
   [HarmonyPatch(typeof(HeartMonitor), nameof(HeartMonitor.Show))]
@@ -25,7 +25,7 @@ internal static class ArchipelagoModifierManagerPatch
     if (!previewTraps.Any())
       return;
 
-    Plugin.Logger.LogDebug("Instantiating guest credit for preview traps");
+    Plugin.Logger.LogDebug($"[{nameof(ArchipelagoModifierManagerPatch)}] Instantiating guest credit for preview traps");
     __instance.isGuestCreditShown = true;
 
     foreach (string trapName in previewTraps)
@@ -72,12 +72,14 @@ internal static class ArchipelagoModifierManagerPatch
     // so we may need apply preview patches here.
     if (levelToGo is nameof(Level.Lesmis) or nameof(Level.RhythmWeightlifter))
     {
-      Plugin.Logger.LogInfo("Going to Rhythm Dogtor/Rhythm Weightlifter (dog) - applying preview traps now");
+      Plugin.Logger.LogInfo(
+        $"[{nameof(ArchipelagoModifierManagerPatch)}] Going to Rhythm Dogtor/Rhythm Weightlifter (dog) - applying preview traps now"
+      );
       // The cheat code for Rhythm Dogtor allows you to end it
       // hovering over any level, we need to check the levelToGo.
       Level level = RDUtils.ParseEnum(levelToGo, Level.None);
       // ReSharper disable once NullableWarningSuppressionIsUsed
-      Plugin.StoryClient.ModifierManagerComponent!.TryApplyChosenModifiersForLevel(level);
+      Plugin.StoryClient.ModifierManagerComponent!.PushAndApplyCompatibleTrapsInQueue(level);
     }
 
     // ReSharper disable once NullableWarningSuppressionIsUsed
@@ -94,12 +96,12 @@ internal static class ArchipelagoModifierManagerPatch
     if (level == Level.Montage2)
     {
       Plugin.Logger.LogWarning($"[{nameof(ArchipelagoModifierManagerPatch)}] Applying traps for {level} immediately");
-      Plugin.StoryClient.ModifierManagerComponent!.TryApplyChosenModifiersForLevel(level);
+      Plugin.StoryClient.ModifierManagerComponent!.PushAndApplyCompatibleTrapsInQueue(level);
       Plugin.StoryClient.ModifierManagerComponent!.PromotePreviewModifiers();
     }
   }
 
-  // Unactive by clearing a level is handled by ClearLocationPatch.
+  /// <remarks>Unactive by clearing a level is handled by ClearLocationPatch.</remarks>
   [HarmonyPatch(typeof(scnGame), nameof(scnGame.Quit))]
   [HarmonyPostfix]
   private static void RestoreActiveTrapsOnAbandonPatch()
