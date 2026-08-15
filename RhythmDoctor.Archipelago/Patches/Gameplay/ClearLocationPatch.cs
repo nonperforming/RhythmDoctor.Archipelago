@@ -273,6 +273,9 @@ internal static class ClearStoryLocationPatch
         // If we aren't above the minimum rank, bail.
         if (minimumRank > otherRank.ToNormal())
         {
+          Plugin.Logger.LogDebug(
+            $"[{nameof(CustomClearLocationPatch)}] Clear All with {minimumRank} not done yet: {otherLevel} below minimum rank (has {otherRank} -> {otherRank.ToNormal()})"
+          );
           clearedAll = false;
           break;
         }
@@ -280,7 +283,9 @@ internal static class ClearStoryLocationPatch
 
       if (clearedAll)
       {
-        Plugin.Logger.LogInfo("Setting goal achieved - Cleared all");
+        Plugin.Logger.LogInfo(
+          $"[{nameof(CustomClearLocationPatch)}] Setting goal achieved - Cleared all with {minimumRank}"
+        );
         Plugin.StoryClient.Session.SetGoalAchieved();
       }
     }
