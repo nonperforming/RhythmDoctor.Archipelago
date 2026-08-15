@@ -137,9 +137,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     }
     Slot = new SlotData(loginSuccessful.SlotData);
 
-    List<Task> clientComponentsToEnable = new();
     ReplicationComponent = new StoryReplicationClientComponent();
-    clientComponentsToEnable.Add(ReplicationComponent.Enable(this, Session));
 
     // Create DeathLink if applicable
     Configuration.DeathLinkConfig deathLinkConfig = await Configuration.GetDeathLink();
@@ -149,18 +147,13 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     )
     {
       DeathLinkComponent = new DeathLinkClientComponent();
-      clientComponentsToEnable.Add(DeathLinkComponent.Enable(this, Session));
     }
 
-    // Wait for all components to enable.
     ItemProcessorComponents = [new StoryLevelItemProcessorClientComponent(), new TrapItemProcessorClientComponent()];
     ModifierManagerComponent = new ArchipelagoModifierManagerClientComponent();
-    foreach (ItemProcessorClientComponent itemProcessorClientComponent in ItemProcessorComponents)
-    {
-      clientComponentsToEnable.Add(itemProcessorClientComponent.Enable(this, Session));
-    }
-    clientComponentsToEnable.Add(ModifierManagerComponent.Enable(this, Session));
-    Task.WaitAll(clientComponentsToEnable.ToArray());
+
+    // Wait for all components to enable.
+    await Task.WhenAll(ClientComponents.Select(__component => __component.Enable(this, Session)).ToArray());
 
     // Apply necessary patches.
     Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Applying gameplay patches");
