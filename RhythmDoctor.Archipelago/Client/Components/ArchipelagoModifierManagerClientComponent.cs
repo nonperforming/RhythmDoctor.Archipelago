@@ -78,11 +78,11 @@ internal sealed class ArchipelagoModifierManagerClientComponent : ModifierManage
     float scale = archipelagoModifier.Scale.GetScale(matchIndexes.Count, out int consumed);
 
     // Remove 'consumed' amount of traps at their respective index, and add them to _trapAndIndexPairs.
-    for (int i = 0; i < consumed; i++)
+    for (int i = consumed - 1; i >= 0; i--)
     {
       int indexToRemove = matchIndexes[i];
       _modifierAndIndexPairs.Add((indexToRemove, modifier.Uid));
-      _modifierQueue.RemoveAt(matchIndexes[i]);
+      _modifierQueue.RemoveAt(indexToRemove);
     }
 
     return scale;
