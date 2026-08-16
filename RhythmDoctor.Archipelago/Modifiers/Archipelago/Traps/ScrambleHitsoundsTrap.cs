@@ -10,7 +10,7 @@ internal class ScrambleHitsoundsTrap : ModifierPatch<ScrambleHitsoundsTrap>, IMo
       .AddBlacklistedLevels(LevelExtensions.AllIntermissionLevels)
       .AddBlacklistedLevels(Level.Bitterness) // TODO: Handle custom beatsounds properly and remove Bitterness from blacklist.
       .Build();
-  public ModifierCapability[] Capabilities => [ModifierCapability.Characters];
+  public ModifierCapability[] Capabilities => [ModifierCapability.Hitsounds];
 
   public override Type[] PreviewPatches => [];
   public override Type[] ActivePatches => [typeof(ActivePatch)];
