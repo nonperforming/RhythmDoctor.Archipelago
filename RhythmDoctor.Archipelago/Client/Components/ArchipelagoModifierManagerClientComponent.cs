@@ -1,6 +1,9 @@
 namespace RhythmDoctor.Archipelago.Client.Components;
 
-internal sealed class ArchipelagoModifierManagerClientComponent : ModifierManagerBase, IClientComponent, IDisposable
+internal sealed class ArchipelagoModifierManagerClientComponent
+  : ModifierManagerStoryLevelSelect,
+    IClientComponent,
+    IDisposable
 {
   public IEnumerable<Type> AssistPatches => [typeof(ArchipelagoModifierManagerPatch)];
 

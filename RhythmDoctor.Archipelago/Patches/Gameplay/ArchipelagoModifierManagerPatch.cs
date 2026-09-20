@@ -2,7 +2,6 @@ namespace RhythmDoctor.Archipelago.Patches.Gameplay;
 
 /// <seealso cref="IModifier"/>
 /// <seealso cref="ArchipelagoModifierManagerClientComponent"/>
-/// <seealso cref="ModifierManagerBase"/>
 [HarmonyPatch]
 internal static class ArchipelagoModifierManagerPatch
 {
@@ -53,14 +52,11 @@ internal static class ArchipelagoModifierManagerPatch
       __instance.creditStrings.Add(guestData.name);
       __instance.links.Add(guestData.link);
       __instance.creditsElements.Add(guestCreditObject);
-
-      // FIXME: Have to set name manually to mitigate localization
-      //        This should instead be handled by Pulse
-      heartMonitorGuest.nameText.text = trapName;
     }
   }
 
-  // PreviewEnd is managed by TrapManager using an event from Pulse.
+  // PreviewEnd is managed by ModifierManagerStoryLevelSelect
+  // using an event from Pulse.
 
   [HarmonyPatch(typeof(scnLevelSelect), nameof(scnLevelSelect.GoToLevelSequence))]
   [HarmonyPostfix]
