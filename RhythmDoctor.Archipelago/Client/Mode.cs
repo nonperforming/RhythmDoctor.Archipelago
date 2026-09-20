@@ -6,7 +6,7 @@ namespace RhythmDoctor.Archipelago.Client;
 internal enum Mode
 {
   /// <summary>
-  /// The primary mode of the client, randomizes levels and wards behind items.
+  /// The primary mode of the client, randomizes story levels and wards behind items.
   /// Clearing standard levels with B (Clear)/A (Complete+)/S (Perfect) ranks,
   /// clearing Rhythm Weightlifter stages sends locations.
   /// </summary>

@@ -5,6 +5,7 @@ internal sealed class ArchipelagoModifierManagerClientComponent
     IClientComponent,
     IDisposable
 {
+  /// <inheritdoc cref="IClientComponent.AssistPatches" />
   public IEnumerable<Type> AssistPatches => [typeof(ArchipelagoModifierManagerPatch)];
 
   private readonly List<string> _modifierQueue = [];

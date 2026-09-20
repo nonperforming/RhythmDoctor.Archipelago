@@ -27,6 +27,12 @@ internal sealed class DeathLinkClientComponent : ClientComponentBase
     " couldn't count to 7",
   ];
 
+  /// <summary>
+  /// Create the DeathLink service, enable it and bind DeathLink events.
+  /// </summary>
+  /// <param name="client">Archipelago client that this client component is under.</param>
+  /// <param name="session">Connected Archipelago session.</param>
+  /// <returns>A task that represents the DeathLink service enabling.</returns>
   public override async Task Enable(StoryClient client, ArchipelagoSession session)
   {
     Plugin.Logger.LogInfo($"[{nameof(DeathLinkClientComponent)}] Enabling DeathLink...");
