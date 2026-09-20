@@ -20,7 +20,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
 
   // State
   internal ClientState State { get; private set; } = ClientState.NotReady;
-  internal SlotData Slot { get; private set; }
+  internal StorySlotData Slot { get; private set; }
 
   /// <summary>
   /// Patches that are applied after logging into Archipelago, and unapplied after logging out.
@@ -135,7 +135,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
       return loginResult as LoginFailure
         ?? throw new InvalidOperationException("Login not successful but not failure either!?");
     }
-    Slot = new SlotData(loginSuccessful.SlotData);
+    Slot = new StorySlotData(loginSuccessful.SlotData);
 
     ReplicationComponent = new StoryReplicationClientComponent();
 

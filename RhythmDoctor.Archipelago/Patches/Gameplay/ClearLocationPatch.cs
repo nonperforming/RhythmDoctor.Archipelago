@@ -250,20 +250,24 @@ internal static class ClearStoryLocationPatch
 
     // Check if we fulfill the End Goal requirements
 #pragma warning disable Harmony003
-    if (Plugin.StoryClient.Slot.endGoal == SlotData.EndGoal.HelpingHands && level == Level.HelpingHands && rank.passed)
+    if (
+      Plugin.StoryClient.Slot.endGoal == StorySlotData.EndGoal.HelpingHands
+      && level == Level.HelpingHands
+      && rank.passed
+    )
 #pragma warning restore Harmony003
     {
       Plugin.Logger.LogInfo("Setting goal achieved - Helping Hands");
       Plugin.StoryClient.Session.SetGoalAchieved();
     }
-    else if (Plugin.StoryClient.Slot.endGoal != SlotData.EndGoal.HelpingHands)
+    else if (Plugin.StoryClient.Slot.endGoal != StorySlotData.EndGoal.HelpingHands)
     {
       bool clearedAll = true;
       Rank minimumRank = Plugin.StoryClient.Slot.endGoal switch
       {
-        SlotData.EndGoal.PerfectAll => Rank.S,
-        SlotData.EndGoal.ARankAll => Rank.A,
-        SlotData.EndGoal.BRankAll => Rank.B,
+        StorySlotData.EndGoal.PerfectAll => Rank.S,
+        StorySlotData.EndGoal.ARankAll => Rank.A,
+        StorySlotData.EndGoal.BRankAll => Rank.B,
         _ => throw new ArgumentOutOfRangeException($"End Goal ({Plugin.StoryClient.Slot.endGoal}) not valid value."),
       };
 

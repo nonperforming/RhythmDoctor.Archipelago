@@ -57,7 +57,7 @@ internal static class UnlockItemPatch
     Plugin.Logger.LogInfo("Moving 1-CNY");
     __instance.FindSelectableEntity("1-CNY").gamePosition.x = -564;
 
-    if (Plugin.StoryClient.Slot.endGoal == SlotData.EndGoal.HelpingHands)
+    if (Plugin.StoryClient.Slot.endGoal == StorySlotData.EndGoal.HelpingHands)
     {
       // Moving X-1 - Art Exercise to the basement if end goal is X-0 - Helping Hands
       Plugin.Logger.LogInfo("Moving X-1 to the basement");
@@ -480,9 +480,9 @@ internal static class UnlockItemPatch
 
       int minimumRank = Plugin.StoryClient.Slot.bossUnlockRequirement switch
       {
-        SlotData.BossUnlockRequirement.ARankAll => Rank.A,
-        SlotData.BossUnlockRequirement.Perfect => Rank.S,
-        SlotData.BossUnlockRequirement.BRankAll => Rank.B,
+        StorySlotData.BossUnlockRequirement.ARankAll => Rank.A,
+        StorySlotData.BossUnlockRequirement.Perfect => Rank.S,
+        StorySlotData.BossUnlockRequirement.BRankAll => Rank.B,
         _ => throw new IndexOutOfRangeException("Boss unlock requirement out of valid range"),
       };
 
