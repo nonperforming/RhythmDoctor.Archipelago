@@ -1,5 +1,7 @@
 namespace RhythmDoctor.Archipelago.Client.Components.ItemProcessors;
 
+using Newtonsoft.Json.Linq;
+
 internal class TrapItemProcessorClientComponent : ItemProcessorClientComponent
 {
   private Dictionary<string, uint> _localTrapClearCache = new();
@@ -15,9 +17,17 @@ internal class TrapItemProcessorClientComponent : ItemProcessorClientComponent
     // Get remote trap cache
     foreach (string trapUid in ModifierRegistry.GetAllRegisteredTrapsUid())
     {
-      // FIXME: this can fail sometimes, retry if necessary
+      // FIXME: this could rarely fail, retry if necessary
       _localTrapClearCache[trapUid] = 0;
-      _remoteTrapClearCache[trapUid] = (uint)_session.DataStorage[Scope.Slot, trapUid];
+      uint remote;
+      JToken remoteJToken = await _session.DataStorage[Scope.Slot, trapUid].GetAsync();
+
+      if (!remoteJToken.HasValues) // == null doesn't work
+        remote = 0;
+      else
+        remote = remoteJToken.ToObject<uint>();
+
+      _remoteTrapClearCache[trapUid] = remote;
     }
 
     Plugin.Logger.LogInfo($"[{nameof(TrapItemProcessorClientComponent)}] Enabled");
@@ -31,19 +41,19 @@ internal class TrapItemProcessorClientComponent : ItemProcessorClientComponent
     if (!Bindings.ModifierItemIdToModifierUid.TryGetValue(itemInfo.ItemId, out string trapUid))
       return false; // Not a trap
 
-    // Check remote cache if this has been cleared already
-    uint local = _localTrapClearCache[trapUid];
-    uint remote = _remoteTrapClearCache[trapUid];
-    if ((local <= remote) && (remote != 0))
+    // Do not add already cleared traps
+    uint local = _localTrapClearCache[trapUid]++; // local skipped traps
+    uint remote = _remoteTrapClearCache[trapUid]; // max cleared traps in DataStorage
+
+    if (local > remote)
     {
       Plugin.Logger.LogDebug(
-        $"[{nameof(TrapItemProcessorClientComponent)}] Trap {trapUid} already cleared, skipping (l: {local} <= r: {remote})"
+        $"[{nameof(TrapItemProcessorClientComponent)}] Trap {trapUid} already cleared, skipping (l: {local} < r: {remote})"
       );
-      _localTrapClearCache[trapUid]++;
       return true;
     }
 
-    // Not cleared already, add to trap manager
+    // Not cleared already, add to modifier manager
     Plugin.Logger.LogInfo(
       $"[{nameof(TrapItemProcessorClientComponent)}] Trap {trapUid} not cleared previously, handling normally"
     );
