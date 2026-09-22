@@ -21,6 +21,7 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
   // State
   internal ClientState State { get; private set; } = ClientState.NotReady;
   internal StorySlotData Slot { get; private set; }
+  private bool _hasGoaled;
 
   /// <summary>
   /// Patches that are applied after logging into Archipelago, and unapplied after logging out.
@@ -110,7 +111,6 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
   /// <returns></returns>
   internal async Task<LoginResult> Login()
   {
-    // TODO: break into multiple methods, don't login and go to level select here
     ThrowIfNotReadyFor(ClientState.LoggingIn);
 
     // At this point Session is guaranteed to not be null
@@ -168,6 +168,8 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     Persistence.p1Skin.Reload();
     Persistence.p2Skin.Reload();
 
+    ClearStoryLocationPatch.ShowedGoalMessage = await HasGoaled();
+
     // Some levels come unlocked by default, such as X-1.
     // Lock all levels to force the user to unlock them with an item.
     foreach (Level level in Enum.GetValues(typeof(Level)))
@@ -223,6 +225,21 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
       ItemInfo itemInfo = Session!.Items.DequeueItem();
       HandleItem(itemInfo);
     }
+  }
+
+  internal async Task<bool> HasGoaled()
+  {
+    if (Session is null)
+    {
+      Plugin.Logger.LogWarning(
+        $"[{nameof(StoryClient)}] Attempted to check goal status with Session null, returning false."
+      );
+      return false;
+    }
+
+    if (!_hasGoaled)
+      _hasGoaled = await Session.DataStorage.GetClientStatusAsync() == ArchipelagoClientState.ClientGoal;
+    return _hasGoaled;
   }
 
   private void HandleInitialItem(ItemInfo itemInfo)

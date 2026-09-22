@@ -10,6 +10,8 @@
   "login.fail.missingInformation": "URL or Name not present",
   "rankscreen.error": "Couldn't get items sent.",
   "rankscreen.found": "Found [item]\n",
+  "rankscreen.goal": "Congratulations! You have goaled!",
+  "rankscreen.goal.already": "Already goaled.",
   "rankscreen.sentTo": "Sent [item] to [player]\n",
   "rankscreen.nothing": "Didn't find anything.",
   "rankscreen.nothingNew": "Didn't find anything new."

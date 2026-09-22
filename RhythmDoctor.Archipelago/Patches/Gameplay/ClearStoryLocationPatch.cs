@@ -11,6 +11,7 @@ internal static class ClearStoryLocationPatch
   // TODO: Hack for ShowSentItemsPatch as ShowAndSaveRank is called before we show the rank description text.
   //       Someone should probably clean this up.
   private static long[] JustSentLocations = [];
+  internal static bool ShowedGoalMessage = false;
 
   [HarmonyPatch(typeof(LevelBase), nameof(LevelBase), MethodType.Constructor)]
   [HarmonyPrefix]
@@ -18,7 +19,9 @@ internal static class ClearStoryLocationPatch
   private static void ScoutItemsSentPatch(LevelBase __instance)
 #pragma warning restore HARMONIZE001
   {
-    Plugin.Logger.LogDebug($"Scouting locations to send for {scnGame.internalIdentifier}");
+    Plugin.Logger.LogDebug(
+      $"[{nameof(ClearStoryLocationPatch)}] Scouting locations to send for {scnGame.internalIdentifier}"
+    );
     ItemsToSend.Clear();
     JustSentLocations = [];
 
@@ -26,8 +29,19 @@ internal static class ClearStoryLocationPatch
     // the locations they clear when they pass the level (replace the rank text)
     if (!Enum.TryParse(scnGame.internalIdentifier, out Level level))
     {
-      Plugin.Logger.LogError($"Couldn't find Level. Level identifier: {scnGame.internalIdentifier}");
+      Plugin.Logger.LogError(
+        $"[{nameof(ClearStoryLocationPatch)}] Couldn't find Level. Level identifier: {scnGame.internalIdentifier}"
+      );
       Plugin.StoryClient.ModifierManagerComponent.ReturnActiveTrapsToQueue();
+      return;
+    }
+
+    if (IsTryingToGoalHelpingHands())
+    {
+      // This is the end goal, so we will not have any locations to scout.
+      Plugin.Logger.LogInfo(
+        $"[{nameof(ClearStoryLocationPatch)}] End goal and current level is Helping Hands, not scouting"
+      );
       return;
     }
 
@@ -43,6 +57,9 @@ internal static class ClearStoryLocationPatch
   /// <summary>
   /// Send relevant locations (and end goal if applicable) when clearing a level.
   /// </summary>
+  /// <remarks>
+  /// Called before <see cref="ShowSentItemsPatch"/>.
+  /// </remarks>
   /// <seealso cref="MiracleDefibrillatorClearLocationPatch"/>
   /// <exception cref="ArgumentOutOfRangeException">Thrown if end goal is not valid.</exception>
   [HarmonyPatch(typeof(Rankscreen), nameof(Rankscreen.ShowAndSaveRank))]
@@ -81,19 +98,35 @@ internal static class ClearStoryLocationPatch
     );
   }
 
+  /// <remarks>
+  /// Called after <see cref="CustomClearLocationPatch"/>/<see cref="MiracleDefibrillatorClearLocationPatch"/>
+  /// </remarks>
   [HarmonyPatch(typeof(Rankscreen), nameof(Rankscreen.ShowRankDescription))]
   [HarmonyPostfix]
   private static void ShowSentItemsPatch(Rankscreen __instance)
   {
     // TODO: Need to check if this works with narration.
-    if (!ItemsToSend.Any())
+    Rank rank = scnGame.instance.currentLevel.GetRankFromMistakes();
+
+    __instance.description.text = "";
+
+    if (CheckIfGoaled() && !ShowedGoalMessage)
+    {
+      ShowedGoalMessage = true;
+      __instance.description.text += $"<color=green>{RDString.Get("archipelago.rankscreen.goal")}</color>\n";
+    }
+    else if (ShowedGoalMessage && IsTryingToGoalHelpingHands() && CheckIfGoaled(rank: rank))
+    {
+      __instance.description.text += $"{RDString.Get("archipelago.rankscreen.goal.already")}\n";
+    }
+
+    if (!ItemsToSend.Any() && !IsTryingToGoalHelpingHands())
     {
       Plugin.Logger.LogWarning("Couldn't get items sent, possibly due to a network issue.");
-      __instance.description.text = $"<color=red>{RDString.Get("archipelago.rankscreen.error")}</color>";
+      __instance.description.text += $"<color=red>{RDString.Get("archipelago.rankscreen.error")}</color>";
     }
     else
     {
-      Rank rank = scnGame.instance.currentLevel.GetRankFromMistakes();
       IEnumerable<long> ids = GetStageLocationIDsToClear(GetCurrentLevel(), rank);
       long[] newLocations = ids.Where(id =>
           !Plugin.StoryClient.Session.Locations.AllLocationsChecked.Contains(id) || JustSentLocations.Contains(id)
@@ -195,7 +228,12 @@ internal static class ClearStoryLocationPatch
     if (!ItemsToSend.Any())
     {
       Plugin.Logger.LogWarning("Couldn't get items sent, possibly due to a network issue.");
-      __instance.game.statusText.SetStatusText("Couldn't get items sent.", Color.red, 10f, useUnscaledTime: true);
+      __instance.game.statusText.SetStatusText(
+        RDString.Get("archipelago.rankscreen.error"),
+        Color.red,
+        10f,
+        useUnscaledTime: true
+      );
     }
     else
     {
@@ -217,6 +255,7 @@ internal static class ClearStoryLocationPatch
       }
 
       IEnumerable<string> itemNames = from id in newLocations select ItemsToSend[id].ItemDisplayName;
+      // TODO: Localize
       __instance.game.statusText.SetStatusText(
         $"Found {string.Join(", ", itemNames)}",
         duration: 10f,
@@ -247,52 +286,7 @@ internal static class ClearStoryLocationPatch
     }
 
     IEnumerable<long> ids = GetStageLocationIDsToClear(level, rank);
-
-    // Check if we fulfill the End Goal requirements
-#pragma warning disable Harmony003
-    if (
-      Plugin.StoryClient.Slot.endGoal == StorySlotData.EndGoal.HelpingHands
-      && level == Level.HelpingHands
-      && rank.passed
-    )
-#pragma warning restore Harmony003
-    {
-      Plugin.Logger.LogInfo("Setting goal achieved - Helping Hands");
-      Plugin.StoryClient.Session.SetGoalAchieved();
-    }
-    else if (Plugin.StoryClient.Slot.endGoal != StorySlotData.EndGoal.HelpingHands)
-    {
-      bool clearedAll = true;
-      Rank minimumRank = Plugin.StoryClient.Slot.endGoal switch
-      {
-        StorySlotData.EndGoal.PerfectAll => Rank.S,
-        StorySlotData.EndGoal.ARankAll => Rank.A,
-        StorySlotData.EndGoal.BRankAll => Rank.B,
-        _ => throw new ArgumentOutOfRangeException($"End Goal ({Plugin.StoryClient.Slot.endGoal}) not valid value."),
-      };
-
-      foreach (Level otherLevel in Bindings.Levels)
-      {
-        Rank otherRank = Persistence.GetLevelRank(otherLevel);
-        // If we aren't above the minimum rank, bail.
-        if (minimumRank > otherRank.ToNormal())
-        {
-          Plugin.Logger.LogDebug(
-            $"[{nameof(CustomClearLocationPatch)}] Clear All with {minimumRank} not done yet: {otherLevel} below minimum rank (has {otherRank} -> {otherRank.ToNormal()})"
-          );
-          clearedAll = false;
-          break;
-        }
-      }
-
-      if (clearedAll)
-      {
-        Plugin.Logger.LogInfo(
-          $"[{nameof(CustomClearLocationPatch)}] Setting goal achieved - Cleared all with {minimumRank}"
-        );
-        Plugin.StoryClient.Session.SetGoalAchieved();
-      }
-    }
+    AttemptToGoal(level, rank);
 
     bool clearedNewLocation = ids.Any(id => !Plugin.StoryClient.Session.Locations.AllLocationsChecked.Contains(id));
     if (clearedNewLocation)
@@ -349,6 +343,63 @@ internal static class ClearStoryLocationPatch
 
     return level;
   }
+
+  private static bool AttemptToGoal(Level? level = null, Rank? rank = null)
+  {
+    bool goaled = CheckIfGoaled(level, rank);
+    if (goaled)
+      Plugin.StoryClient.Session.SetGoalAchieved();
+    return goaled;
+  }
+
+  private static bool CheckIfGoaled(Level? level = null, Rank? rank = null)
+  {
+#pragma warning disable Harmony003
+    if (!level.HasValue)
+      level = GetCurrentLevel();
+    if (!rank.HasValue)
+      rank = scnGame.instance.currentLevel.GetRankFromMistakes();
+
+    // Check Helping Hands goal
+    if (
+      Plugin.StoryClient.Slot.endGoal == StorySlotData.EndGoal.HelpingHands
+      && level.Value == Level.HelpingHands
+      && rank.Value.passed
+    )
+    {
+      Plugin.Logger.LogInfo($"[{nameof(ClearStoryLocationPatch)}] Setting goal achieved - Helping Hands");
+      return true;
+    }
+
+    // Check Clear All goal
+    Rank minimumRank = Plugin.StoryClient.Slot.endGoal switch
+    {
+      StorySlotData.EndGoal.PerfectAll => Rank.S,
+      StorySlotData.EndGoal.ARankAll => Rank.A,
+      StorySlotData.EndGoal.BRankAll => Rank.B,
+      _ => throw new ArgumentOutOfRangeException($"End Goal ({Plugin.StoryClient.Slot.endGoal}) not valid."),
+    };
+
+    foreach (Level otherLevel in Bindings.Levels)
+    {
+      Rank otherRank = Persistence.GetLevelRank(otherLevel);
+      // If we aren't above the minimum rank, bail.
+      if (minimumRank > otherRank.ToNormal())
+      {
+        Plugin.Logger.LogDebug(
+          $"[{nameof(CustomClearLocationPatch)}] Clear All with {minimumRank} not done yet: {otherLevel} below minimum rank (has {otherRank} -> {otherRank.ToNormal()})"
+        );
+        return false;
+      }
+    }
+
+    Plugin.Logger.LogInfo($"[{nameof(CustomClearLocationPatch)}] Setting goal achieved - Cleared All {minimumRank}");
+    return true;
+#pragma warning restore Harmony003
+  }
+
+  private static bool IsTryingToGoalHelpingHands() =>
+    GetCurrentLevel() == Level.HelpingHands && Plugin.StoryClient.Slot.endGoal == StorySlotData.EndGoal.HelpingHands;
 
 #pragma warning disable Harmony003
   private static IEnumerable<long> GetStageLocationIDsToClear(Level level, Rank rank)
