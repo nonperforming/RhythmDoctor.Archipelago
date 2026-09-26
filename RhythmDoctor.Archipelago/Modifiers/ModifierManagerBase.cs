@@ -127,7 +127,7 @@ internal abstract class ModifierManagerBase : IDisposable
     return modifiers;
   }
 
-  internal IEnumerable<string> GetPreviewTrapNames()
+  internal IEnumerable<string> GetPreviewModifierNames()
   {
     return _previewModifiers.Select(modifier => modifier.GetLocalizedName());
   }

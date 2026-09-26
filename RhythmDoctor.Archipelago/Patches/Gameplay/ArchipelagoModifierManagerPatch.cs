@@ -20,23 +20,23 @@ internal static class ArchipelagoModifierManagerPatch
   [HarmonyPostfix]
   private static void ShowTrapNameOnPhonePatch(HeartMonitor __instance)
   {
-    IEnumerable<string> previewTraps = Plugin.StoryClient.ModifierManagerComponent!.GetPreviewTrapNames();
-    if (!previewTraps.Any())
+    IEnumerable<string> previewModifierNames = Plugin.StoryClient.ModifierManagerComponent!.GetPreviewModifierNames();
+    if (!previewModifierNames.Any())
       return;
 
     Plugin.Logger.LogDebug($"[{nameof(ArchipelagoModifierManagerPatch)}] Instantiating guest credit for preview traps");
     __instance.isGuestCreditShown = true;
 
-    foreach (string trapName in previewTraps)
+    foreach (string modifierName in previewModifierNames)
     {
-      Plugin.Logger.LogDebug($"Creating guest credit for {trapName}");
+      Plugin.Logger.LogDebug($"[{nameof(ArchipelagoModifierManagerPatch)}] Creating guest credit for {modifierName}");
       GuestData guestData = new()
       {
         type = null,
         link = null,
         // FIXME: Doesn't work - no icon appears
         linkType = "other-unused", // TODO: Load our own sprite
-        name = trapName,
+        name = modifierName,
       };
 
       // TODO: From HeartMonitor.Show(): local function InstantiateGuest(GuestData gd).
@@ -48,7 +48,10 @@ internal static class ArchipelagoModifierManagerPatch
         __instance.creditsContainer
       );
       HeartMonitorGuest heartMonitorGuest = guestCreditObject.GetComponent<HeartMonitorGuest>();
-      heartMonitorGuest.Setup(guestData);
+      heartMonitorGuest.Setup(guestData); // TODO: localization error here pollutes log 'no key: enum.GuestType. ...'
+      // Use our own localization scheme...
+      heartMonitorGuest.nameText.text = modifierName;
+
       __instance.creditStrings.Add(guestData.name);
       __instance.links.Add(guestData.link);
       __instance.creditsElements.Add(guestCreditObject);
