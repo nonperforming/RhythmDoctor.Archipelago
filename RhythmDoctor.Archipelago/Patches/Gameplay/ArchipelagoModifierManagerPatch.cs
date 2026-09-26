@@ -106,6 +106,6 @@ internal static class ArchipelagoModifierManagerPatch
   private static void RestoreActiveTrapsOnAbandonPatch()
   {
     Plugin.Logger.LogInfo($"[{nameof(ArchipelagoModifierManagerPatch)}] Clearing active traps (returning to queue)");
-    Plugin.StoryClient.ModifierManagerComponent!.ReturnActiveTrapsToQueue();
+    Plugin.StoryClient.ModifierManagerComponent!.ReturnActiveModifiersToQueue();
   }
 }

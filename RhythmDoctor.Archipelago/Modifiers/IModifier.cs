@@ -30,7 +30,8 @@ internal interface IModifier
 
   /// <summary>
   /// Capabilities of the modifier.
-  /// This should include anything the modifier might change.
+  /// This should include anything the modifier might change,
+  /// and is used for checking compatibility between modifiers.
   /// </summary>
   [Pure]
   ModifierCapability[] Capabilities { get; }

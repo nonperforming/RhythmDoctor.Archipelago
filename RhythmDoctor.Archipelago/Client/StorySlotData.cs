@@ -151,7 +151,7 @@ internal readonly struct StorySlotData
   /// The names of the traps that should always be applied whenever possible.
   /// </summary>
   /// <remarks>
-  /// This needs to be converted to a trao's UID: see <see cref="Bindings"/>.
+  /// This needs to be converted to a modifier's UID: see <see cref="Bindings"/>.
   /// </remarks>
   // TODO: When Sticky Traps are implemented, fix the cref to link to the specific field.
   internal readonly string[] stickyTraps;
@@ -165,7 +165,7 @@ internal readonly struct StorySlotData
   /// The names of the traps that should always be applied whenever possible.
   /// </summary>
   /// <remarks>
-  /// This needs to be converted to a powerup's UID: see <see cref="Bindings"/>.
+  /// This needs to be converted to a modifier's UID: see <see cref="Bindings"/>.
   /// </remarks>
   // TODO: When Sticky Traps are implemented, fix the cref to link to the specific field.
   //internal readonly string[] stickyPowerups;

@@ -214,4 +214,13 @@ internal static class Bindings
     { Act.Act6, [Level.PaigesReckoning] },
     { Act.Act7, [Level.Montage, Level.Montage2] },
   };
+
+  // TODO: Move this into generated binding
+  internal static readonly Dictionary<string, string> StickyModifierOptionToModifierUid = new()
+  {
+    { "Scramble Characters", ScrambleCharactersTrap.UID },
+    { "Scramble Beatsounds", ScrambleBeatsoundsTrap.UID },
+    { "Scramble Hitsounds", ScrambleHitsoundsTrap.UID },
+    { "Ghost Tap", GhostTapTrap.UID },
+  };
 }

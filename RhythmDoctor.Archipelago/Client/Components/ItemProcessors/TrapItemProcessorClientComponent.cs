@@ -31,9 +31,6 @@ internal class TrapItemProcessorClientComponent : ItemProcessorClientComponent
     }
 
     Plugin.Logger.LogInfo($"[{nameof(TrapItemProcessorClientComponent)}] Enabled");
-
-    // Add sticky traps
-    // TODO:
   }
 
   internal override bool HandleItemInitial(ItemInfo itemInfo)

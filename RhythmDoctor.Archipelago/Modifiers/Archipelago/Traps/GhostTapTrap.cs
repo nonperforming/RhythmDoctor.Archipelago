@@ -6,7 +6,8 @@ namespace RhythmDoctor.Archipelago.Modifiers.Archipelago.Traps;
 /// <remarks>Adapted from https://github.com/Mysthaps/MyseIfRDPatches/blob/master/GhostTapMiss.cs</remarks>
 internal class GhostTapTrap : ModifierPatch<GhostTapTrap>, IModifier, IArchipelagoModifier
 {
-  public string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.ghostTap";
+  internal const string UID = $"{MyPluginInfo.PLUGIN_GUID}.mod.ghostTap";
+  public string Uid => UID;
   public string LocalizationKey => "mods.archipelago.trap.ghostTap";
   public ModifierCompatibility Compatibility =>
     ModifierCompatibilityBuilder

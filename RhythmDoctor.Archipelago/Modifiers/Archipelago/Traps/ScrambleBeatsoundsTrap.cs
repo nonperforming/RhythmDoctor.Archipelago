@@ -2,7 +2,8 @@ namespace RhythmDoctor.Archipelago.Modifiers.Archipelago.Traps;
 
 internal class ScrambleBeatsoundsTrap : ModifierPatch<ScrambleBeatsoundsTrap>, IModifier, IArchipelagoModifier
 {
-  public string Uid => $"{MyPluginInfo.PLUGIN_GUID}.mod.scrambleBeatsounds";
+  internal const string UID = $"{MyPluginInfo.PLUGIN_GUID}.mod.scrambleBeatsounds";
+  public string Uid => UID;
   public string LocalizationKey => "mods.archipelago.trap.scrambleBeatsounds";
   public ModifierCompatibility Compatibility =>
     ModifierCompatibilityBuilder

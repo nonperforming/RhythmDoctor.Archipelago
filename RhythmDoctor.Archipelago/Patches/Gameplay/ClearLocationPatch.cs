@@ -27,7 +27,7 @@ internal static class ClearStoryLocationPatch
     if (!Enum.TryParse(scnGame.internalIdentifier, out Level level))
     {
       Plugin.Logger.LogError($"Couldn't find Level. Level identifier: {scnGame.internalIdentifier}");
-      Plugin.StoryClient.ModifierManagerComponent.ReturnActiveTrapsToQueue();
+      Plugin.StoryClient.ModifierManagerComponent.ReturnActiveModifiersToQueue();
       return;
     }
 
@@ -242,7 +242,7 @@ internal static class ClearStoryLocationPatch
 #endif
     if (bossLevelFailed)
     {
-      Plugin.StoryClient.ModifierManagerComponent.ReturnActiveTrapsToQueue();
+      Plugin.StoryClient.ModifierManagerComponent.ReturnActiveModifiersToQueue();
       return [];
     }
 
@@ -304,7 +304,7 @@ internal static class ClearStoryLocationPatch
     }
     else
     {
-      Plugin.StoryClient.ModifierManagerComponent.ReturnActiveTrapsToQueue();
+      Plugin.StoryClient.ModifierManagerComponent.ReturnActiveModifiersToQueue();
     }
 
     return ids;

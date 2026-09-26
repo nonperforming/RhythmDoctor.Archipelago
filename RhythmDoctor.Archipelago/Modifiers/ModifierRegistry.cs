@@ -62,7 +62,12 @@ internal static class ModifierRegistry
     //}
 
     if (toAdd.Compatibility.blacklistedLevels.Contains(level))
+    {
+      Plugin.Logger.LogDebug(
+        $"[{nameof(ModifierRegistry)}] Level {level} is incompatible with to add modifier {toAdd.Uid}"
+      );
       return false;
+    }
 
     // Group 'others' into strength and mod
     Dictionary<IModifier, int> strength = new();
@@ -88,17 +93,23 @@ internal static class ModifierRegistry
       //
       //}
 
+      // check if other capabilities are in blacklist
       if (
-        toAdd.Compatibility.blacklistedCapabilities.Any(
-          (ModifierCapability otherCompat) => toAdd.Compatibility.blacklistedCapabilities.Contains(otherCompat)
-        )
+        other.Capabilities.Any(otherCapability => toAdd.Compatibility.blacklistedCapabilities.Contains(otherCapability))
       )
+      {
+        Plugin.Logger.LogDebug(
+          $"[{nameof(ModifierRegistry)}] Capability of other is incompatible with to add modifier {toAdd.Uid}"
+        );
         return false;
-      if (
-        toAdd.Compatibility.blacklistedModifierUids is not null
-        && toAdd.Compatibility.blacklistedModifierUids.Contains(other.Uid)
-      )
+      }
+
+      // check if other uid is in blacklist
+      if (toAdd.Compatibility.blacklistedModifierUids?.Contains(other.Uid) == true)
+      {
+        Plugin.Logger.LogDebug($"[{nameof(ModifierRegistry)}] Other modifier has blacklisted modifier {toAdd.Uid}");
         return false;
+      }
     }
 
     // All checks passed
