@@ -76,12 +76,28 @@ internal class ScrambleBeatsoundsTrap : ModifierPatch<ScrambleBeatsoundsTrap>, I
       {
         if (levelEvent is LevelEvent_SetBeatSound setBeatSound)
         {
-          SoundEffect originalSound = Enum.Parse<SoundEffect>(setBeatSound.sound.filename);
-          SoundEffect randomizedSound = scrambled[originalSound];
-          Plugin.Logger.LogDebug($"SetBeatSound in level events: {originalSound} -> {randomizedSound}");
-          setBeatSound.sound = new SoundDataStruct(
-            randomizedSound.ToString().Replace("snd", "", StringComparison.Ordinal)
-          );
+          SoundEffect randomizedSound;
+          try
+          {
+            SoundEffect originalSound = Enum.Parse<SoundEffect>(setBeatSound.sound.filename);
+            randomizedSound = scrambled[originalSound];
+            Plugin.Logger.LogDebug($"SetBeatSound in level events: {originalSound} -> {randomizedSound}");
+            setBeatSound.sound = new SoundDataStruct(
+              randomizedSound.ToString().Replace("snd", "", StringComparison.Ordinal)
+            );
+          }
+          catch (ArgumentException argumentException)
+          {
+            Plugin.Logger.LogError(
+              $"[{nameof(ScrambleBeatsoundsTrap)}] Couldn't look up {setBeatSound.sound.filename} in randomization dictionary: {argumentException.Message}"
+                + "\nApplying random beatsound to this sound."
+            );
+            randomizedSound = scrambled.Values.ToArray()[Plugin.Random.Next(scrambled.Count)];
+            Plugin.Logger.LogDebug($"SetBeatSound in level events: {setBeatSound.sound.filename} -> {randomizedSound}");
+            setBeatSound.sound = new SoundDataStruct(
+              randomizedSound.ToString().Replace("snd", "", StringComparison.Ordinal)
+            );
+          }
         }
       }
     }
