@@ -64,7 +64,7 @@ internal abstract class ModifierManagerBase : IDisposable
   {
     foreach (IModifier modifier in _activeModifiers)
     {
-      modifier.PreviewEnd();
+      modifier.ActiveEnd();
     }
     _activeModifiers.Clear();
   }
