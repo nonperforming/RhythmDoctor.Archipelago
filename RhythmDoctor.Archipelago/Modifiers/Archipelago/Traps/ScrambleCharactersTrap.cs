@@ -114,6 +114,25 @@ internal class ScrambleCharactersTrap : ModifierPatch<ScrambleCharactersTrap>, I
           Plugin.Logger.LogDebug($"[{nameof(ScrambleCharactersTrap)}] Character changed to: {randomized}");
         }
       }
+      foreach (LevelEvent_MakeDecorationBase makeDecoration in __result.decorations)
+      {
+        if (makeDecoration.type == LevelEventType.Text)
+          continue;
+
+        if (makeDecoration is LevelEvent_Sprite spriteEvent)
+        {
+          if (spriteEvent.character == Character.Custom)
+          {
+            // don't randomize custom characters
+            continue;
+          }
+
+          Character old = spriteEvent.character;
+          Character scrambledCharacter = scrambled[spriteEvent.character];
+          Plugin.Logger.LogDebug($"[{nameof(ScrambleCharactersTrap)}] Character deco {old} -> {scrambledCharacter}");
+          spriteEvent.character = scrambledCharacter;
+        }
+      }
     }
 
     [HarmonyPatch(typeof(scnGame), nameof(scnGame.MakeRow))]
