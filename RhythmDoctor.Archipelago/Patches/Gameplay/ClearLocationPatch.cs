@@ -195,7 +195,12 @@ internal static class ClearStoryLocationPatch
     if (!ItemsToSend.Any())
     {
       Plugin.Logger.LogWarning("Couldn't get items sent, possibly due to a network issue.");
-      __instance.game.statusText.SetStatusText("Couldn't get items sent.", Color.red, 10f, useUnscaledTime: true);
+      __instance.game.statusText.SetStatusText(
+        RDString.Get("archipelago.rankscreen.error"),
+        Color.red,
+        10f,
+        useUnscaledTime: true
+      );
     }
     else
     {
