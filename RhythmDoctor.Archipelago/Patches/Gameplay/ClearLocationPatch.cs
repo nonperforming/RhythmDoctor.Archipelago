@@ -175,7 +175,7 @@ internal static class ClearStoryLocationPatch
 
     // We need to calculate the level's rank manually...
     int rank;
-    if (!__instance.missedOnce && !__instance.game.GetPassedLevelWithoutCheckpoints())
+    if (!__instance.missedOnce)
     {
       // Perfect
       rank = Rank.BossPerfect;
