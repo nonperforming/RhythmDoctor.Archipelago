@@ -48,11 +48,13 @@ internal abstract class ModifierManagerBase : IDisposable
 
   public void ClearAllChosenModifiers()
   {
+    Plugin.Logger.LogInfo($"[{nameof(ModifierManagerBase)}] Clearing all chosen modifiers");
     _chosenModifiers.Clear();
   }
 
   public void ClearAllPreviewModifiers()
   {
+    Plugin.Logger.LogInfo($"[{nameof(ModifierManagerBase)}] Clearing all preview modifiers");
     foreach (IModifier modifier in _previewModifiers)
     {
       modifier.PreviewEnd();
@@ -62,6 +64,7 @@ internal abstract class ModifierManagerBase : IDisposable
 
   public void ClearAllActiveModifiers()
   {
+    Plugin.Logger.LogInfo($"[{nameof(ModifierManagerBase)}] Clearing all active modifiers");
     foreach (IModifier modifier in _activeModifiers)
     {
       modifier.ActiveEnd();
@@ -71,6 +74,7 @@ internal abstract class ModifierManagerBase : IDisposable
 
   public void ClearAllModifiers()
   {
+    Plugin.Logger.LogInfo($"[{nameof(ModifierManagerBase)}] Clearing all modifiers");
     ClearAllChosenModifiers();
     ClearAllPreviewModifiers();
     ClearAllActiveModifiers();

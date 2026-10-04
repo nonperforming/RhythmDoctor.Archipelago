@@ -4,11 +4,12 @@ internal abstract class ModifierManagerStoryLevelSelect : ModifierManagerBase, I
 {
   internal ModifierManagerStoryLevelSelect()
   {
-    Events.Instance.LevelDeselected += OnInstanceOnLevelDeselected;
+    Events.Instance.LevelDeselected += OnLevelDeselected;
   }
 
-  private void OnInstanceOnLevelDeselected(object _, EventArgs _1)
+  private void OnLevelDeselected(object _, EventArgs _1)
   {
+    Plugin.Logger.LogDebug($"[{nameof(ModifierManagerStoryLevelSelect)}] Level deselected");
     ClearAllPreviewModifiers();
   }
 
@@ -16,6 +17,6 @@ internal abstract class ModifierManagerStoryLevelSelect : ModifierManagerBase, I
   {
     base.Dispose();
     Plugin.Logger.LogInfo($"[{nameof(ModifierManagerStoryLevelSelect)}] Disposing");
-    Events.Instance.LevelDeselected -= OnInstanceOnLevelDeselected;
+    Events.Instance.LevelDeselected -= OnLevelDeselected;
   }
 }
