@@ -130,13 +130,17 @@ internal static class ArchipelagoLoginPatch
     string? password = null;
     try
     {
-      password = text[2];
+      string rawPassword = text[2];
+      if (!rawPassword.IsNullOrWhiteSpace())
+      {
+        password = text[2];
+      }
     }
     catch (IndexOutOfRangeException)
     {
       // No password given.
     }
-    Plugin.Logger.LogInfo($"URL: {url}, Slot Name: {name}");
+    Plugin.Logger.LogInfo($"URL: {url}, Slot name: {name}");
 
     if (url.IsNullOrWhiteSpace() || name.IsNullOrWhiteSpace())
     {
@@ -145,13 +149,15 @@ internal static class ArchipelagoLoginPatch
       goto BailOut;
     }
 
+    // FIXME: When AP.NET supports secure websockets, change to WSS
     // Attempt to log in with the information given.
-    Plugin.Logger.LogInfo("Creating client");
-    Plugin.Client = new Client.Client();
+    Plugin.Logger.LogInfo($"[{nameof(ArchipelagoLoginPatch)}] Creating client");
+    // TODO: use URIs. `new Uri($"ws://{url}")` likes throwing errors..
+    Plugin.StoryClient = new StoryClient(new LoginInformation(Mode.Main, url, name, password));
+    Plugin.StoryClient.CreateSession();
 
     // Should be safe in this context
-    // ReSharper disable AccessToDisposedClosure
-    Task<LoginResult> login = Task.Run(() => Plugin.Client.CreateSessionAndConnect(url, name, password));
+    Task<LoginResult> login = Task.Run(Plugin.StoryClient.Login);
     yield return new WaitUntil(() => login.IsCompleted);
 
     if (login.IsCanceled || login.IsFaulted)
@@ -160,27 +166,24 @@ internal static class ArchipelagoLoginPatch
         // ReSharper disable once NullableWarningSuppressionIsUsed
         ? login.Exception!.ToString()
         : "false";
-      Plugin.Logger.LogError($"Login has cancelled or faulted (cancel: {login.IsCanceled} / fault: {fault})");
+      Plugin.Logger.LogError(
+        $"[{nameof(ArchipelagoLoginPatch)}] Login has cancelled or faulted (cancel: {login.IsCanceled} / fault: {fault})"
+      );
       goto Failure;
     }
 
     switch (login.Result)
     {
       case LoginSuccessful:
-        Plugin.Logger.LogInfo("Logged in!");
+        Plugin.Logger.LogInfo($"[{nameof(ArchipelagoLoginPatch)}] Logged in!");
         __instance.cls.CLSPlaySound("sndImportInstallFinish");
         yield return null;
 
         UnpatchMenuPatch();
 
-        // Wait for setup...
-        while (!Plugin.Client.Setup)
-        {
-          yield return new WaitForSecondsRealtime(1);
-        }
-
-        Plugin.Logger.LogInfo("Heading to Level Select...");
-        scnBase.GoToScene(GC.SceneLevelSelect);
+        Task receivePriorItems = Plugin.StoryClient.ReceivePriorItems();
+        yield return new WaitUntil(() => receivePriorItems.IsCompleted);
+        Plugin.StoryClient.StartPlay();
         yield break;
       case LoginFailure fail:
         Plugin.Logger.LogError(
@@ -196,8 +199,8 @@ internal static class ArchipelagoLoginPatch
       Plugin.Logger.LogError("Login failed (Login)");
       UnapplyPatchesPatch.TearDownClientPluginPatch();
       // ReSharper disable once ConstantConditionalAccessQualifier
-      Plugin.Client?.Dispose();
-      Plugin.Client = null!;
+      Plugin.StoryClient?.Dispose();
+      Plugin.StoryClient = null!;
       BailOut:
         // Bail out
         __instance.CurrentContentName = LevelImporter.ContentName.LevelsInstalled;

@@ -1,0 +1,105 @@
+namespace RhythmDoctor.Archipelago.Modifiers.Archipelago.Traps;
+
+internal class ScrambleBeatsoundsTrap : ModifierPatch<ScrambleBeatsoundsTrap>, IModifier, IArchipelagoModifier
+{
+  internal const string UID = $"{MyPluginInfo.PLUGIN_GUID}.mod.scrambleBeatsounds";
+  public string Uid => UID;
+  public string LocalizationKey => "mods.archipelago.trap.scrambleBeatsounds";
+  public ModifierCompatibility Compatibility =>
+    ModifierCompatibilityBuilder
+      .GetDefaultBuilderForMod(this)
+      .AddBlacklistedLevels(LevelExtensions.AllIntermissionLevels)
+      .Build();
+  public ModifierCapability[] Capabilities => [ModifierCapability.Beatsounds];
+
+  public override Type[] PreviewPatches => [];
+  public override Type[] ActivePatches => [typeof(ActivePatch)];
+
+  public IScale Scale => BinaryScale.Instance;
+
+  private static readonly Dictionary<SoundEffect, SoundEffect> scrambled = new();
+
+  public override void Active(float strength)
+  {
+    base.Active(strength);
+
+    SoundEffect[] randomizedOrder = (SoundEffect[])RDEditorConstants.BeatSounds.Clone();
+
+    Plugin.Random.Shuffle(randomizedOrder);
+
+    for (int i = 0; i < randomizedOrder.Length; i++)
+    {
+      SoundEffect originalBeatsound = RDEditorConstants.BeatSounds[i];
+      SoundEffect randomizeTo = randomizedOrder[i];
+
+      if (randomizeTo == SoundEffect.None)
+      {
+        int num = Plugin.Random.Next(0, RDEditorConstants.BeatSounds.Length);
+        if (num == Array.IndexOf(RDEditorConstants.BeatSounds, SoundEffect.None))
+        {
+          num++;
+        }
+        randomizeTo = RDEditorConstants.BeatSounds[num];
+      }
+
+      scrambled[originalBeatsound] = randomizeTo;
+    }
+
+    Plugin.Logger.LogDebug("Randomized beatsounds:");
+    foreach ((SoundEffect originalBeatsound, SoundEffect randomizedBeatsound) in scrambled)
+    {
+      Plugin.Logger.LogDebug($"  {originalBeatsound} -> {randomizedBeatsound}");
+    }
+  }
+
+  [HarmonyPatch(typeof(LevelBase))]
+  private static class ActivePatch
+  {
+    [HarmonyPatch(nameof(LevelBase.DecodeLevelData))]
+    [HarmonyPostfix]
+    private static void ModifyCharacterDataPatch(RDLevelData __result)
+    {
+      Plugin.Logger.LogDebug("Scramble Beatsounds: Modifying MakeRow and SetBeatSound level events");
+
+      foreach (LevelEvent_MakeRow row in __result.rows)
+      {
+        SoundEffect originalSound = Enum.Parse<SoundEffect>(
+          row.pulseSound.filename.Replace("snd", "", StringComparison.Ordinal)
+        );
+        SoundEffect randomizedSound = scrambled[originalSound];
+
+        Plugin.Logger.LogDebug($"MakeRow in rows: {originalSound} -> {randomizedSound}");
+        row.pulseSound.filename = randomizedSound.ToString();
+      }
+
+      foreach (LevelEvent_Base levelEvent in __result.levelEvents)
+      {
+        if (levelEvent is LevelEvent_SetBeatSound setBeatSound)
+        {
+          SoundEffect randomizedSound;
+          try
+          {
+            SoundEffect originalSound = Enum.Parse<SoundEffect>(setBeatSound.sound.filename);
+            randomizedSound = scrambled[originalSound];
+            Plugin.Logger.LogDebug($"SetBeatSound in level events: {originalSound} -> {randomizedSound}");
+            setBeatSound.sound = new SoundDataStruct(
+              randomizedSound.ToString().Replace("snd", "", StringComparison.Ordinal)
+            );
+          }
+          catch (ArgumentException argumentException)
+          {
+            Plugin.Logger.LogError(
+              $"[{nameof(ScrambleBeatsoundsTrap)}] Couldn't look up {setBeatSound.sound.filename} in randomization dictionary: {argumentException.Message}"
+                + "\nApplying random beatsound to this sound."
+            );
+            randomizedSound = scrambled.Values.ToArray()[Plugin.Random.Next(scrambled.Count)];
+            Plugin.Logger.LogDebug($"SetBeatSound in level events: {setBeatSound.sound.filename} -> {randomizedSound}");
+            setBeatSound.sound = new SoundDataStruct(
+              randomizedSound.ToString().Replace("snd", "", StringComparison.Ordinal)
+            );
+          }
+        }
+      }
+    }
+  }
+}

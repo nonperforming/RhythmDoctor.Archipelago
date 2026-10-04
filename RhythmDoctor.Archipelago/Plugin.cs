@@ -9,7 +9,7 @@ namespace RhythmDoctor.Archipelago;
 public class Plugin : BaseUnityPlugin
 {
   // ReSharper disable NullableWarningSuppressionIsUsed
-  internal static Client.Client Client = null!;
+  internal static StoryClient StoryClient = null!;
   internal static new ManualLogSource Logger = null!;
 #if DEBUG
   internal static DebugMenu DebugMenu = null!;
@@ -49,29 +49,6 @@ public class Plugin : BaseUnityPlugin
 #endif
   ];
 
-  /// <summary>
-  /// Patches that are applied after logging into Archipelago, and unapplied after logging out.
-  /// </summary>
-  private static readonly Type[] PostLoginPatches =
-  [
-    typeof(Act5Patch),
-    typeof(ClearLocationPatch),
-    typeof(DeathLinkPatch),
-    //typeof(JanitorPatch), // use pause menu for in/outbox
-    typeof(LevelSelectVisualFixesPatch),
-    typeof(RhythmDogtorLevelPatch),
-    typeof(RhythmWeightlifterPatch),
-    typeof(RunningCharactersPatch),
-    typeof(SkipCutscenePatch),
-    typeof(SkipTutorialPatch),
-    typeof(StateReplicationPatch),
-    typeof(TrapManagerPatch),
-    typeof(UnlockItemPatch),
-    typeof(WelcomeBackPatch),
-    typeof(SavingPatch),
-    typeof(UnapplyPatchesPatch),
-  ];
-
   private static readonly Type CustomLoginScreenPatch = typeof(ArchipelagoLoginPatch);
 
   /// <summary>
@@ -90,6 +67,26 @@ public class Plugin : BaseUnityPlugin
 
     Logger.LogInfo($"Registering custom localization ({Paths.Localization})");
     CustomLocalizationHelper.SearchAndRegisterDirectory(Paths.Localization);
+
+    Logger.LogInfo("Registering modifiers");
+    foreach (
+      IModifier modifier in (IModifier[])
+        [
+          new EasyDifficultyPowerup(),
+          new StrongHeartPowerup(),
+          new ChilliSpeedTrap(),
+          new FragileHeartTrap(),
+          new GhostTapTrap(),
+          new HardDifficultyTrap(),
+          new IceSpeedTrap(),
+          new ScrambleBeatsoundsTrap(),
+          new ScrambleCharactersTrap(),
+          new ScrambleHitsoundsTrap(),
+        ]
+    )
+    {
+      ModifierRegistry.Register(modifier);
+    }
 
     Logger.LogInfo("Applying always active patches");
     ApplyPatches(PATCH_ID_ALWAYS_ACTIVE, AlwaysActivePatches);
@@ -154,7 +151,8 @@ public class Plugin : BaseUnityPlugin
     }
   }
 
-  private static void ApplyPatches(string id, params Type[] patches)
+  // TODO: see storyclient L144 ("pull this out")
+  internal static void ApplyPatches(string id, params Type[] patches)
   {
     Logger.LogInfo($"Applying patches as {id}");
     Harmony harmony = new(id);
@@ -164,13 +162,6 @@ public class Plugin : BaseUnityPlugin
       Logger.LogInfo($"Applying {patch.Name}");
       harmony.PatchAll(patch);
     }
-  }
-
-  internal static void ApplyGameplayPatches()
-  {
-    Logger.LogInfo("Applying gameplay patches");
-    ApplyPatches(PATCH_ID_POST_LOGIN, PostLoginPatches);
-    ApplyPatches(PATCH_ID_SLEEVE_PAINT, typeof(LockSleevePaintPatch));
   }
 
   internal static void UnapplyGameplayPatches()

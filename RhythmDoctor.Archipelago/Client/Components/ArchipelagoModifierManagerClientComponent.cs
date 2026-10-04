@@ -1,0 +1,150 @@
+namespace RhythmDoctor.Archipelago.Client.Components;
+
+internal sealed class ArchipelagoModifierManagerClientComponent
+  : ModifierManagerStoryLevelSelect,
+    IClientComponent,
+    IDisposable
+{
+  /// <inheritdoc cref="IClientComponent.AssistPatches" />
+  public IEnumerable<Type> AssistPatches => [typeof(ArchipelagoModifierManagerPatch)];
+
+  private readonly List<string> _modifierQueue = [];
+  private readonly List<(int index, string Uid)> _modifierAndIndexPairs = [];
+  private IEnumerable<string> _stickyModifiers = null!;
+  private int _stickyActivatedCount = 0;
+
+  public Task Enable(StoryClient client, ArchipelagoSession session)
+  {
+    // Apply AssistPatches
+    foreach (Type assistPatch in AssistPatches)
+    {
+      Harmony.CreateAndPatchAll(assistPatch, Plugin.PATCH_ID_POST_LOGIN);
+    }
+
+    // Get sticky traps/powerups from SlotData
+    // TODO: support powerups when sticky powerups are implemented in world side
+    _stickyModifiers = client.Slot.stickyTraps.Select(trapName => Bindings.StickyModifierOptionToModifierUid[trapName]);
+
+    return Task.CompletedTask;
+  }
+
+  internal void AddModifierToQueue(string modifierUid)
+  {
+    Plugin.Logger.LogInfo($"[{nameof(ArchipelagoModifierManagerClientComponent)}] Adding {modifierUid} to queue");
+    _modifierQueue.Add(modifierUid);
+  }
+
+  internal void PushCompatibleInQueueToChosenModifiers(Level level)
+  {
+    int TryApplyModifiers(params IEnumerable<string> modifierUids)
+    {
+      int addedTraps = 0;
+      foreach (string uid in modifierUids)
+      {
+        if (!ModifierRegistry.TryGetModifier(uid, out IModifier modifier))
+        {
+          Plugin.Logger.LogWarning(
+            $"[{nameof(ArchipelagoModifierManagerClientComponent)}] Cannot add unregistered modifier {uid} to chosen"
+          );
+          continue;
+        }
+
+        if (ModifierRegistry.Compatible(modifier, level, _chosenModifiers))
+        {
+          Plugin.Logger.LogDebug(
+            $"[{nameof(ArchipelagoModifierManagerClientComponent)}] Trap {modifier.Uid} compatible with chosen modifiers"
+          );
+          addedTraps++;
+          TryAddModifier(uid);
+        }
+        else
+        {
+          Plugin.Logger.LogDebug(
+            $"[{nameof(ArchipelagoModifierManagerClientComponent)}] Trap {modifier.Uid} not compatible with chosen modifiers"
+          );
+        }
+      }
+      return addedTraps;
+    }
+
+    Plugin.Logger.LogDebug(
+      $"[{nameof(ArchipelagoModifierManagerClientComponent)}] Attempting to add sticky modifiers {_stickyModifiers.Join()}"
+    );
+    _stickyActivatedCount = TryApplyModifiers(_stickyModifiers);
+    Plugin.Logger.LogDebug(
+      $"[{nameof(ArchipelagoModifierManagerClientComponent)}] Attempting to add traps in queue {_modifierQueue.Join()}"
+    );
+    TryApplyModifiers(_modifierQueue);
+  }
+
+  internal void PushAndApplyCompatibleTrapsInQueue(Level level)
+  {
+    PushCompatibleInQueueToChosenModifiers(level);
+    TryApplyChosenModifiersForLevel(level);
+  }
+
+  internal void ReturnActiveModifiersToQueue()
+  {
+    // We iterate in reverse because _trapAndIndexPairs is guaranteed to be ordered from the
+    //  lowest index to the highest index, so we don't have to manipulate the index this way.
+    for (int i = _modifierAndIndexPairs.Count - 1; i >= 0; i--)
+    {
+      (int index, string uid) = _modifierAndIndexPairs[i];
+
+      if (_stickyModifiers.Contains(uid))
+      {
+        Plugin.Logger.LogDebug(
+          $"[{nameof(ArchipelagoModifierManagerClientComponent)}] Not returning sticky modifier {uid} (idx {index})."
+        );
+        continue;
+      }
+
+      Plugin.Logger.LogDebug(
+        $"[{nameof(ArchipelagoModifierManagerClientComponent)}] Returning modifier {uid} to index {index}."
+      );
+      _modifierQueue.Insert(index, uid);
+    }
+    _modifierAndIndexPairs.Clear();
+  }
+
+  protected override float GetModifierStrength(IModifier modifier)
+  {
+    if (modifier is not IArchipelagoModifier archipelagoModifier)
+      throw new ArgumentException($"Trap must be {nameof(IArchipelagoModifier)}.");
+
+    // Find the maximum scale we can get for each trap...
+    // At this point the trap's in _previewModifiers.
+
+    List<int> matchIndexes = _modifierQueue
+      .Select((otherUid, i) => otherUid == modifier.Uid ? i : -1)
+      .Where(i => i != -1)
+      .ToList();
+    float scale = archipelagoModifier.Scale.GetScale(matchIndexes.Count, out int consumed);
+
+    // Remove 'consumed' amount of traps at their respective index, and add them to _trapAndIndexPairs.
+    for (int i = consumed - 1; i >= 0; i--)
+    {
+      // Ignore sticky traps
+      if (_stickyModifiers.Contains(modifier.Uid))
+      {
+        // this is a sticky trap, don't add it to _modifierAndIndexPairs
+        Plugin.Logger.LogDebug(
+          $"[{nameof(ArchipelagoModifierManagerClientComponent)}] Not adding sticky trap {modifier.Uid} to modifier and index pairs"
+        );
+        _modifierQueue.RemoveAt(matchIndexes[i]);
+        continue;
+      }
+
+      int indexToRemove = matchIndexes[i - _stickyActivatedCount];
+      _modifierAndIndexPairs.Add((indexToRemove, modifier.Uid));
+      _modifierQueue.RemoveAt(indexToRemove);
+    }
+
+    return scale;
+  }
+
+  public new void Dispose()
+  {
+    base.Dispose();
+  }
+}

@@ -1,0 +1,172 @@
+namespace RhythmDoctor.Archipelago.Modifiers.Archipelago.Traps;
+
+// FIXME: Narration will break
+internal class ScrambleCharactersTrap : ModifierPatch<ScrambleCharactersTrap>, IModifier, IArchipelagoModifier
+{
+  internal const string UID = $"{MyPluginInfo.PLUGIN_GUID}.mod.scrambleCharacters";
+  public string Uid => UID;
+  public string LocalizationKey => "mods.archipelago.trap.scrambleCharacters";
+  public ModifierCompatibility Compatibility =>
+    ModifierCompatibilityBuilder
+      .GetDefaultBuilderForMod(this)
+      .AddBlacklistedLevels(LevelExtensions.AllIntermissionLevels)
+      .Build();
+  public ModifierCapability[] Capabilities => [ModifierCapability.Characters];
+
+  public override Type[] PreviewPatches => [];
+  public override Type[] ActivePatches => [typeof(ActivePatch)];
+
+  public IScale Scale => BinaryScale.Instance;
+
+  private static readonly Dictionary<Character, Character> scrambled = new();
+
+  private static readonly IReadOnlyCollection<Character> _disallowedCharacters =
+  [
+    Character.None,
+    Character.Otto,
+    Character.Custom,
+    Character.Rodney,
+    Character.DancingCouple,
+    Character.Janitor,
+    Character.Player,
+    Character.BlankCPU,
+    Character.AthletePhysio,
+    Character.New,
+    Character.Weightlifter,
+  ];
+
+  public override void Active(float strength)
+  {
+    base.Active(strength);
+
+    Character[] characters = (Character[])Enum.GetValues(typeof(Character));
+    Character[] randomizedOrder = (Character[])characters.Clone();
+    // Do not scramble these characters, as they will appear broken/no character
+    IReadOnlyList<Character> allowedCharacters = characters
+      .Where(character => !_disallowedCharacters.Contains(character))
+      .ToList();
+    IList<Character> pool = ((Character[])allowedCharacters.ToArray().Clone()).ToList();
+    Plugin.Random.Shuffle(randomizedOrder);
+
+    for (int i = 0; i < randomizedOrder.Length; i++)
+    {
+      Character originalCharacter = characters[i];
+      // Unscramble forbidden characters
+      if (_disallowedCharacters.Contains(originalCharacter))
+      {
+        scrambled[originalCharacter] = originalCharacter;
+        continue;
+      }
+
+      Character randomizeTo = randomizedOrder[i];
+
+      if (_disallowedCharacters.Contains(randomizeTo))
+      {
+        int randomizeIndex = Plugin.Random.Next(0, pool.Count);
+        randomizeTo = allowedCharacters[randomizeIndex];
+        pool.RemoveAt(randomizeIndex);
+      }
+
+      scrambled[originalCharacter] = randomizeTo;
+    }
+
+    Plugin.Logger.LogDebug($"[{nameof(ScrambleCharactersTrap)}] Randomized characters:");
+    foreach ((Character originalCharacter, Character randomizedCharacter) in scrambled)
+    {
+      Plugin.Logger.LogDebug($"[{nameof(ScrambleCharactersTrap)}]  {originalCharacter} -> {randomizedCharacter}");
+    }
+  }
+
+  [HarmonyPatch]
+  private static class ActivePatch
+  {
+    [HarmonyPatch(typeof(LevelBase), nameof(LevelBase.DecodeLevelData))]
+    [HarmonyPostfix]
+    private static void ModifyCharacterDataPatch(RDLevelData __result)
+    {
+      Plugin.Logger.LogDebug("[Scramble Characters] Modifying MakeRow and ChangeCharacter level events");
+
+      foreach (LevelEvent_Base levelEvent in __result.levelEvents)
+      {
+        if (levelEvent is LevelEvent_CallCustomMethod callCustomMethod)
+        {
+          if (!callCustomMethod.methodName.StartsWith("ChangeCharacter"))
+          {
+            continue;
+          }
+
+          Plugin.Logger.LogDebug(
+            $"[{nameof(ScrambleCharactersTrap)}] ChangeCharacter custom method: {callCustomMethod.methodName}"
+          );
+
+          string changeToString = callCustomMethod
+            .methodName.Replace("ChangeCharacterSmooth(str:", "", StringComparison.Ordinal)
+            .Replace("ChangeCharacter(str:", "", StringComparison.Ordinal)
+            .Split(",")[0];
+          Character changeTo = Enum.Parse<Character>(changeToString);
+          Character randomized = scrambled[changeTo];
+
+          callCustomMethod.methodName = callCustomMethod.methodName.Replace(
+            changeToString,
+            randomized.ToString(),
+            StringComparison.Ordinal
+          );
+          Plugin.Logger.LogDebug($"[{nameof(ScrambleCharactersTrap)}] Character changed to: {randomized}");
+        }
+      }
+      foreach (LevelEvent_MakeDecorationBase makeDecoration in __result.decorations)
+      {
+        if (makeDecoration.type == LevelEventType.Text)
+          continue;
+
+        if (makeDecoration is LevelEvent_Sprite spriteEvent)
+        {
+          if (spriteEvent.character == Character.Custom)
+          {
+            // don't randomize custom characters
+            continue;
+          }
+
+          Character old = spriteEvent.character;
+          Character scrambledCharacter = scrambled[spriteEvent.character];
+          Plugin.Logger.LogDebug($"[{nameof(ScrambleCharactersTrap)}] Character deco {old} -> {scrambledCharacter}");
+          spriteEvent.character = scrambledCharacter;
+        }
+      }
+    }
+
+    [HarmonyPatch(typeof(scnGame), nameof(scnGame.MakeRow))]
+    [HarmonyPrefix]
+    private static void ModifyMakeRowPatch(ref Character character)
+    {
+      Plugin.Logger.LogDebug(
+        $"[{nameof(ScrambleCharactersTrap)}] Modifying MakeRow method from {character} to {scrambled[character]}"
+      );
+      character = scrambled[character];
+    }
+
+    [HarmonyPatch(typeof(scrChar), nameof(scrChar.ChangeCharacter))]
+    [HarmonyPrefix]
+    private static void ModifyChangeCharacterPatch(ref Character newChar)
+    {
+      Plugin.Logger.LogDebug(
+        $"[{nameof(ScrambleCharactersTrap)}] Modifying ChangeCharacter method from {newChar} to {scrambled[newChar]}"
+      );
+      newChar = scrambled[newChar];
+    }
+
+    [HarmonyPatch(typeof(RDInk), nameof(RDInk.ParsePortrait))]
+    [HarmonyPrefix]
+    private static void ModifyInkPortraitPatch(ref string fullName)
+    {
+      string character = fullName.Split("_")[0];
+      if (Enum.TryParse(character, out Character toRandomize))
+      {
+        Character randomized = scrambled[toRandomize];
+        string scrambledTo = randomized.ToString();
+        Plugin.Logger.LogDebug($"[Scramble Characters] Modifying portrait from {toRandomize} to {scrambledTo}");
+        fullName = fullName.Replace(character, scrambledTo, StringComparison.Ordinal);
+      }
+    }
+  }
+}

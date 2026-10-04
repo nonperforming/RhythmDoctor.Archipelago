@@ -1,0 +1,118 @@
+namespace RhythmDoctor.Archipelago.Modifiers;
+
+internal static class ModifierRegistry
+{
+  private static Dictionary<string, IModifier> _uidToModifier = new();
+
+  internal static void Register(IModifier modifier)
+  {
+    if (_uidToModifier.ContainsKey(modifier.Uid))
+    {
+      // TODO: consider using custom exception
+      throw new Exception($"Trap '{modifier.Uid}' already registered");
+    }
+
+    Plugin.Logger.LogInfo($"[{nameof(ModifierRegistry)}] Registering trap {modifier.Uid}");
+    modifier.Initialize();
+    _uidToModifier.Add(modifier.Uid, modifier);
+  }
+
+  internal static void Register(params IModifier[] modifiers) => modifiers.Do(Register);
+
+  internal static bool TryGetModifier(string uid, out IModifier modifier)
+  {
+    return _uidToModifier.TryGetValue(uid, out modifier);
+  }
+
+  // /// <summary>
+  // ///
+  // /// </summary>
+  // /// <param name="toAdd"></param>
+  // /// <param name="other"></param>
+  // /// <param name="level"></param>
+  // /// <returns></returns>
+  // /// <remarks>
+  // /// Prefer using <see cref="Compatible(IModifier, IModifier, Level)"/> whenever possible.
+  // /// </remarks>
+  // internal static bool Compatible(IModifier toAdd, IModifier other, Level level = Level.None)
+  // {
+  // }
+
+  internal static IEnumerable<string> GetAllRegisteredTrapsUid()
+  {
+    return _uidToModifier.Keys;
+  }
+
+  internal static bool Compatible(
+    string modifierUidToAdd,
+    Level level = Level.None,
+    params IEnumerable<IModifier> others
+  )
+  {
+    if (!TryGetModifier(modifierUidToAdd, out IModifier modifier))
+      return false;
+    return Compatible(modifier, level, others);
+  }
+
+  internal static bool Compatible(IModifier toAdd, Level level = Level.None, params IEnumerable<IModifier> others)
+  {
+    //if (!others.All((IModifier other) => Compatible(toAdd, other)))
+    //{
+    //  return false;
+    //}
+
+    if (toAdd.Compatibility.blacklistedLevels.Contains(level))
+    {
+      Plugin.Logger.LogDebug(
+        $"[{nameof(ModifierRegistry)}] Level {level} is incompatible with to add modifier {toAdd.Uid}"
+      );
+      return false;
+    }
+
+    // Group 'others' into strength and mod
+    Dictionary<IModifier, int> strength = new();
+    foreach (IModifier modifier in others)
+    {
+      if (strength.ContainsKey(modifier))
+      {
+        strength[modifier] += 1;
+      }
+      else
+      {
+        strength[modifier] = 1;
+      }
+    }
+
+    foreach (IModifier other in others)
+    {
+      // Checking strength scales cheaper than the others so we do it first
+      //todo min
+      // todo max
+      //if (toAdd.Compatibility.maxStrength <= strength[other])
+      //{
+      //
+      //}
+
+      // check if other capabilities are in blacklist
+      if (
+        other.Capabilities.Any(otherCapability => toAdd.Compatibility.blacklistedCapabilities.Contains(otherCapability))
+      )
+      {
+        Plugin.Logger.LogDebug(
+          $"[{nameof(ModifierRegistry)}] Capability of other is incompatible with to add modifier {toAdd.Uid}"
+        );
+        return false;
+      }
+
+      // check if other uid is in blacklist
+      if (toAdd.Compatibility.blacklistedModifierUids?.Contains(other.Uid) == true)
+      {
+        Plugin.Logger.LogDebug($"[{nameof(ModifierRegistry)}] Other modifier has blacklisted modifier {toAdd.Uid}");
+        return false;
+      }
+    }
+
+    // All checks passed
+    return true;
+  }
+}

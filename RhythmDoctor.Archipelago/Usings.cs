@@ -22,18 +22,25 @@ global using RDLevelEditor;
 
 global using RhythmDoctor.Archipelago;
 global using RhythmDoctor.Archipelago.Client;
+global using RhythmDoctor.Archipelago.Client.Components;
+global using RhythmDoctor.Archipelago.Client.Components.ItemProcessors;
+global using RhythmDoctor.Archipelago.Client.Components.Interfaces;
 #if DEBUG
 global using RhythmDoctor.Archipelago.Debug;
 global using RhythmDoctor.Archipelago.Debug.Patches;
 #endif
 global using RhythmDoctor.Archipelago.Extensions;
 global using RhythmDoctor.Archipelago.Helpers;
-global using RhythmDoctor.Archipelago.Interfaces;
+global using RhythmDoctor.Archipelago.Modifiers;
+global using RhythmDoctor.Archipelago.Modifiers.Archipelago;
+global using RhythmDoctor.Archipelago.Modifiers.Archipelago.Powerups;
+global using RhythmDoctor.Archipelago.Modifiers.Archipelago.Scales;
+global using RhythmDoctor.Archipelago.Modifiers.Archipelago.Traps;
 global using RhythmDoctor.Archipelago.Patches;
 global using RhythmDoctor.Archipelago.Patches.Gameplay;
-global using RhythmDoctor.Archipelago.Patches.Gameplay.Powerups;
-global using RhythmDoctor.Archipelago.Patches.Gameplay.Traps;
+global using RhythmDoctor.Archipelago.Patches.Gameplay.ClientAssistPatches;
 global using RhythmDoctor.Archipelago.Patches.Menu;
+global using RhythmDoctor.Archipelago.Patches.Shared;
 global using RhythmDoctor.Archipelago.World;
 global using RhythmDoctor.Archipelago.World.Data;
 
@@ -41,6 +48,7 @@ global using System;
 global using System.Collections;
 global using System.Collections.Concurrent;
 global using System.Diagnostics.Contracts;
+global using System.Collections.ObjectModel;
 global using System.Collections.Generic;
 global using System.IO;
 global using System.Linq;
