@@ -9,7 +9,8 @@ internal class ScrambleHitsoundsTrap : ModifierPatch<ScrambleHitsoundsTrap>, IMo
     ModifierCompatibilityBuilder
       .GetDefaultBuilderForMod(this)
       .AddBlacklistedLevels(LevelExtensions.AllIntermissionLevels)
-      .AddBlacklistedLevels(Level.Bitterness) // TODO: Handle custom beatsounds properly and remove Bitterness from blacklist.
+      .AddBlacklistedLevels(Level.Bitterness, Level.Blurred) // TODO: Handle custom beatsounds properly
+      .AddBlacklistedLevels(Level.OrientalTechno) // TODO: Handle levels that don't use a rdlevel.
       .Build();
   public ModifierCapability[] Capabilities => [ModifierCapability.Hitsounds];
 
@@ -26,6 +27,8 @@ internal class ScrambleHitsoundsTrap : ModifierPatch<ScrambleHitsoundsTrap>, IMo
 
   public override void Active(float strength)
   {
+    base.Active(strength);
+
     string[] randomizedOrder = (string[])hitsounds.Clone();
 
     Plugin.Random.Shuffle(randomizedOrder);
@@ -47,7 +50,7 @@ internal class ScrambleHitsoundsTrap : ModifierPatch<ScrambleHitsoundsTrap>, IMo
   {
     [HarmonyPatch(nameof(LevelBase.DecodeLevelData))]
     [HarmonyPostfix]
-    private static void ModifyCharacterDataPatch(RDLevelData __result)
+    private static void ModifyClapSoundsDataPatch(RDLevelData __result)
     {
       Plugin.Logger.LogDebug("[Scramble Hitsounds] Modifying SetClapSounds level events");
 
@@ -56,7 +59,6 @@ internal class ScrambleHitsoundsTrap : ModifierPatch<ScrambleHitsoundsTrap>, IMo
         if (levelEvent is LevelEvent_SetClapSounds setClapSounds)
         {
           Plugin.Logger.LogDebug("[Scramble Hitsounds] SetClapSounds in level events:");
-          Plugin.Logger.LogWarning(setClapSounds.p1Sound?.filename);
           if (setClapSounds.p1Sound.HasValue)
           {
             Plugin.Logger.LogDebug(
