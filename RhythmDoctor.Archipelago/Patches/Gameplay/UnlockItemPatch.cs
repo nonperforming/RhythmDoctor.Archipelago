@@ -437,11 +437,13 @@ internal static class UnlockItemPatch
 
   internal static bool TryUnlockBossSong(Act act, bool initial = false)
   {
-    Plugin.Logger.LogDebug($"[{nameof(UnlockItemPatch)}] Attempting to unlock {act}'s boss songs");
+    Plugin.Logger.LogDebug($"[{nameof(UnlockItemPatch)}] Attempting to unlock {act}'s boss songs (initial: {initial}");
     if (HasUnlockedBossSong(act))
     {
       Level[] levelBosses = Bindings.ActBoss[act];
-      Plugin.Logger.LogDebug($"[{nameof(UnlockItemPatch)}] Unlocked {act}'s boss song(s) [{levelBosses.Join()}]");
+      Plugin.Logger.LogDebug(
+        $"[{nameof(UnlockItemPatch)}] Unlocked {act}'s boss song(s) [{levelBosses.Join()}, initial: {initial}]"
+      );
 
       foreach (Level levelBoss in levelBosses)
       {
