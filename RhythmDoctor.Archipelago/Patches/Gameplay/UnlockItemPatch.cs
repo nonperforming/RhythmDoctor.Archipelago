@@ -495,7 +495,7 @@ internal static class UnlockItemPatch
         long clearRequirement = Plugin.StoryClient.Slot.GetBossSongLevelClearRequirement(act);
         if (clearedInAct >= clearRequirement)
         {
-          Plugin.Logger.LogInfo($"Unlocking {act} boss ({clearRequirement} requirement, rank {minimumRank})");
+          Plugin.Logger.LogInfo($"Can unlock {act} boss ({clearRequirement} requirement, rank {minimumRank})");
           return true;
         }
       }
