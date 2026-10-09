@@ -104,6 +104,7 @@ internal sealed class ArchipelagoModifierManagerClientComponent
       );
       _modifierQueue.Insert(index, uid);
     }
+    ClearAllActiveModifiers();
     _modifierAndIndexPairs.Clear();
   }
 
