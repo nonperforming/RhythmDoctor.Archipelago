@@ -1,7 +1,8 @@
 {
   "archipelago": "Archipelago",
+  "button.login": "Login",
+  "button.reconnect": "Reconnect",
   "connectScreenTitle": "ARCHIPELAGO",
-  "loginButton": "Login",
   "login.menu.title": "ARCHIPELAGO LOGIN",
   "login.menu.instructions": "Put in your client information in the format given and hit Connect.",
   "login.menu.hint": "<URL>\n<Name>\n<Password>",

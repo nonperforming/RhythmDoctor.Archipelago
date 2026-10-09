@@ -22,7 +22,13 @@ internal static class ArchipelagoLoginPatch
     );
     #endregion
 
-    #region Rename ward options
+    // TODO: This should probably be repurposed into actual description
+    #region Hide LevelDetail
+    GameObject.Find("/Canvas/LevelDetail").SetActive(false);
+    GameObject.Find("/Canvas/LevelDetailBackground Container").SetActive(false);
+    #endregion
+
+    #region Rename and delete ward options
     Plugin.Logger.LogInfo("Renaming ward options");
     // Get WardOptions
     scnCLS.WardOption libraryOption = __instance.wardOptions.Find(wardOption =>
@@ -36,16 +42,36 @@ internal static class ArchipelagoLoginPatch
       wardOption.name == scnCLS.WardOptionName.ImportLevels
     );
 
-    // We need to deselect the Library option first otherwise we get weird issues with UI
-    __instance.ChangeToImportOption();
-
-    // Delete Library and Steam Workshop options
-    if (libraryOption != null)
+    if (!Configuration.PriorLoginInformation.HasValue)
     {
-      libraryOption.rect?.transform.parent?.gameObject.SetActive(false);
-      __instance.wardOptions.Remove(libraryOption);
+      // We need to deselect the Library option first otherwise we get weird issues with UI
+      // (Reconnect button will not be visible)
+      __instance.ChangeToImportOption();
+
+      // Delete Library option
+      if (libraryOption != null)
+      {
+        libraryOption.rect?.transform.parent?.gameObject.SetActive(false);
+        __instance.wardOptions.Remove(libraryOption);
+      }
+    }
+    else
+    {
+      // Player has connected to AP before, show Reconnect button
+      Plugin.Logger.LogInfo($"[{nameof(ArchipelagoLoginPatch)}] Renaming Library to Reconnect option");
+      // WardOption.rect returns LibrarySign Container.
+      // Library Tab/LibrarySign Container/Button/Text
+      Transform reconnectButtonObject = libraryOption.rect.Find("Button");
+      Image libraryImage = reconnectButtonObject.Find("Icon Image").GetComponent<Image>();
+      libraryImage.sprite = AssetHelper.LoadSprite(
+        AssetHelper.AssetType.WardIcons.TYPE,
+        AssetHelper.AssetType.WardIcons.RECONNECT
+      );
+      libraryImage.rectTransform.localScale = new Vector3(1.5f, 1.5f, 1.5f); // looks similar enough to other icons scale
+      reconnectButtonObject.Find("Text").GetComponent<Text>().text = RDString.Get("archipelago.button.reconnect");
     }
 
+    // Delete Steam Workshop option
     if (workshopOption != null)
     {
       workshopOption.rect?.transform.parent?.gameObject.SetActive(false);
@@ -54,17 +80,17 @@ internal static class ArchipelagoLoginPatch
     #endregion
 
     #region Import to Archipelago option
-    Plugin.Logger.LogInfo("Renaming Import to Archipelago option");
+    Plugin.Logger.LogInfo($"[{nameof(ArchipelagoLoginPatch)}] Renaming Import to Archipelago option");
     // WardOption.rect returns ImportSign Container.
     // ImportLevels/ImportSign Container/Button/Text
-    Transform buttonObject = importOption.rect.Find("Button");
-    Image importImage = buttonObject.Find("Icon Image").GetComponent<Image>();
+    Transform importButtonObject = importOption.rect.Find("Button");
+    Image importImage = importButtonObject.Find("Icon Image").GetComponent<Image>();
     importImage.sprite = AssetHelper.LoadSprite(
       AssetHelper.AssetType.WardIcons.TYPE,
       AssetHelper.AssetType.WardIcons.ARCHIPELAGO
     );
     importImage.rectTransform.localScale = new Vector3(1.5f, 1.5f, 1.5f); // looks similar enough to other icons scale
-    buttonObject.Find("Text").GetComponent<Text>().text = RDString.Get("archipelago.loginButton");
+    importButtonObject.Find("Text").GetComponent<Text>().text = RDString.Get("archipelago.button.login");
     #endregion
 
     #region Hiding other Install Levels options
@@ -81,6 +107,38 @@ internal static class ArchipelagoLoginPatch
 
     // Fix UI breaking after changing selection
     __instance._currentWardOptionIndex = 0;
+  }
+
+  [HarmonyPatch(typeof(scnCLS), nameof(scnCLS.LoadLevelsData))]
+  [HarmonyPrefix]
+  private static void OverrideLibraryButtonPatch(ref IEnumerator __result, ref bool __runOriginal, scnCLS __instance)
+  {
+    // TODO: doesn't work for other modes
+    __result = null!; // yes this works
+    __runOriginal = false;
+
+    LoginInformation? loginInformation = Configuration.PriorLoginInformation;
+    if (!loginInformation.HasValue)
+    {
+      Plugin.Logger.LogWarning(
+        $"[{nameof(ArchipelagoLoginPatch)}] Somehow activated Reconnect button with no/invalid login information!! Ignoring..."
+      );
+      return;
+    }
+
+    // emulate standard login flow with information, like in CafeLink
+    string text =
+      loginInformation.Value.Uri + '\n' + loginInformation.Value.SlotName + '\n' + loginInformation.Value.Password;
+
+    __instance.ChangeToImportOption();
+    __instance.SelectWardOption();
+    // note we change InputField as opposed to Text because InputField still controls the Text at this point,
+    // it will reset Text.text to whatever is in InputField.text.
+    __instance
+      .levelImporter.transform.Find("screen/Contents/InsertURL Container/URL InputField")
+      .GetComponent<InputField>()
+      .text = text;
+    scnCLS.instance.levelImporter.Install_Public();
   }
 
   [HarmonyPatch(typeof(LevelImporter), nameof(LevelImporter.Install))]
@@ -112,7 +170,7 @@ internal static class ArchipelagoLoginPatch
       .GetComponent<Text>()
       .text;
     string[] text = rawText.Split('\n').Select(text => text.Trim()).ToArray();
-    Plugin.Logger.LogInfo($"Input: '{text.Join()}' (raw: {Convert.ToBase64String(Encoding.UTF8.GetBytes(rawText))}");
+    Plugin.Logger.LogInfo($"Input: '{text.Join()}' (raw: {Convert.ToBase64String(Encoding.UTF8.GetBytes(rawText))})");
 
     if (text.Length < 2)
     {
@@ -155,7 +213,9 @@ internal static class ArchipelagoLoginPatch
     // Attempt to log in with the information given.
     Plugin.Logger.LogInfo($"[{nameof(ArchipelagoLoginPatch)}] Creating client");
     // TODO: use URIs. `new Uri($"ws://{url}")` likes throwing errors..
-    Plugin.StoryClient = new StoryClient(new LoginInformation(Mode.Main, url, name, password));
+    LoginInformation loginInformation = new(Mode.Main, url, name, password);
+    Configuration.PriorLoginInformation = loginInformation;
+    Plugin.StoryClient = new StoryClient(loginInformation);
     Plugin.StoryClient.CreateSession();
 
     // Should be safe in this context

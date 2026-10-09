@@ -8,6 +8,7 @@ internal static class AssetHelper
     {
       internal const string TYPE = "WardIcons";
       internal const string ARCHIPELAGO = "Archipelago.png";
+      internal const string RECONNECT = "Reconnect.png";
     }
   }
 
