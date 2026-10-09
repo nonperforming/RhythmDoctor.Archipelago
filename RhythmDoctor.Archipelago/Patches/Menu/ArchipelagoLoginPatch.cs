@@ -58,10 +58,12 @@ internal static class ArchipelagoLoginPatch
     // WardOption.rect returns ImportSign Container.
     // ImportLevels/ImportSign Container/Button/Text
     Transform buttonObject = importOption.rect.Find("Button");
-    buttonObject.Find("Icon Image").GetComponent<Image>().sprite = AssetHelper.LoadSprite(
+    Image importImage = buttonObject.Find("Icon Image").GetComponent<Image>();
+    importImage.sprite = AssetHelper.LoadSprite(
       AssetHelper.AssetType.WardIcons.TYPE,
       AssetHelper.AssetType.WardIcons.ARCHIPELAGO
     );
+    importImage.rectTransform.localScale = new Vector3(1.5f, 1.5f, 1.5f); // looks similar enough to other icons scale
     buttonObject.Find("Text").GetComponent<Text>().text = RDString.Get("archipelago.loginButton");
     #endregion
 
