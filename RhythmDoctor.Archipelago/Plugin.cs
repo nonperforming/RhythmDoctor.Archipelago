@@ -104,14 +104,27 @@ public class Plugin : BaseUnityPlugin
     //       It would require we pull from game files though...
     //       ...it wouldn't work on CI.
     //       Probably write a script or something that just fetches the required resources and outputs a C# file.
-    Version builtForVersion = new("1.1.2");
-    const int RELEASE_NUMBER = 42;
-    const string RELEASE_HASH = "a71fd77";
-    const string RELEASE_DATE = "2026/07/31 10:50 PM";
+    Version builtForVersion = new("1.2.0");
+    const int RELEASE_NUMBER = 43;
+    const string RELEASE_HASH = "ea32898";
+    const string RELEASE_DATE = "2026/10/07 2:34 AM";
 
     // https://patorjk.com/software/taag/#p=display&f=Future+Smooth&t=Please+update+your+game!!!
     // TODO: parse date for same version and release number but differing hash
     Version thisVersion = new(Application.version);
+    if (!GC.onBetaBranch)
+    {
+      // csharpier-ignore-start
+      Logger.LogWarning( "================================================================================");
+      Logger.LogWarning( "|                ╭─╮╷  ╭─╴╭─╮╭─╮╭─╴   ╷ ╷╭─╮╭─╴   ╭╮ ╭─╴╶┬╴╭─╮                 |");
+      Logger.LogWarning( "|                ├─╯│  ├╴ ├─┤╰─╮├╴    │ │╰─╮├╴    ├┴╮├╴  │ ├─┤                 |");
+      Logger.LogWarning( "|                ╵  ╰─╴╰─╴╵ ╵╰─╯╰─╴   ╰─╯╰─╯╰─╴   ╰─╯╰─╴ ╵ ╵ ╵                 |");
+      Logger.LogWarning( "================================================================================");
+      Logger.LogWarning( "This mod is built on the beta versions of Rhythm Doctor,");
+      Logger.LogWarning( "you might get unexpected issues on the stable branch/previous versions.");
+      Logger.LogWarning( "================================================================================");
+      // csharpier-ignore-end
+    }
     if (Releases.releaseNumber < RELEASE_NUMBER || thisVersion < builtForVersion)
     {
       // csharpier-ignore-start
