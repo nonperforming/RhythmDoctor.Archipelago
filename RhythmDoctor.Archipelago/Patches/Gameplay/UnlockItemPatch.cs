@@ -119,7 +119,7 @@ internal static class UnlockItemPatch
       (__instance.GetSelectableEntity("2-B1"), true, null), // bonus level
       (__instance.GetSelectableEntity("5-B1"), true, null), // bonus level
       (__instance.GetSelectableEntity("5-1"), true, true), // 5-1N before 5-1
-      (__instance.GetSelectableEntity("6-1"), true, true), // record room levels before 6-1
+      (__instance.GetSelectableEntity("6-2"), true, true), // record room levels before 6-1
       (__instance.GetSelectableEntity("6-X"), true, true), // record room levels before 6-1
       (__instance.GetSelectableEntity("7-1"), true, true), // record room levels before 6-1
       (__instance.GetSelectableEntity("1-X"), null, true), // 1-XN
@@ -431,7 +431,8 @@ internal static class UnlockItemPatch
     Plugin.Logger.LogInfo($"[{nameof(UnlockItemPatch)}] Attempting to unlock all boss songs");
     foreach (Act act in Enum.GetValues(typeof(Act)))
     {
-      TryUnlockBossSong(act, initial);
+      if (act != Act.None)
+        TryUnlockBossSong(act, initial);
     }
   }
 
@@ -456,7 +457,6 @@ internal static class UnlockItemPatch
           Persistence.SetLevelRank(levelBoss, Rank.NotFinished);
         }
       }
-
       return true;
     }
     Plugin.Logger.LogDebug($"[{nameof(UnlockItemPatch)}] Does not meet requirements to unlock {act}'s boss song");
@@ -466,9 +466,7 @@ internal static class UnlockItemPatch
   private static bool HasUnlockedBossSong(Act act)
   {
     if (act == Act.None)
-    {
       return false;
-    }
 
     Plugin.Logger.LogDebug($"Checking act {act}");
     int clearedInAct = 0;
