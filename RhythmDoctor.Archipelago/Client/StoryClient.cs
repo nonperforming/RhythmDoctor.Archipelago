@@ -218,9 +218,11 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     if (State != ClientState.Ready)
       throw new InvalidOperationException("Not ready to process new items yet");
 
+    Plugin.Logger.LogDebug($"[{nameof(StoryClient)}] Processing new received items");
     while (Session!.Items.Any())
     {
       ItemInfo itemInfo = Session!.Items.DequeueItem();
+      Plugin.Logger.LogDebug($"[{nameof(StoryClient)}] Dequeued item {itemInfo.ItemName} ({itemInfo.ItemId})");
       HandleItem(itemInfo);
     }
   }
