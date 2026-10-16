@@ -41,6 +41,30 @@ internal static class ClearStoryLocationPatch
   }
 
   /// <summary>
+  /// Disable <see cref="DeathLinkPatch"/> when hitting a Finish Level event.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// It's possible to get a DeathLink after we hit a Finish Level event.
+  /// </para>
+  /// <para>
+  /// If hit after the nth Finish Level event:
+  /// <list type="bullet">
+  /// <item>first (darken screen): real rank changes (locations lost)</item>
+  /// <item> second (letter rank shown): or second (locations send, visible mistakes count changes, desyncs with locations sent display)</item>
+  /// <item>third/fourth: nothing really changes just sfx, heart breaks</item>
+  /// </list>
+  /// So we need to disable it here.
+  /// </para>
+  /// </remarks>
+  [HarmonyPatch(typeof(Rankscreen), nameof(Rankscreen.AdvanceGameover))]
+  [HarmonyPostfix]
+  private static void DisableDeathLinkWhenClearingLevelPatch()
+  {
+    DeathLinkPatch.enabled = false;
+  }
+
+  /// <summary>
   /// Send relevant locations (and end goal if applicable) when clearing a level.
   /// </summary>
   /// <seealso cref="MiracleDefibrillatorClearLocationPatch"/>
