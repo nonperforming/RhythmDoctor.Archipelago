@@ -104,10 +104,10 @@ public class Plugin : BaseUnityPlugin
     //       It would require we pull from game files though...
     //       ...it wouldn't work on CI.
     //       Probably write a script or something that just fetches the required resources and outputs a C# file.
-    Version builtForVersion = new("1.2.0");
+    Version builtForVersion = new("1.2.1");
     const int RELEASE_NUMBER = 43;
-    const string RELEASE_HASH = "ea32898";
-    const string RELEASE_DATE = "2026/10/07 2:34 AM";
+    const string RELEASE_HASH = "ce43e1b";
+    const string RELEASE_DATE = "2026/10/14 6:07 PM";
 
     // https://patorjk.com/software/taag/#p=display&f=Future+Smooth&t=Please+update+your+game!!!
     // TODO: parse date for same version and release number but differing hash
