@@ -426,6 +426,36 @@ internal static class UnlockItemPatch
     }
   }
 
+  /// <summary>
+  /// <para>
+  /// FIXME: For some unknown reason, for certain players levels don't unlock normally and they have to
+  /// go through the fallback (<see cref="UnlockBonusItemsPatch"/>) unlock in order to get new levels.
+  /// </para>
+  /// <para>
+  /// It looks like <see cref="StoryLevelItemProcessorClientComponent.HandleItem"/> isn't firing?! (No logs.)
+  /// But <see cref="StoryClient"/> doesn't log about an item falling through all processors,
+  /// so it must have been handled somehow.
+  /// </para>
+  /// </summary>
+  [HarmonyPatch(nameof(scnLevelSelect.Update))]
+  [HarmonyPostfix]
+  private static void FixLevelsNotUnlockingProperlyForSomeReasonWhyPatch(scnLevelSelect __instance)
+  {
+    // TODO: Find what is actually causing this and fix it
+    // ReSharper disable once NullableWarningSuppressionIsUsed
+    foreach (ItemInfo item in Plugin.StoryClient.Session!.Items.AllItemsReceived)
+    {
+      if (Bindings.KeyItemIdToWard.TryGetValue(item.ItemId, out Region region))
+      {
+        scnLevelSelect.instance.UnlockEntrance(region);
+      }
+      else if (Bindings.ItemIdToLevel.TryGetValue(item.ItemId, out Level level))
+      {
+        Persistence.SetLevelRank(level, Rank.NotFinished, false, false);
+      }
+    }
+  }
+
   internal static void TryUnlockAllBossSongs(bool initial = false)
   {
     Plugin.Logger.LogInfo($"[{nameof(UnlockItemPatch)}] Attempting to unlock all boss songs");
