@@ -157,11 +157,6 @@ internal readonly struct StorySlotData
   internal readonly string[] stickyTraps;
 
   /// <summary>
-  /// Dictates if perfect rank locations are included in the world or not.
-  /// </summary>
-  internal readonly bool perfectRankLocations;
-
-  /// <summary>
   /// The names of the traps that should always be applied whenever possible.
   /// </summary>
   /// <remarks>
@@ -169,6 +164,11 @@ internal readonly struct StorySlotData
   /// </remarks>
   // TODO: When Sticky Traps are implemented, fix the cref to link to the specific field.
   //internal readonly string[] stickyPowerups;
+
+  /// <summary>
+  /// Dictates if perfect rank locations are included in the world or not.
+  /// </summary>
+  internal readonly bool perfectRankLocations;
 
   /// <summary>
   /// Dictates if DeathLink is on for this slot.
@@ -210,4 +210,19 @@ internal readonly struct StorySlotData
       _ => throw new ArgumentOutOfRangeException(nameof(act), act, null),
     };
   }
+
+  public override string ToString() =>
+    $"End Goal: {endGoal}, "
+    + $"Boss Unlock Requirement: {bossUnlockRequirement} "
+    + $"(1: {act1BossUnlockRequirement}, "
+    + $"2: {act2BossUnlockRequirement}, "
+    + $"3: {act3BossUnlockRequirement}, "
+    + $"4: {act4BossUnlockRequirement}, "
+    + $"5: {act5BossUnlockRequirement}, "
+    + $"6: {act6BossUnlockRequirement}, "
+    + $"7: {act7BossUnlockRequirement}), "
+    + $"Sticky Traps: {stickyTraps.Join()}, "
+    + $"Sticky Powerups: (NYI), " // TODO: When sticky traps are implemented
+    + $"Perfect Locations: {perfectRankLocations}, "
+    + $"DeathLink: {deathLink}";
 }
