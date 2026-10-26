@@ -101,7 +101,25 @@ internal sealed class ArchipelagoModifierManagerClientComponent
     TryApplyChosenModifiersForLevel(level);
   }
 
-  internal void ReturnActiveModifiersToQueue()
+  public override void ClearAllChosenModifiers()
+  {
+    base.ClearAllChosenModifiers();
+    _modifierAndIndexPairs.Clear();
+  }
+
+  public override void ClearAllPreviewModifiers()
+  {
+    base.ClearAllPreviewModifiers();
+    _modifierAndIndexPairs.Clear();
+  }
+
+  public override void ClearAllActiveModifiers()
+  {
+    base.ClearAllActiveModifiers();
+    _modifierAndIndexPairs.Clear();
+  }
+
+  private void ReturnTrapIndexToQueue()
   {
     // We iterate in reverse because _trapAndIndexPairs is guaranteed to be ordered from the
     //  lowest index to the highest index, so we don't have to manipulate the index this way.
@@ -122,8 +140,19 @@ internal sealed class ArchipelagoModifierManagerClientComponent
       );
       _modifierQueue.Insert(index, uid);
     }
-    ClearAllActiveModifiers();
     _modifierAndIndexPairs.Clear();
+  }
+
+  private void ReturnPreviewModifiersToQueue()
+  {
+    ReturnTrapIndexToQueue();
+    ClearAllPreviewModifiers();
+  }
+
+  internal void ReturnActiveModifiersToQueue()
+  {
+    ReturnTrapIndexToQueue();
+    ClearAllActiveModifiers();
   }
 
   protected override float GetModifierStrength(IModifier modifier)
