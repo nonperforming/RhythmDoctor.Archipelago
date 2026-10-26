@@ -18,6 +18,18 @@ internal sealed class ArchipelagoModifierManagerClientComponent
   private IEnumerable<string> _stickyModifiers = null!;
   private int _stickyActivatedCount = 0;
 
+  internal ArchipelagoModifierManagerClientComponent()
+  {
+    Plugin.Logger.LogInfo($"[{nameof(ArchipelagoModifierManagerClientComponent)}] Binding level deselect event");
+    Events.Instance.LevelDeselected += OnLevelDeselected;
+  }
+
+  private void OnLevelDeselected(object _, EventArgs _1)
+  {
+    Plugin.Logger.LogDebug($"[{nameof(ArchipelagoModifierManagerClientComponent)}] Level deselected");
+    ReturnPreviewModifiersToQueue();
+  }
+
   public Task Enable(StoryClient client, ArchipelagoSession session)
   {
     // Apply AssistPatches
