@@ -28,4 +28,6 @@ internal struct LoginInformation(Mode mode, string uri, string slotName, string?
   /// Password for the Archipelago server.
   /// </summary>
   internal readonly string? Password = password;
+
+  public override string ToString() => $"Mode: {Mode}, Uri: {Uri}, SlotName: {SlotName}, Password: {Password}";
 }
