@@ -2,9 +2,13 @@ namespace RhythmDoctor.Archipelago.Modifiers;
 
 internal abstract class ModifierManagerStoryLevelSelect : ModifierManagerBase, IDisposable
 {
-  internal ModifierManagerStoryLevelSelect()
+  internal ModifierManagerStoryLevelSelect(bool bindDeselectEvent = true)
   {
-    Events.Instance.LevelDeselected += OnLevelDeselected;
+    if (bindDeselectEvent)
+    {
+      Plugin.Logger.LogInfo($"[{nameof(ModifierManagerStoryLevelSelect)}] Binding level deselect event");
+      Events.Instance.LevelDeselected += OnLevelDeselected;
+    }
   }
 
   private void OnLevelDeselected(object _, EventArgs _1)

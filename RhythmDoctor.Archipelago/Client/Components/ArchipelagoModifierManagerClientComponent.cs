@@ -19,6 +19,7 @@ internal sealed class ArchipelagoModifierManagerClientComponent
   private int _stickyActivatedCount = 0;
 
   internal ArchipelagoModifierManagerClientComponent()
+    : base(false)
   {
     Plugin.Logger.LogInfo($"[{nameof(ArchipelagoModifierManagerClientComponent)}] Binding level deselect event");
     Events.Instance.LevelDeselected += OnLevelDeselected;
