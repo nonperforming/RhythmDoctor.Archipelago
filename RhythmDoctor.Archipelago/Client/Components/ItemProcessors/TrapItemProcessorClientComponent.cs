@@ -27,6 +27,7 @@ internal class TrapItemProcessorClientComponent : ItemProcessorClientComponent
       else
         remote = remoteJToken.ToObject<uint>();
 
+      Plugin.Logger.LogInfo($"[{nameof(TrapItemProcessorClientComponent)}] Remote {trapUid} = {remote}");
       _remoteTrapClearCache[trapUid] = remote;
     }
 
