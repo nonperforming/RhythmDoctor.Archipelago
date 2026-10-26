@@ -2,9 +2,15 @@ namespace RhythmDoctor.Archipelago.Modifiers;
 
 internal abstract class ModifierManagerBase : IDisposable
 {
+#if DEBUG // so DebugMenu can see inside
+  protected internal List<IModifier> _chosenModifiers = [];
+  protected internal List<IModifier> _previewModifiers = [];
+  protected internal List<IModifier> _activeModifiers = [];
+#else
   protected List<IModifier> _chosenModifiers = [];
   protected List<IModifier> _previewModifiers = [];
   protected List<IModifier> _activeModifiers = [];
+#endif
 
   /// <summary>
   /// Attempts to add a modifier to <see cref="_chosenModifiers"/>.

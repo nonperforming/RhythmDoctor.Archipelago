@@ -8,8 +8,13 @@ internal sealed class ArchipelagoModifierManagerClientComponent
   /// <inheritdoc cref="IClientComponent.AssistPatches" />
   public IEnumerable<Type> AssistPatches => [typeof(ArchipelagoModifierManagerPatch)];
 
+#if DEBUG // so DebugMenu can see inside
+  internal readonly List<string> _modifierQueue = [];
+  internal readonly List<(int index, string Uid)> _modifierAndIndexPairs = [];
+#else
   private readonly List<string> _modifierQueue = [];
   private readonly List<(int index, string Uid)> _modifierAndIndexPairs = [];
+#endif
   private IEnumerable<string> _stickyModifiers = null!;
   private int _stickyActivatedCount = 0;
 
