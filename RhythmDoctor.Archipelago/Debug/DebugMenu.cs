@@ -11,6 +11,7 @@ public class DebugMenu : MonoBehaviour
   {
     None,
     Main,
+    Client,
     Patches,
     Levels,
   }
@@ -44,6 +45,8 @@ public class DebugMenu : MonoBehaviour
     {
       if (Input.GetKeyDown(KeyCode.F3))
         return ActivatedGUI.Main;
+      else if (Input.GetKeyDown(KeyCode.F4))
+        return ActivatedGUI.Client;
       else if (Input.GetKeyDown(KeyCode.F5))
         return ActivatedGUI.Patches;
       else if (Input.GetKeyDown(KeyCode.F6))
@@ -99,6 +102,36 @@ public class DebugMenu : MonoBehaviour
           Notify("Applying disable achievement patch");
           Harmony.CreateAndPatchAll(typeof(DisableSteamAchievementsPatch), Plugin.PATCH_ID_DEBUG);
         }
+        break;
+      case ActivatedGUI.Client:
+        GUI.Box(new Rect(10, 10, 1830, 900), "Rhythm Doctor Archipelago Client Debug");
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        if (Plugin.StoryClient is null)
+        {
+          GUI.TextArea(new Rect(30, 30, 1800, 870), "No client");
+          break;
+        }
+
+        StoryClient cl = Plugin.StoryClient;
+        // technically not the correct type but makes it super easy to copy-paste
+        // I hope your resolution is at least 1920x1080...
+        // csharpier-ignore-start
+        GUI.TextArea(
+          new Rect(30, 30, 1800, 870),
+          $"""
+          Type: {cl.GetType().AssemblyQualifiedName}
+          State: {cl.State}
+          Login Information: {cl.LoginInformation}
+          Slot Data: {cl.Slot}
+          Components: {cl.ClientComponents.Select(__component => __component.GetType().AssemblyQualifiedName).Join()}
+          DeathLink Component?: {cl.DeathLinkComponent is null}
+          Modifiers (Queue): {cl.ModifierManagerComponent?._modifierQueue.Join()}
+          Modifiers (Chosen): {cl.ModifierManagerComponent?._chosenModifiers.Select(__modifier => __modifier.Uid).Join()}
+          Modifiers (Preview): {cl.ModifierManagerComponent?._previewModifiers.Select(__modifier => __modifier.Uid).Join()}
+          Modifiers (Active): {cl.ModifierManagerComponent?._activeModifiers.Select(__modifier => __modifier.Uid).Join()}
+          Modifiers (idx pairs): {cl.ModifierManagerComponent?._modifierAndIndexPairs.Join()}
+          """);
+        // csharpier-ignore-end
         break;
       case ActivatedGUI.Patches:
         GUI.Box(new Rect(10, 10, 330, 890), "Rhythm Doctor Archipelago Patches Debug");
