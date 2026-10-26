@@ -27,7 +27,6 @@ internal static class ClearStoryLocationPatch
     if (!Enum.TryParse(scnGame.internalIdentifier, out Level level))
     {
       Plugin.Logger.LogError($"Couldn't find Level. Level identifier: {scnGame.internalIdentifier}");
-      Plugin.StoryClient.ModifierManagerComponent.ReturnActiveModifiersToQueue();
       return;
     }
 
@@ -243,11 +242,13 @@ internal static class ClearStoryLocationPatch
       if (!ids.Any())
       {
         __instance.game.statusText.SetStatusText(RDString.Get("archipelago.rankscreen.nothing"));
+        Plugin.StoryClient.ModifierManagerComponent?.ReturnActiveModifiersToQueue();
         return;
       }
       else if (newLocations.Length == 0)
       {
         __instance.game.statusText.SetStatusText(RDString.Get("archipelago.rankscreen.nothingNew"));
+        Plugin.StoryClient.ModifierManagerComponent?.ReturnActiveModifiersToQueue();
         return;
       }
 
@@ -293,6 +294,7 @@ internal static class ClearStoryLocationPatch
 #pragma warning restore Harmony003
     {
       Plugin.Logger.LogInfo("Setting goal achieved - Helping Hands");
+      // TODO: if already goaled, show message.
       Plugin.StoryClient.Session.SetGoalAchieved();
     }
     else if (Plugin.StoryClient.Slot.endGoal != StorySlotData.EndGoal.HelpingHands)
@@ -326,6 +328,7 @@ internal static class ClearStoryLocationPatch
           $"[{nameof(CustomClearLocationPatch)}] Setting goal achieved - Cleared all with {minimumRank}"
         );
         Plugin.StoryClient.Session.SetGoalAchieved();
+        // TODO: if already goaled, show message.
       }
     }
 
@@ -375,7 +378,7 @@ internal static class ClearStoryLocationPatch
     if (!Enum.TryParse(scnGame.internalIdentifier, out Level level))
     {
       Plugin.Logger.LogError($"Couldn't find Level. Level identifier: {scnGame.internalIdentifier}");
-      //Plugin.StoryClient.ModifierManagerComponent.ClearActiveTraps(false);
+      Plugin.StoryClient.ModifierManagerComponent.ReturnActiveModifiersToQueue();
       throw new ArgumentOutOfRangeException($"Couldn't find level {scnGame.internalIdentifier}");
     }
 
