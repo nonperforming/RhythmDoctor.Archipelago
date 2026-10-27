@@ -10,9 +10,24 @@ updates:
       - dependency-name: "UnityEngine.Modules"
       - dependency-name: "Microsoft.NETFramework.ReferenceAssemblies"
       - dependency-name: "csharpier"
+    registries:
+      - nuget
+      - bepinex
+      - samboy
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
     assignees:
       - "nonperforming"
+
+registries:
+  nuget:
+    type: "nuget-feed"
+    url: "https://api.nuget.org/v3/index.json"
+  bepinex:
+    type: "nuget-feed"
+    url: "https://nuget.bepinex.dev/v3/index.json"
+  samboy:
+    type: "nuget-feed"
+    url: "https://nuget.samboy.dev/v3/index.json"
