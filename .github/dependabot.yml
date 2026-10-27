@@ -7,8 +7,11 @@ updates:
     assignees:
       - "nonperforming"
     ignore:
+      # Pinned to game (Unity) version
       - dependency-name: "UnityEngine.Modules"
+      - dependency-name: "System.Text.Encodings.Web"
       - dependency-name: "Microsoft.NETFramework.ReferenceAssemblies"
+      # Formatting style can change with updates
       - dependency-name: "csharpier"
     registries:
       - nuget
