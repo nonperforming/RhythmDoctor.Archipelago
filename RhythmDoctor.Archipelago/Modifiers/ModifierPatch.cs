@@ -29,7 +29,7 @@ internal abstract class ModifierPatch<T>
 
   public virtual void Preview(float strength)
   {
-    Plugin.Logger.LogDebug($"[{TName}] Preview; applying preview patches");
+    Plugin.Logger.LogDebug($"[{TName}:{nameof(Preview)}] Applying preview patches");
     foreach (Type previewPatch in PreviewPatches)
     {
       _previewHarmony.PatchAll(previewPatch);
@@ -38,13 +38,13 @@ internal abstract class ModifierPatch<T>
 
   public virtual void PreviewEnd()
   {
-    Plugin.Logger.LogDebug($"[{TName}] PreviewEnd; unapplying preview patches");
+    Plugin.Logger.LogDebug($"[{TName}:{nameof(PreviewEnd)}] Unapplying preview patches");
     _previewHarmony.UnpatchSelf();
   }
 
   public virtual void Active(float strength)
   {
-    Plugin.Logger.LogDebug($"[{TName}] Active; applying active patches");
+    Plugin.Logger.LogDebug($"[{TName}:{nameof(Active)}] Applying active patches");
     foreach (Type activePatch in ActivePatches)
     {
       _activeHarmony.PatchAll(activePatch);
@@ -53,7 +53,7 @@ internal abstract class ModifierPatch<T>
 
   public virtual void ActiveEnd()
   {
-    Plugin.Logger.LogDebug($"[{TName}] ActiveEnd; unapplying active patches");
+    Plugin.Logger.LogDebug($"[{TName}:{nameof(ActiveEnd)}] Unapplying active patches");
     _activeHarmony.UnpatchSelf();
   }
 }

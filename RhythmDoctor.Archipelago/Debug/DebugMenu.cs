@@ -36,7 +36,7 @@ public class DebugMenu : MonoBehaviour
       LEDSign.status = toShow;
     }
     catch (NullReferenceException) { }
-    Plugin.Logger.LogDebug(toShow);
+    Plugin.Logger.LogDebug($"[{nameof(DebugMenu)}]" + toShow);
   }
 
   private ActivatedGUI GUIButton
