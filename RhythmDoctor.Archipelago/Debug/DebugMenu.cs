@@ -100,7 +100,7 @@ public class DebugMenu : MonoBehaviour
         if (GUI.Button(new Rect(30, 90, 300, 20), "Disable Steam Achievements"))
         {
           Notify("Applying disable achievement patch");
-          Harmony.CreateAndPatchAll(typeof(DisableSteamAchievementsPatch), Plugin.PATCH_ID_DEBUG);
+          PatchHelper.ApplyPatches(PatchHelper.PATCH_ID_DEBUG, typeof(DisableSteamAchievementsPatch));
         }
         break;
       case ActivatedGUI.Client:
@@ -139,13 +139,13 @@ public class DebugMenu : MonoBehaviour
         if (GUI.Button(new Rect(30, 480, 300, 20), "Unapply post-login patches"))
         {
           Notify("Unapplying post-login patches");
-          Plugin.UnapplyGameplayPatches();
+          PatchHelper.UnapplyPostLoginPatches();
         }
 
         if (GUI.Button(new Rect(30, 510, 300, 20), "Unapply debug patches"))
         {
           Notify("Unapplying debug patches");
-          Plugin.UnapplyDebugPatches();
+          PatchHelper.UnapplyDebugPatches();
         }
         break;
       case ActivatedGUI.Levels:

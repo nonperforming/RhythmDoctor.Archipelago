@@ -27,7 +27,7 @@ internal static class ArchipelagoMainMenuOptionPatch
       return;
 
     __runOriginal = false;
-    Plugin.ApplyArchipelagoMenuPatch();
+    PatchHelper.ApplyArchipelagoMenuPatch();
     __instance.PlayConfirmSound();
     __instance.TransitionToScene("scnCLS");
   }

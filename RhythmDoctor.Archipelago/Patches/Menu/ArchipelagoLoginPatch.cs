@@ -278,7 +278,7 @@ internal static class ArchipelagoLoginPatch
   [HarmonyPostfix]
   private static void UnpatchMenuPatch()
   {
-    Plugin.UnapplyArchipelagoMenuPatch();
+    PatchHelper.UnapplyArchipelagoMenuPatch();
   }
 
   [HarmonyPatch(typeof(scnCLS), nameof(scnCLS.SelectWardOption))]

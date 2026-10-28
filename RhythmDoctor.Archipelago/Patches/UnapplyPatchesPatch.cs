@@ -11,7 +11,7 @@ internal static class UnapplyPatchesPatch
   internal static void TearDownClientPluginPatch()
   {
     Plugin.Logger.LogInfo("Tearing down client plugin");
-    Plugin.UnapplyGameplayPatches();
+    PatchHelper.UnapplyPostLoginPatches();
 
     // Reload data - we wipe Slot 1 (by default) in ArchipelagoLoginPatch, and we do **NOT** want to lose it.
     Persistence.Load();

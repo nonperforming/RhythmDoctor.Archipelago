@@ -23,8 +23,8 @@ internal abstract class ModifierPatch<T>
   public virtual void Initialize()
   {
     Plugin.Logger.LogDebug($"[{TName}] Initializing");
-    _previewHarmony = new($"{Plugin.PATCH_ID_TRAP}.{nameof(T)}.preview");
-    _activeHarmony = new($"{Plugin.PATCH_ID_TRAP}.{nameof(T)}.active");
+    _previewHarmony = new($"{nameof(T)}.preview");
+    _activeHarmony = new($"{nameof(T)}.active");
   }
 
   public virtual void Preview(float strength)

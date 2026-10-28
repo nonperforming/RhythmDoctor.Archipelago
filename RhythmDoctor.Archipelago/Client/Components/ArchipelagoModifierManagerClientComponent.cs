@@ -34,10 +34,7 @@ internal sealed class ArchipelagoModifierManagerClientComponent
   public Task Enable(StoryClient client, ArchipelagoSession session)
   {
     // Apply AssistPatches
-    foreach (Type assistPatch in AssistPatches)
-    {
-      Harmony.CreateAndPatchAll(assistPatch, Plugin.PATCH_ID_POST_LOGIN);
-    }
+    PatchHelper.ApplyPatches(PatchHelper.PATCH_ID_POST_LOGIN, AssistPatches);
 
     // Get sticky traps/powerups from SlotData
     // TODO: support powerups when sticky powerups are implemented in world side

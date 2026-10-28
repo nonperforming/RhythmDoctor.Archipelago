@@ -156,10 +156,9 @@ internal sealed class StoryClient : IDisposable, IAsyncDisposable
     await Task.WhenAll(ClientComponents.Select(__component => __component.Enable(this, Session)).ToArray());
 
     // Apply necessary patches.
-    Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Applying gameplay patches");
-    // TODO: pull this OUT of plugin
-    Plugin.ApplyPatches(Plugin.PATCH_ID_POST_LOGIN, PostLoginPatches);
-    Plugin.ApplyPatches(Plugin.PATCH_ID_SLEEVE_PAINT, typeof(LockSleevePaintPatch));
+    Plugin.Logger.LogInfo($"[{nameof(StoryClient)}] Applying post-login patches");
+    PatchHelper.ApplyPatches(PatchHelper.PATCH_ID_POST_LOGIN, PostLoginPatches);
+    PatchHelper.ApplyPatches(PatchHelper.PATCH_ID_SLEEVE_PAINT, typeof(LockSleevePaintPatch));
 
     // If we got here then SavingPatch has been applied, and this should be safe.
     Persistence.slotPrefs[Configuration.GetSlotToUse()].dict.Clear();

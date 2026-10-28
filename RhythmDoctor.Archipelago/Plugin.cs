@@ -22,35 +22,6 @@ public class Plugin : BaseUnityPlugin
 
   // ReSharper restore NullableWarningSuppressionIsUsed
 
-  internal const string PATCH_ID_ALWAYS_ACTIVE = MyPluginInfo.PLUGIN_GUID;
-#if DEBUG
-  internal const string PATCH_ID_DEBUG = $"{MyPluginInfo.PLUGIN_GUID}.debug";
-#endif
-  internal const string PATCH_ID_ARCHIPELAGO_MENU = $"{MyPluginInfo.PLUGIN_GUID}.cls";
-  internal const string PATCH_ID_POST_LOGIN = $"{MyPluginInfo.PLUGIN_GUID}.post";
-  internal const string PATCH_ID_TRAP = $"{MyPluginInfo.PLUGIN_GUID}.trap";
-  internal const string PATCH_ID_SLEEVE_PAINT = $"{MyPluginInfo.PLUGIN_GUID}.sleevepaint";
-
-  // Harmony's PatchCategories are not available on HarmonyX yet.
-
-  /// <summary>
-  /// Patches that are always applied regardless of Archipelago status.
-  /// </summary>
-  private static readonly Type[] AlwaysActivePatches =
-  [
-    typeof(ArchipelagoMainMenuOptionPatch),
-    typeof(VersionTextPatch),
-    typeof(scnGameExtensions),
-#if DEBUG
-    typeof(CreateDebugMenuPatch),
-    typeof(LogClearLevelPatch),
-    typeof(LogEntityInteractionsPatch),
-    // typeof(LogLoadLevelAssetPatch),
-#endif
-  ];
-
-  private static readonly Type CustomLoginScreenPatch = typeof(ArchipelagoLoginPatch);
-
   /// <summary>
   /// Apply AlwaysActive patches and create the Logger
   /// </summary>
@@ -89,7 +60,7 @@ public class Plugin : BaseUnityPlugin
     }
 
     Logger.LogInfo("Applying always active patches");
-    ApplyPatches(PATCH_ID_ALWAYS_ACTIVE, AlwaysActivePatches);
+    PatchHelper.ApplyAlwaysActivePatches();
 
     Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} loaded");
   }
@@ -164,46 +135,6 @@ public class Plugin : BaseUnityPlugin
     }
   }
 
-  // TODO: see storyclient L144 ("pull this out")
-  internal static void ApplyPatches(string id, params Type[] patches)
-  {
-    Logger.LogInfo($"Applying patches as {id}");
-    Harmony harmony = new(id);
-
-    foreach (Type patch in patches)
-    {
-      Logger.LogInfo($"Applying {patch.Name}");
-      harmony.PatchAll(patch);
-    }
-  }
-
-  internal static void UnapplyGameplayPatches()
-  {
-    Logger.LogInfo("Unapplying gameplay patches");
-    Harmony.UnpatchID(PATCH_ID_POST_LOGIN);
-    Harmony.UnpatchID(PATCH_ID_SLEEVE_PAINT);
-  }
-
-#if DEBUG
-  internal static void UnapplyDebugPatches()
-  {
-    Logger.LogInfo("Unapplying debug patches");
-    Harmony.UnpatchID(PATCH_ID_DEBUG);
-  }
-#endif
-
-  internal static void ApplyArchipelagoMenuPatch()
-  {
-    Logger.LogInfo("Applying Archipelago menu patch");
-    Harmony.CreateAndPatchAll(CustomLoginScreenPatch, PATCH_ID_ARCHIPELAGO_MENU);
-  }
-
-  internal static void UnapplyArchipelagoMenuPatch()
-  {
-    Logger.LogInfo("Unapplying Archipelago menu patch");
-    Harmony.UnpatchID(PATCH_ID_ARCHIPELAGO_MENU);
-  }
-
   #region Cleaning up
   private bool _quitting = false;
 
@@ -220,10 +151,7 @@ public class Plugin : BaseUnityPlugin
 
     Logger.LogWarning("Tearing down plugin. This is unsupported!");
     UnapplyPatchesPatch.TearDownClientPluginPatch();
-    Harmony.UnpatchID(PATCH_ID_ALWAYS_ACTIVE);
-    Harmony.UnpatchID(PATCH_ID_ARCHIPELAGO_MENU);
-    Harmony.UnpatchID(PATCH_ID_POST_LOGIN);
-    Harmony.UnpatchID(PATCH_ID_TRAP);
+    PatchHelper.UnapplyAllPatches();
 #if DEBUG
     DestroyImmediate(GameObject.Find($"/{CreateDebugMenuPatch.DEBUG_MENU_OBJECT_NAME}"));
 #endif

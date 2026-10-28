@@ -28,10 +28,7 @@ internal abstract class ClientComponentBase : IClientComponent
   {
     _client = client;
     _session = session;
-    foreach (Type assistPatch in AssistPatches)
-    {
-      Harmony.CreateAndPatchAll(assistPatch, Plugin.PATCH_ID_POST_LOGIN);
-    }
+    PatchHelper.ApplyPatches(PatchHelper.PATCH_ID_POST_LOGIN, AssistPatches);
     return Task.CompletedTask;
   }
 }
